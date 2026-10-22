@@ -1,0 +1,36 @@
+# Dependencias
+node_modules/
+
+# Base de datos SQLite — cada integrante tiene la suya local
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+server/prisma/dev.db
+
+# Entornos y credenciales (NUNCA SUBIR)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Compilados de Frontend
+dist/
+build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Configuraciones de Editores e IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Comprobantes de pago subidos localmente
+server/uploads/
