@@ -34,3 +34,8 @@ Thumbs.db
 
 # Comprobantes de pago subidos localmente
 server/uploads/
+
+# React Native / Expo
+.expo/
+client-mobile/ios/
+client-mobile/android/
