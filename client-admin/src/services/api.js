@@ -10,7 +10,7 @@ const API_URL = import.meta.env.VITE_API_URL;
  * @returns {Promise<object>} Respuesta parseada { success, data, error }
  */
 export async function fetchAPI(endpoint, opciones = {}) {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
 
   const config = {
     ...opciones,
