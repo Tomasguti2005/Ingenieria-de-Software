@@ -69,3 +69,9 @@ model Pedido {
   fechaCreacion        DateTime     @default(now())
   fechaEntrega         DateTime?
 }
+
+model Vehiculo {
+  id      Int    @id @default(autoincrement())
+  patente String @unique
+  modelo  String
+}
