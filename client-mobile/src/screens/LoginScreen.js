@@ -19,7 +19,9 @@ import {
   Image,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { loginRepartidor } from '../services/auth.service';
+import ThemeToggle from '../components/ThemeToggle';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
@@ -28,6 +30,7 @@ const SEGUNDOS_BLOQUEO = 30;
 
 export default function LoginScreen() {
   const { login } = useAuth();
+  const { colors, esOscuro } = useTheme();
 
   // ── Estado del formulario ──────────────────────────────────────
   const [email, setEmail] = useState('');
@@ -132,16 +135,29 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.page}>
-          <View style={styles.card}>
+        <View style={[styles.page, { backgroundColor: colors.bg }]}>
+          {/* Switch de Tema flotante superior derecho */}
+          <View style={styles.themeToggleFloating}>
+            <ThemeToggle />
+          </View>
+
+          <View
+            style={[
+              styles.card,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+              },
+            ]}
+          >
 
             {/* Encabezado */}
             <View style={styles.header}>
               <View style={styles.logoContainer}>
                 <Image
-                  source={require('../../assets/icon.png')}
+                  source={require('../../assets/logo.png')}
                   style={styles.logoImg}
-                  resizeMode="contain"
+                  resizeMode="cover"
                 />
               </View>
               <Text style={styles.title}>Repartos Ya</Text>
@@ -149,12 +165,18 @@ export default function LoginScreen() {
             </View>
 
             {/* Campo Email */}
-            {/* Campo Email */}
             <View style={styles.formField}>
-              <Text style={styles.label}>Email</Text>
+              <Text style={[styles.label, { color: colors.text }]}>Email</Text>
               <View style={styles.inputWrapper}>
                 <TextInput
-                  style={[styles.input, inputConError === 'email' && styles.inputError]}
+                  style={[
+                    styles.input,
+                    {
+                      backgroundColor: colors.inputBg,
+                      borderColor: inputConError === 'email' ? COLORS.error : colors.border,
+                      color: colors.text,
+                    },
+                  ]}
                   value={email}
                   onChangeText={setEmail}
                   editable={!bloqueado && !cargando}
@@ -164,18 +186,26 @@ export default function LoginScreen() {
                   returnKeyType="next"
                   onSubmitEditing={() => passwordRef.current?.focus()}
                   placeholder="tu@email.com"
-                  placeholderTextColor={COLORS.textMuted}
+                  placeholderTextColor={colors.textMuted}
                 />
               </View>
             </View>
 
             {/* Campo Contraseña */}
             <View style={styles.formField}>
-              <Text style={styles.label}>Contraseña</Text>
+              <Text style={[styles.label, { color: colors.text }]}>Contraseña</Text>
               <View style={styles.inputWrapper}>
                 <TextInput
                   ref={passwordRef}
-                  style={[styles.input, styles.inputWithToggle, inputConError === 'password' && styles.inputError]}
+                  style={[
+                    styles.input,
+                    styles.inputWithToggle,
+                    {
+                      backgroundColor: colors.inputBg,
+                      borderColor: inputConError === 'password' ? COLORS.error : colors.border,
+                      color: colors.text,
+                    },
+                  ]}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!mostrarPassword}
@@ -183,7 +213,7 @@ export default function LoginScreen() {
                   returnKeyType="done"
                   onSubmitEditing={handleSubmit}
                   placeholder="••••••••"
-                  placeholderTextColor={COLORS.textMuted}
+                  placeholderTextColor={colors.textMuted}
                 />
                 <TouchableOpacity
                   style={styles.togglePassword}
@@ -192,9 +222,9 @@ export default function LoginScreen() {
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
                   {mostrarPassword ? (
-                    <FontAwesome name="eye" size={20} color={COLORS.textMuted} />
+                    <FontAwesome name="eye" size={20} color={colors.textMuted} />
                   ) : (
-                    <AntDesign name="eye-invisible" size={20} color={COLORS.textMuted} />
+                    <AntDesign name="eye-invisible" size={20} color={colors.textMuted} />
                   )}
                 </TouchableOpacity>
               </View>
@@ -288,6 +318,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: COLORS.bg,
     padding: 24,
+    position: 'relative',
+  },
+
+  themeToggleFloating: {
+    position: 'absolute',
+    top: 50,
+    right: 24,
+    zIndex: 10,
   },
 
   // ─── Card central ─────────────────────────────────────────────
@@ -313,20 +351,18 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   logoContainer: {
-    width: 72,
-    height: 72,
-    borderRadius: 18,
-    backgroundColor: 'rgba(59, 130, 246, 0.12)',
+    width: 140,
+    height: 70,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(59, 130, 246, 0.25)',
+    borderRadius: 16,
+    overflow: 'hidden',
   },
   logoImg: {
-    width: 48,
-    height: 48,
-    borderRadius: 10,
+    width: '100%',
+    height: '100%',
+    borderRadius: 16,
   },
   title: {
     fontSize: 26,
