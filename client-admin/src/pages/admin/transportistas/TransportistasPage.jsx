@@ -3,6 +3,12 @@
 // Incluye navegación a ficha individual: /admin/transportistas/:id
 
 export default function TransportistasPage() {
-  // TODO: Implementar en Fase 2 (paso 3) y Fase 3 (paso 7)
-  return null;
+  return (
+    <div>
+      <h2 style={{ margin: '0 0 8px 0', fontSize: '20px' }}>Gestión de Transportistas</h2>
+      <p style={{ color: '#94a3b8', fontSize: '14px', margin: 0 }}>
+        Vista post-login (módulo a implementar en Fase 2/3).
+      </p>
+    </div>
+  );
 }

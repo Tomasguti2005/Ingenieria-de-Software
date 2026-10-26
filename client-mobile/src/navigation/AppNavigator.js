@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from '../screens/LoginScreen';
 import ListaPedidosScreen from '../screens/ListaPedidosScreen';
 import DetalleEntregaScreen from '../screens/DetalleEntregaScreen';
+import UserMenu from '../components/UserMenu';
 import { useAuth } from '../context/AuthContext';
 
 const Stack = createNativeStackNavigator();
@@ -18,7 +19,12 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerBackTitle: 'Volver' }}>
+      <Stack.Navigator
+        screenOptions={{
+          headerBackTitle: 'Volver',
+          headerRight: () => (estaAutenticado ? <UserMenu /> : null),
+        }}
+      >
         {!estaAutenticado ? (
           <Stack.Screen
             name="Login"
