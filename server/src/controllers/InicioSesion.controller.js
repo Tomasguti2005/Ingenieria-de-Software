@@ -6,22 +6,21 @@
    500          Ocurrió un error interno del servidor.
 */
 
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const prisma = require('../config/prisma');
 const { success, error } = require('../utils/response');
 
 const intentosFallidos = new Map();
-const TIEMPO_BLOQUEO_MS = 30; // 30 segundos de bloqueo
+const TIEMPO_BLOQUEO_MS = 30 * 1000; // 30 segundos de bloqueo
 const MAX_INTENTOS = 3;
 
 /**
- * Controlador de inicio de sesión adaptado al proyecto Repartos Ya.
- * Espera req.body con { email, password }.
- * Modelo Prisma: Usuario { id, nombre, apellido, email, password, rol, estado, ... }
+ * Lógica de inicio de sesión que valida credenciales, roles y bloqueos.
  */
-const iniciarSesion = async (req, res) => {
+const procesarInicioSesion = async (req, res, rolEsperado) => {
   const { email, password } = req.body || {};
 
-  // Validación de campos obligatorios
   if (!email || !password) {
     return error(res, 'Debe ingresar un email y una contraseña.', 400);
   }
@@ -30,7 +29,6 @@ const iniciarSesion = async (req, res) => {
   const ahora = Date.now();
   const registro = intentosFallidos.get(claveEmail);
 
-  // Verificación de bloqueo temporal
   if (registro && registro.bloqueadoHasta > ahora) {
     return error(res, 'Cuenta bloqueada momentáneamente tras reiterados intentos fallidos.', 423);
   }
@@ -40,15 +38,11 @@ const iniciarSesion = async (req, res) => {
   }
 
   try {
-    // Búsqueda del usuario por email único en la base de datos
     const usuario = await prisma.usuario.findUnique({
       where: { email: claveEmail },
     });
 
-    // Validación de usuario y contraseña
-    // Nota: Por el momento se compara contra texto plano según la base de datos inicial/seed.
-    // Al incorporar bcrypt, aquí se cambiará por await bcrypt.compare(password, usuario.password)
-    if (!usuario || usuario.password !== password) {
+    const registrarIntentoFallido = (mensajeError) => {
       const intentos = (intentosFallidos.get(claveEmail)?.intentos || 0) + 1;
 
       if (intentos >= MAX_INTENTOS) {
@@ -56,26 +50,42 @@ const iniciarSesion = async (req, res) => {
           intentos,
           bloqueadoHasta: ahora + TIEMPO_BLOQUEO_MS,
         });
-
         return error(res, 'Cuenta bloqueada momentáneamente tras 3 intentos fallidos.', 423);
       }
 
       intentosFallidos.set(claveEmail, { intentos });
+      return error(res, mensajeError, 401);
+    };
 
-      // Mensajes específicos que el front-end reconoce para marcar el input exacto
-      const mensaje = usuario ? 'contraseña incorrecta' : 'id invalido';
-      return error(res, mensaje, 401);
+    if (!usuario) {
+      return registrarIntentoFallido('id invalido');
     }
 
-    // Si el usuario es repartidor y se encuentra inactivo, no debe poder iniciar sesión
+    if (usuario.rol !== rolEsperado) {
+      return registrarIntentoFallido('id invalido');
+    }
+
+    let passwordValida = false;
+    try {
+      passwordValida = await bcrypt.compare(password, usuario.password);
+    } catch {
+      passwordValida = false;
+    }
+
+    if (!passwordValida && usuario.password === password) {
+      passwordValida = true;
+    }
+
+    if (!passwordValida) {
+      return registrarIntentoFallido('contraseña incorrecta');
+    }
+
     if (usuario.rol === 'REPARTIDOR' && usuario.estado !== 'ACTIVO') {
       return error(res, 'El usuario repartidor se encuentra inactivo.', 403);
     }
 
-    // Limpieza de intentos fallidos al tener éxito
     intentosFallidos.delete(claveEmail);
 
-    // Datos del usuario que necesita el frontend
     const datosUsuario = {
       id: usuario.id,
       nombre: usuario.nombre,
@@ -85,13 +95,22 @@ const iniciarSesion = async (req, res) => {
       estado: usuario.estado,
     };
 
-    // Formato compatible con el frontend (retornando datos del usuario y estructura estándar)
+    const token = jwt.sign(
+      {
+        id: usuario.id,
+        rol: usuario.rol,
+        email: usuario.email,
+      },
+      process.env.JWT_SECRET || 'secreto_largo_y_aleatorio',
+      { expiresIn: process.env.JWT_EXPIRES_IN || '12h' }
+    );
+
     return success(
       res,
       {
         mensaje: 'Inicio de sesión exitoso.',
         usuario: datosUsuario,
-        token: `jwt-token-${usuario.id}-${Date.now()}`, // Placeholder listo para sustituir por token JWT firmado
+        token,
       },
       200
     );
@@ -101,5 +120,15 @@ const iniciarSesion = async (req, res) => {
   }
 };
 
-module.exports = iniciarSesion;
+const loginAdmin = async (req, res) => {
+  return procesarInicioSesion(req, res, 'ADMIN');
+};
 
+const loginRepartidor = async (req, res) => {
+  return procesarInicioSesion(req, res, 'REPARTIDOR');
+};
+
+module.exports = {
+  loginAdmin,
+  loginRepartidor,
+};

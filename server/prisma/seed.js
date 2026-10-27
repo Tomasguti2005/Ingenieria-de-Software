@@ -24,10 +24,11 @@ async function main() {
     );
   }
 
+  const emailNormalizado = ADMIN_EMAIL.trim().toLowerCase();
   const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
 
   const admin = await prisma.usuario.upsert({
-    where: { email: ADMIN_EMAIL },
+    where: { email: emailNormalizado },
     update: {
       nombre: ADMIN_NOMBRE,
       apellido: ADMIN_APELLIDO,
@@ -35,7 +36,7 @@ async function main() {
       password: passwordHash,
     },
     create: {
-      email: ADMIN_EMAIL,
+      email: emailNormalizado,
       password: passwordHash,
       nombre: ADMIN_NOMBRE,
       apellido: ADMIN_APELLIDO,
