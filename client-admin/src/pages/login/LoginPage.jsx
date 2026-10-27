@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { loginAdmin } from '../../services/auth.service.js';
+import ThemeToggle from '../../components/common/ThemeToggle.jsx';
 import logoImg from '../../assets/logo.png';
 import './LoginPage.css';
 
@@ -129,6 +130,10 @@ export default function LoginPage() {
 
   return (
     <div className="login-page">
+      <div className="login-theme-toggle-wrap">
+        <ThemeToggle />
+      </div>
+
       <div className={cardClass} key={shakeKey}>
 
         {/* Encabezado */}

@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
+import { ThemeProvider } from './context/ThemeContext.jsx';
 import LoginPage from './pages/login/LoginPage.jsx';
 import AdminLayout from './components/layout/AdminLayout.jsx';
 import TransportistasPage from './pages/admin/transportistas/TransportistasPage.jsx';
@@ -13,8 +14,9 @@ import TransportistasPage from './pages/admin/transportistas/TransportistasPage.
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
+      <ThemeProvider>
+        <AuthProvider>
+          <Routes>
           {/* Rutas públicas */}
           <Route path="/login" element={<LoginPage />} />
           {/* <Route path="/seguimiento/:codigo" element={<TrackingPage />} /> */}
@@ -31,7 +33,8 @@ function App() {
           {/* Cualquier ruta desconocida → login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
-      </AuthProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

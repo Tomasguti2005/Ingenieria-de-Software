@@ -1,0 +1,91 @@
+/* ThemeToggle.css — Switch traslúcido con micro-animaciones suaves */
+
+.theme-toggle-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 58px;
+  height: 30px;
+  padding: 3px;
+  background: rgba(22, 27, 34, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+  user-select: none;
+}
+
+.theme-toggle-btn:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(33, 38, 45, 0.85);
+}
+
+/* En tema claro */
+.theme-light .theme-toggle-btn {
+  background: #e2e8f0;
+  border-color: #64748b;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .theme-toggle-btn:hover {
+  background: #cbd5e1;
+  border-color: #475569;
+}
+
+/* Iconos de Sol y Luna dentro del track */
+.theme-toggle-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  z-index: 1;
+  color: #8b949e;
+  transition: color 0.2s ease, opacity 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.theme-toggle-icon.sun {
+  opacity: 0.45;
+}
+
+.theme-toggle-icon.moon {
+  opacity: 0.9;
+  color: #58a6ff;
+}
+
+.theme-light .theme-toggle-icon.sun {
+  opacity: 1;
+  color: #b45309;
+}
+
+.theme-light .theme-toggle-icon.moon {
+  opacity: 0.45;
+  color: #64748b;
+}
+
+/* Perilla circular móvil (Thumb) */
+.theme-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #21262d;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, border-color 0.2s ease;
+  transform: translateX(28px); /* En modo oscuro (predeterminado) está a la derecha */
+}
+
+/* En modo claro la perilla se desliza a la izquierda */
+.theme-light .theme-toggle-thumb {
+  transform: translateX(0px);
+  background: #ffffff;
+  border-color: #94a3b8;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.15);
+}

@@ -6,12 +6,14 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import Sidebar from '../layout/Sidebar.jsx';
+import ThemeToggle from '../common/ThemeToggle.jsx';
 import './AdminLayout.css';
 
 export default function AdminLayout() {
   const { estaAutenticado, logout, usuario } = useAuth();
   const navigate = useNavigate();
 
+  const [sidebarAbierto, setSidebarAbierto] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [modalLogoutAbierto, setModalLogoutAbierto] = useState(false);
   const menuRef = useRef(null);
@@ -34,6 +36,7 @@ export default function AdminLayout() {
     function manejarKeyDown(e) {
       if (e.key === 'Escape') {
         setMenuAbierto(false);
+        setSidebarAbierto(false);
         setModalLogoutAbierto(false);
       }
     }
@@ -71,14 +74,35 @@ export default function AdminLayout() {
 
   return (
     <div className="admin-layout">
-      <Sidebar />
+      <Sidebar abierto={sidebarAbierto} onClose={() => setSidebarAbierto(false)} />
       <div className="admin-main-wrapper">
         <header className="admin-topbar">
-          <div className="admin-topbar-title">
-            Panel de Administración
+          <div className="admin-topbar-left">
+            <button
+              type="button"
+              className={`admin-menu-toggle-btn ${sidebarAbierto ? 'activo' : ''}`}
+              onClick={() => setSidebarAbierto((prev) => !prev)}
+              aria-label="Alternar menú de navegación"
+              title="Menú principal"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+              <span className="admin-menu-toggle-label">Menú</span>
+            </button>
+
+            <div className="admin-topbar-divider" />
+
+            <div className="admin-topbar-title">
+              Repartos Ya <span className="admin-topbar-subtitle">/ Admin</span>
+            </div>
           </div>
 
-          <div className="admin-user-menu-wrapper" ref={menuRef}>
+          <div className="admin-topbar-right">
+            <ThemeToggle />
+            <div className="admin-user-menu-wrapper" ref={menuRef}>
             <button
               type="button"
               className={`admin-user-btn ${menuAbierto ? 'activo' : ''}`}
@@ -86,10 +110,17 @@ export default function AdminLayout() {
               aria-expanded={menuAbierto}
               aria-haspopup="menu"
             >
-              <span className="admin-user-avatar">👤</span>
+              <span className="admin-user-avatar">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </span>
               <span className="admin-user-name">{nombreMostrar}</span>
               <span className="admin-user-badge">Admin</span>
-              <span className={`admin-menu-arrow ${menuAbierto ? 'rotada' : ''}`}>▾</span>
+              <svg className={`admin-menu-arrow ${menuAbierto ? 'rotada' : ''}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
             </button>
 
             {menuAbierto && (
@@ -148,6 +179,7 @@ export default function AdminLayout() {
                 </button>
               </div>
             )}
+            </div>
           </div>
         </header>
 

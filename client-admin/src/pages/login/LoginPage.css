@@ -282,3 +282,46 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* ─── Toggle flotante en Login ──────────────────────────────── */
+.login-theme-toggle-wrap {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 20;
+}
+
+/* ─── Modo Claro Sobrio (Blanco y Grises Suaves) ────────────── */
+.theme-light .login-page {
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f1f5f9;
+  --color-border: #e2e8f0;
+  --color-border-focus: #2563eb;
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(148, 163, 184, 0.08) 0%, transparent 50%);
+}
+
+.theme-light .login-card {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.theme-light .login-input {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.theme-light .login-input:focus {
+  background: #ffffff;
+}
+
+.theme-light .login-input-icon,
+.theme-light .login-toggle-password {
+  color: #64748b;
+}
+
