@@ -4,6 +4,7 @@ import { ThemeProvider } from './context/ThemeContext.jsx';
 import LoginPage from './pages/login/LoginPage.jsx';
 import AdminLayout from './components/layout/AdminLayout.jsx';
 import TransportistasPage from './pages/admin/transportistas/TransportistasPage.jsx';
+import RegistroVehiculoPage from './pages/admin/registro-vehiculo/RegistroVehiculo.jsx';  
 
 // Páginas pendientes de Fase 2/3 — se importarán cuando se implementen:
 // import PedidosPage from './pages/admin/pedidos/PedidosPage.jsx';
@@ -24,6 +25,7 @@ function App() {
           {/* Rutas protegidas del admin — Layout con Sidebar */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="transportistas" element={<TransportistasPage />} />
+            <Route path="registro-vehiculo" element={<RegistroVehiculoPage />} />
             {/* Fases 2 y 3: descomentar cuando estén implementadas */}
             {/* <Route path="pedidos" element={<PedidosPage />} /> */}
             {/* <Route path="rendicion" element={<RendicionPage />} /> */}
