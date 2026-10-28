@@ -1,6 +1,17 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+// Obtener todos los vehículos (para el select del frontend)
+const obtenerVehiculos = async (req, res) => {
+  try {
+    const vehiculos = await prisma.vehiculo.findMany();
+    return res.status(200).json({ success: true, data: vehiculos });
+  } catch (error) {
+    console.error('Error al obtener vehículos:', error);
+    return res.status(500).json({ success: false, error: 'Error al obtener vehículos.' });
+  }
+};
+
 const registrarVehiculo = async (req, res) => {
   try {
     
@@ -49,4 +60,7 @@ const registrarVehiculo = async (req, res) => {
   }
 };
 
-module.exports = { registrarVehiculo };
+module.exports = {
+  registrarVehiculo,
+  obtenerVehiculos
+};

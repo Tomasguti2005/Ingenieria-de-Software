@@ -1,8 +1,12 @@
-const express = require('express');
-const router = express.Router(); // 1. Creamos una sección para agrupar rutas
-const { registrarVehiculo } = require('../controllers/vehiculo.controller');
+const { Router } = require('express');
+const { registrarVehiculo, obtenerVehiculos } = require('../controllers/vehiculo.controller.js');
 
-// 2. Definimos la puerta exacta y quién atiende
+const router = Router();
+
+// Endpoint para el select del frontend (GET /api/vehiculos)
+router.get('/', obtenerVehiculos);
+
+// Endpoint para registrar vehículos (POST /api/vehiculos/registrar)
 router.post('/registrar', registrarVehiculo);
 
 module.exports = router;
