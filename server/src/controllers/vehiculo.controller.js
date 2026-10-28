@@ -16,7 +16,7 @@ const registrarVehiculo = async (req, res) => {
     });
 
     if (vehiculoExistente) {
-      return res.status(400).json({ 
+      return res.status(401).json({ 
         error: 'La patente ingresada ya se encuentra registrada en el sistema' 
       });
     }
@@ -45,7 +45,7 @@ const registrarVehiculo = async (req, res) => {
 
   } catch (error) {
     console.error('Error al registrar vehículo:', error);
-    return res.status(500).json({ error: 'Hubo un error interno en el servidor' });
+    return res.status(500).json({ error });
   }
 };
 

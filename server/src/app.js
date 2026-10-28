@@ -1,9 +1,13 @@
+const cors= require('cors');
 const express = require('express');
 const vehiculoRoutes = require('./routes/vehiculo.routes');
 
 // 1. Inicializamos la aplicación de Express
 const app = express();
-
+app.use(cors({
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+}));
 // 2. Middleware crucial: le dice a Express que procese y entienda el formato JSON
 app.use(express.json());
 
