@@ -86,12 +86,67 @@ export async function obtenerTransportistas() {
   if (USAR_MOCK) {
     return new Promise((resolve) => {
       setTimeout(() => {
-        // Devolvemos una copia para evitar mutaciones accidentales
         resolve([...MOCK_TRANSPORTISTAS]);
-      }, 400); // Pequeña latencia para efecto de carga fluido
+      }, 300);
     });
   }
 
   const respuesta = await fetchAPI('/admin/transportistas');
   return respuesta.data || [];
+}
+
+/**
+ * Registrar un nuevo transportista (Historia: Crear Cuenta al Transportista)
+ * @param {Object} nuevoTransportista
+ * @returns {Promise<object>}
+ */
+export async function crearTransportista(nuevoTransportista) {
+  if (USAR_MOCK) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const creado = {
+          ...nuevoTransportista,
+          id: Date.now(),
+          createdAt: new Date().toISOString(),
+          estado: 'ACTIVO',
+          rol: 'REPARTIDOR',
+        };
+        MOCK_TRANSPORTISTAS.unshift(creado);
+        resolve({ success: true, data: creado });
+      }, 300);
+    });
+  }
+
+  const respuesta = await fetchAPI('/admin/transportistas', {
+    method: 'POST',
+    body: JSON.stringify(nuevoTransportista),
+  });
+  return respuesta;
+}
+
+/**
+ * Eliminar / dar de baja un transportista (Historia: Eliminar Transportista)
+ * @param {number|string} id
+ * @returns {Promise<object>}
+ */
+export async function eliminarTransportista(id) {
+  const idNum = Number(id);
+  if (USAR_MOCK) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const index = MOCK_TRANSPORTISTAS.findIndex((t) => t.id === idNum);
+        if (index === -1) {
+          reject(new Error(`Transportista con ID ${id} no encontrado en el sistema`));
+          return;
+        }
+        const eliminado = MOCK_TRANSPORTISTAS.splice(index, 1)[0];
+        resolve({ success: true, data: eliminado });
+      }, 300);
+    });
+  }
+
+  const respuesta = await fetchAPI(`/admin/transportistas/${id}`, {
+    method: 'DELETE',
+  });
+  return respuesta;
 }

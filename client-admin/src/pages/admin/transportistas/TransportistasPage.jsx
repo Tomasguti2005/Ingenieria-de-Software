@@ -4,7 +4,11 @@
 // Cero emojis, uso exclusivo de iconos vectoriales SVG limpios.
 
 import { useState, useEffect, useMemo } from 'react';
-import { obtenerTransportistas } from '../../../services/transportistas.service.js';
+import {
+  obtenerTransportistas,
+  crearTransportista,
+  eliminarTransportista,
+} from '../../../services/transportistas.service.js';
 import './TransportistasPage.css';
 
 export default function TransportistasPage() {
@@ -19,6 +23,34 @@ export default function TransportistasPage() {
 
   // Modo de prueba para simular base sin datos
   const [simularBaseVacia, setSimularBaseVacia] = useState(false);
+
+  // ─── Estados para Historias de Usuario ──────────────────────────────────────
+  // 1. Alertas de feedback flotantes (Toast)
+  const [alerta, setAlerta] = useState(null);
+
+  // 2. Modal: Crear Transportista
+  const [mostrarModalCrear, setMostrarModalCrear] = useState(false);
+  const [formDataCrear, setFormDataCrear] = useState({
+    nombre: '',
+    apellido: '',
+    email: '',
+    telefono: '',
+    vehiculo: '',
+    password: '',
+  });
+
+  // 3. Modal: Eliminar Transportista
+  const [mostrarModalEliminar, setMostrarModalEliminar] = useState(false);
+  const [transportistaSeleccionadoId, setTransportistaSeleccionadoId] = useState('');
+
+  // Auto-cierre de alertas a los 5 segundos
+  useEffect(() => {
+    if (!alerta) return;
+    const timer = setTimeout(() => {
+      setAlerta(null);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [alerta]);
 
   useEffect(() => {
     async function cargarDatos() {
@@ -81,7 +113,7 @@ export default function TransportistasPage() {
 
   function handleCambioCriterio(nuevoCriterio) {
     setCriterioOrden(nuevoCriterio);
-    setDireccionOrden('asc'); // Predeterminado: A-Z para alfabético, más antiguo para antigüedad
+    setDireccionOrden('asc');
   }
 
   function handleInvertirOrden() {
@@ -118,8 +150,213 @@ export default function TransportistasPage() {
     criterioOrden !== 'alfabetico' ||
     direccionOrden !== 'asc';
 
+  // ─── Manejo de Formularios y Modales ────────────────────────────────────────
+
+  // Manejo de cambios en el formulario de alta
+  function handleChangeCrear(e) {
+    const { name, value } = e.target;
+    setFormDataCrear((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+
+  // ==========================================
+  // HISTORIA 1: CREAR CUENTA DE TRANSPORTISTA
+  // ==========================================
+  async function handleSubmitCrear(e) {
+    e.preventDefault();
+
+    const emailNormalizado = formDataCrear.email.trim().toLowerCase();
+
+    // 1. Campos obligatorios
+    if (
+      !formDataCrear.nombre.trim() ||
+      !formDataCrear.apellido.trim() ||
+      !formDataCrear.email.trim() ||
+      !formDataCrear.telefono.trim() ||
+      !formDataCrear.vehiculo.trim() ||
+      !formDataCrear.password.trim()
+    ) {
+      setAlerta({
+        tipo: 'error',
+        mensaje: 'Por favor, completá todos los campos requeridos.',
+      });
+      return;
+    }
+
+    // 2. Escenario 2: Registro rechazado por email duplicado
+    const emailExiste = transportistas.some(
+      (t) => t.email.toLowerCase() === emailNormalizado
+    );
+
+    if (emailExiste) {
+      setAlerta({
+        tipo: 'error',
+        mensaje:
+          'Operación no permitida: el correo electrónico ya pertenece a otro usuario registrado',
+      });
+      return;
+    }
+
+    // 3. Escenario 3: Registro rechazado por contraseña débil
+    // Estándar de seguridad: al menos 8 caracteres, al menos una letra y un número
+    const tieneLargoMinimo = formDataCrear.password.length >= 8;
+    const tieneLetra = /[a-zA-Z]/.test(formDataCrear.password);
+    const tieneNumero = /\d/.test(formDataCrear.password);
+
+    if (!tieneLargoMinimo || !tieneLetra || !tieneNumero) {
+      setAlerta({
+        tipo: 'error',
+        mensaje: 'La contraseña no cumple con los estándares de seguridad requeridos',
+      });
+      return;
+    }
+
+    // 4. Escenario 1: Alta de cuenta exitosa
+    const nuevoTransportista = {
+      nombre: formDataCrear.nombre.trim(),
+      apellido: formDataCrear.apellido.trim(),
+      email: emailNormalizado,
+      telefono: formDataCrear.telefono.trim(),
+      vehiculo: formDataCrear.vehiculo.trim(),
+      password: formDataCrear.password,
+    };
+
+    try {
+      const res = await crearTransportista(nuevoTransportista);
+      const creado = res.data || {
+        ...nuevoTransportista,
+        id: Date.now(),
+        createdAt: new Date().toISOString(),
+        estado: 'ACTIVO',
+        rol: 'REPARTIDOR',
+      };
+
+      setTransportistas((prev) => [creado, ...prev]);
+
+      setFormDataCrear({
+        nombre: '',
+        apellido: '',
+        email: '',
+        telefono: '',
+        vehiculo: '',
+        password: '',
+      });
+
+      setMostrarModalCrear(false);
+
+      setAlerta({
+        tipo: 'success',
+        mensaje: 'El usuario transportista ha sido creado con éxito',
+      });
+    } catch (err) {
+      setAlerta({
+        tipo: 'error',
+        mensaje: err.message || 'Error al crear la cuenta del transportista.',
+      });
+    }
+  }
+
+  // ==========================================
+  // HISTORIA 2: ELIMINAR TRANSPORTISTA
+  // ==========================================
+  function handleAbrirEliminar() {
+    setTransportistaSeleccionadoId('');
+    setMostrarModalEliminar(true);
+  }
+
+  function handleCerrarEliminar() {
+    setMostrarModalEliminar(false);
+    setTransportistaSeleccionadoId('');
+  }
+
+  async function handleConfirmarEliminacion() {
+    // Escenario 2: No se ha seleccionado al repartidor
+    if (!transportistaSeleccionadoId) {
+      setAlerta({
+        tipo: 'error',
+        mensaje: 'Debe seleccionar un transportista de la lista para proceder con la eliminación.',
+      });
+      return;
+    }
+
+    try {
+      const idNum = Number(transportistaSeleccionadoId);
+      const existe = transportistas.some((t) => t.id === idNum);
+
+      if (!existe) {
+        throw new Error(`El transportista con ID ${transportistaSeleccionadoId} no fue encontrado.`);
+      }
+
+      await eliminarTransportista(idNum);
+
+      // Escenario 1: Se elimina al repartidor de manera exitosa
+      setTransportistas((prev) => prev.filter((t) => t.id !== idNum));
+
+      setAlerta({
+        tipo: 'success',
+        mensaje: 'El transportista ha sido eliminado de forma correcta.',
+      });
+
+      handleCerrarEliminar();
+    } catch (error) {
+      // Escenario 3: Error al eliminar (almacenar en registro de errores del sistema)
+      const logError = {
+        fecha: new Date().toISOString(),
+        origen: 'EliminarTransportista',
+        error: error.message,
+        idTransportistaIntentado: transportistaSeleccionadoId,
+      };
+
+      try {
+        const erroresGuardados = JSON.parse(localStorage.getItem('sistema_errores') || '[]');
+        erroresGuardados.push(logError);
+        localStorage.setItem('sistema_errores', JSON.stringify(erroresGuardados));
+      } catch (_) {}
+
+      console.error('[SISTEMA / LOGS / ERRORES]:', logError);
+
+      setAlerta({
+        tipo: 'error',
+        mensaje:
+          'Ocurrió un error al intentar eliminar el transportista. El error fue registrado en el sistema para su verificación.',
+      });
+    }
+  }
+
   return (
     <div className="transportistas-container">
+      {/* ── Notificación Flotante (Toast) ── */}
+      {alerta && (
+        <div className={`toast-notification toast-${alerta.tipo}`} role="alert">
+          <div className="toast-content">
+            <span className="toast-icon">
+              {alerta.tipo === 'success' ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+              )}
+            </span>
+            <span className="toast-text">{alerta.mensaje}</span>
+          </div>
+          <button
+            type="button"
+            className="toast-close"
+            onClick={() => setAlerta(null)}
+            title="Cerrar aviso"
+          >
+            &times;
+          </button>
+        </div>
+      )}
+
       {/* ── Encabezado Principal ── */}
       <header className="page-header">
         <div className="header-meta">
@@ -132,6 +369,32 @@ export default function TransportistasPage() {
         </div>
 
         <div className="header-actions">
+          {/* Botón de la Historia 1: Crear cuenta al transportista */}
+          <button
+            type="button"
+            className="btn-action-primary"
+            onClick={() => setMostrarModalCrear(true)}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span>Nuevo transportista</span>
+          </button>
+
+          {/* Botón de la Historia 2: Eliminar transportista */}
+          <button
+            type="button"
+            className="btn-action-danger"
+            onClick={handleAbrirEliminar}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            </svg>
+            <span>Eliminar transportista</span>
+          </button>
+
           {/* Toggle de simulación de base vacía para pruebas */}
           <button
             type="button"
@@ -278,12 +541,10 @@ export default function TransportistasPage() {
           <span className="loading-text">Cargando transportistas...</span>
         </div>
       ) : listaBase.length === 0 ? (
-        /* Caso Base: No hay transportistas cargados aún en el sistema (Solo texto en negrita) */
         <div className="state-card empty-base text-only">
           <h2 className="empty-title">Aún no hay transportistas cargados en el sistema</h2>
         </div>
       ) : transportistasFiltrados.length === 0 ? (
-        /* Escenario 2: Sin resultados bajo los filtros aplicados */
         <div className="state-card empty-filtered">
           <div className="empty-header-inline">
             <div className="empty-icon-wrap">
@@ -307,13 +568,13 @@ export default function TransportistasPage() {
           </button>
         </div>
       ) : (
-        /* Escenario 1: Éxito y Transportistas Encontrados */
         <div className="table-container">
           <table className="data-table">
             <thead>
               <tr>
                 <th className="col-user">Repartidor</th>
                 <th className="col-phone">Teléfono</th>
+                <th className="col-vehicle">Vehículo</th>
                 <th className="col-status">Estado</th>
                 <th className="col-date">Alta en Sistema</th>
               </tr>
@@ -341,6 +602,9 @@ export default function TransportistasPage() {
                   <td className="col-phone">
                     <span className="cell-phone">{item.telefono || '—'}</span>
                   </td>
+                  <td className="col-vehicle">
+                    <span className="cell-vehicle">{item.vehiculo || '—'}</span>
+                  </td>
                   <td className="col-status">
                     <span
                       className={`status-pill ${
@@ -361,13 +625,215 @@ export default function TransportistasPage() {
             </tbody>
           </table>
 
-          {/* Footer de la Tabla */}
           <footer className="table-footer">
             <span className="footer-metric">
               Mostrando {transportistasFiltrados.length} de {listaBase.length} repartidores
             </span>
             <span className="footer-legend">Directorio Activo</span>
           </footer>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* MODAL HISTORIA 1: CREAR CUENTA AL TRANSPORTISTA              */}
+      {/* ============================================================ */}
+      {mostrarModalCrear && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="modal-window">
+            <div className="modal-header">
+              <h2 className="modal-title">Registrar Nuevo Transportista</h2>
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={() => setMostrarModalCrear(false)}
+                title="Cerrar modal"
+              >
+                &times;
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmitCrear} noValidate className="modal-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="nombre">Nombre *</label>
+                  <input
+                    id="nombre"
+                    type="text"
+                    name="nombre"
+                    placeholder="Ej. Lucas"
+                    value={formDataCrear.nombre}
+                    onChange={handleChangeCrear}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="apellido">Apellido *</label>
+                  <input
+                    id="apellido"
+                    type="text"
+                    name="apellido"
+                    placeholder="Ej. Gómez"
+                    value={formDataCrear.apellido}
+                    onChange={handleChangeCrear}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="email">Correo Electrónico *</label>
+                <input
+                  id="email"
+                  type="email"
+                  name="email"
+                  placeholder="repartidor@repartosya.com"
+                  value={formDataCrear.email}
+                  onChange={handleChangeCrear}
+                />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="telefono">Teléfono *</label>
+                  <input
+                    id="telefono"
+                    type="tel"
+                    name="telefono"
+                    placeholder="+54 221 456-7890"
+                    value={formDataCrear.telefono}
+                    onChange={handleChangeCrear}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="vehiculo">Vehículo / Modelo *</label>
+                  <input
+                    id="vehiculo"
+                    type="text"
+                    name="vehiculo"
+                    placeholder="Ej. Moto / Camioneta"
+                    value={formDataCrear.vehiculo}
+                    onChange={handleChangeCrear}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="password">Contraseña Temporal *</label>
+                <input
+                  id="password"
+                  type="password"
+                  name="password"
+                  placeholder="Mínimo 8 caracteres (letras y números)"
+                  value={formDataCrear.password}
+                  onChange={handleChangeCrear}
+                />
+                <span className="field-hint">
+                  Debe tener al menos 8 caracteres e incluir letras y números.
+                </span>
+              </div>
+
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="btn-modal-cancel"
+                  onClick={() => setMostrarModalCrear(false)}
+                >
+                  Cancelar
+                </button>
+                <button type="submit" className="btn-modal-submit">
+                  Guardar transportista
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* MODAL HISTORIA 2: ELIMINAR AL TRANSPORTISTA                  */}
+      {/* ============================================================ */}
+      {mostrarModalEliminar && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="modal-window modal-window-wide">
+            <div className="modal-header">
+              <h2 className="modal-title">Eliminar al Transportista</h2>
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={handleCerrarEliminar}
+                title="Cerrar modal"
+              >
+                &times;
+              </button>
+            </div>
+
+            <p className="modal-description">
+              Seleccioná de la lista al transportista que deseás dar de baja y presioná el botón de eliminar.
+            </p>
+
+            {transportistas.length === 0 ? (
+              <div className="empty-base text-only" style={{ padding: '2rem 0' }}>
+                <p className="empty-title">No hay transportistas cargados en el sistema para eliminar.</p>
+              </div>
+            ) : (
+              <div className="modal-table-wrap">
+                <table className="modal-table">
+                  <thead>
+                    <tr>
+                      <th style={{ width: '48px', textAlign: 'center' }}>Elegir</th>
+                      <th>Nombre y Apellido</th>
+                      <th>Vehículo</th>
+                      <th>Email</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {transportistas.map((t) => {
+                      const seleccionado = transportistaSeleccionadoId === String(t.id);
+                      return (
+                        <tr
+                          key={t.id}
+                          className={seleccionado ? 'row-selected' : ''}
+                          onClick={() => setTransportistaSeleccionadoId(String(t.id))}
+                        >
+                          <td style={{ textAlign: 'center' }}>
+                            <input
+                              type="radio"
+                              name="selTransportista"
+                              value={String(t.id)}
+                              checked={seleccionado}
+                              onChange={() => setTransportistaSeleccionadoId(String(t.id))}
+                            />
+                          </td>
+                          <td>
+                            <strong>
+                              {t.nombre} {t.apellido}
+                            </strong>
+                          </td>
+                          <td>{t.vehiculo || '—'}</td>
+                          <td>{t.email}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="btn-modal-cancel"
+                onClick={handleCerrarEliminar}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="btn-modal-danger"
+                onClick={handleConfirmarEliminacion}
+              >
+                Eliminar transportista
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
