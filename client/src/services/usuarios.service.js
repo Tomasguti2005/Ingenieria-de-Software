@@ -72,3 +72,4 @@ export async function eliminarTransportista(id) {
     throw error
   }
 }
+
