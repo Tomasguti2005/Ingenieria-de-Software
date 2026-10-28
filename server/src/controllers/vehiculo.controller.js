@@ -40,7 +40,7 @@ const registrarVehiculo = async (req, res) => {
 
     return res.status(201).json({
       mensaje: 'Vehículo registrado correctamente',
-      vehiculo: 'nuevoVehiculo'
+      vehiculo: nuevoVehiculo
     });
 
   } catch (error) {
