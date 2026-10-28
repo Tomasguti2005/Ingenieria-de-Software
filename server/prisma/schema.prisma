@@ -1,0 +1,77 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum RolUsuario {
+  ADMIN
+  REPARTIDOR
+}
+
+enum EstadoRepartidor {
+  ACTIVO
+  INACTIVO
+}
+
+enum EstadoPedido {
+  REGISTRADO
+  ASIGNADO
+  RETIRADO
+  EN_CAMINO
+  ENTREGADO
+  FALLIDO
+  CANCELADO
+}
+
+enum MetodoPago {
+  EFECTIVO
+  TRANSFERENCIA
+  MERCADO_PAGO
+  OTRO
+}
+
+model Usuario {
+  id        Int              @id @default(autoincrement())
+  nombre    String
+  apellido  String
+  email     String           @unique
+  password  String
+  telefono  String
+  rol       RolUsuario       @default(REPARTIDOR)
+  estado    EstadoRepartidor @default(ACTIVO)
+  vehiculo  String?
+  pedidos   Pedido[]         @relation("TransportistaPedidos")
+  createdAt DateTime         @default(now())
+}
+
+model Pedido {
+  id                   Int          @id @default(autoincrement())
+  codigoSeguimiento    String       @unique
+  direccionOrigen      String
+  direccionDestino     String
+  destinatarioNombre   String
+  destinatarioTelefono String
+  descripcionProductos String
+  notas                String?
+  estado               EstadoPedido @default(REGISTRADO)
+  repartidorId         Int?
+  repartidor           Usuario?     @relation("TransportistaPedidos", fields: [repartidorId], references: [id])
+  ordenEntrega         Int?
+  metodoPagoCobrado    MetodoPago?
+  montoCobrado         Float?
+  urlComprobante       String?
+  motivoFallo          String?
+  pedidoOriginalId     Int?
+  fechaCreacion        DateTime     @default(now())
+  fechaEntrega         DateTime?
+}
+
+model Vehiculo {
+  id      Int    @id @default(autoincrement())
+  patente String @unique
+  modelo  String
+}

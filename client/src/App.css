@@ -1,9 +1,0 @@
-/* Estilos globales de la aplicación */
-
-.app-container {
-  width: 100%;
-  min-height: 100vh;
-  background-color: #f9fafb;
-  display: flex;
-  flex-direction: column;
-}

@@ -1,0 +1,142 @@
+// Sidebar.jsx — Menú lateral desplegable tipo drawer.
+// Permanece oculto por defecto y se despliega al presionar el botón de menú en el topbar.
+// Utiliza exclusivamente iconos vectoriales SVG minimalistas.
+
+import { useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
+import './Sidebar.css';
+
+export default function Sidebar({ abierto, onClose }) {
+  // Cerrar con Escape
+  useEffect(() => {
+    function manejarTecla(e) {
+      if (e.key === 'Escape' && abierto) {
+        onClose();
+      }
+    }
+    window.addEventListener('keydown', manejarTecla);
+    return () => window.removeEventListener('keydown', manejarTecla);
+  }, [abierto, onClose]);
+
+  return (
+    <>
+      {/* Backdrop con difuminado suave */}
+      <div
+        className={`sidebar-backdrop ${abierto ? 'visible' : ''}`}
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Drawer deslizante */}
+      <aside
+        className={`admin-sidebar-drawer ${abierto ? 'abierto' : ''}`}
+        aria-label="Menú principal de navegación"
+        aria-hidden={!abierto}
+      >
+        <div className="sidebar-header">
+          <div className="sidebar-brand">
+            <div className="sidebar-logo-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                <path d="m3.3 7 8.7 5 8.7-5" />
+                <path d="M12 22V12" />
+              </svg>
+            </div>
+            <div className="sidebar-brand-text">
+              <span className="sidebar-brand-title">Repartos Ya</span>
+              <span className="sidebar-brand-sub">Panel de Control</span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="sidebar-close-btn"
+            onClick={onClose}
+            title="Cerrar menú (Esc)"
+            aria-label="Cerrar menú"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <nav className="sidebar-nav">
+          <div className="sidebar-section-label">Módulos del Sistema</div>
+
+          {/* 1. Gestión de Transportistas (ACTIVA) */}
+          <NavLink
+            to="/admin/transportistas"
+            className={({ isActive }) => `sidebar-link ${isActive ? 'activo' : ''}`}
+            onClick={onClose}
+            title="Gestión de Transportistas"
+          >
+            <span className="sidebar-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
+                <path d="M15 18H9" />
+                <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14" />
+                <circle cx="17" cy="18.5" r="2.5" />
+                <circle cx="7" cy="18.5" r="2.5" />
+              </svg>
+            </span>
+            <span className="sidebar-label">Transportistas</span>
+            <span className="sidebar-active-indicator" />
+          </NavLink>
+
+          {/* 2. Gestión de Pedidos */}
+          <div
+            className="sidebar-link deshabilitado"
+            title="Gestión de Pedidos"
+          >
+            <span className="sidebar-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                <path d="M12 11h4" />
+                <path d="M12 16h4" />
+                <path d="M8 11h.01" />
+                <path d="M8 16h.01" />
+              </svg>
+            </span>
+            <span className="sidebar-label">Pedidos</span>
+          </div>
+
+          {/* 3. Rendición de Cuentas */}
+          <div
+            className="sidebar-link deshabilitado"
+            title="Rendición de Cuentas"
+          >
+            <span className="sidebar-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
+                <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
+              </svg>
+            </span>
+            <span className="sidebar-label">Rendición</span>
+          </div>
+
+          {/* 4. Reportes y Estadísticas */}
+          <div
+            className="sidebar-link deshabilitado"
+            title="Reportes y Estadísticas"
+          >
+            <span className="sidebar-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 3v18h18" />
+                <path d="m19 9-5 5-4-4-3 3" />
+              </svg>
+            </span>
+            <span className="sidebar-label">Reportes</span>
+          </div>
+        </nav>
+
+        <div className="sidebar-footer">
+          <span className="sidebar-footer-dot" />
+          <span>Sistema Operativo v1.0</span>
+        </div>
+      </aside>
+    </>
+  );
+}
