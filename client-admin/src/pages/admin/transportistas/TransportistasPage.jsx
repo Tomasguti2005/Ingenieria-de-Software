@@ -131,7 +131,7 @@ export default function TransportistasPage() {
     const emailNorm = formDataCrear.email.trim().toLowerCase();
 
     if (!formDataCrear.nombre.trim() || !formDataCrear.apellido.trim() || !formDataCrear.email.trim() ||
-        !formDataCrear.telefono.trim() || !formDataCrear.vehiculo.trim() || !formDataCrear.password.trim()) {
+      !formDataCrear.telefono.trim() || !formDataCrear.vehiculo.trim() || !formDataCrear.password.trim()) {
       setAlerta({ tipo: 'error', mensaje: 'Por favor, completá todos los campos requeridos.' });
       return;
     }
@@ -178,8 +178,8 @@ export default function TransportistasPage() {
   async function handleSubmitEditar(e) {
     e.preventDefault();
     if (!formDataEditar.nombre.trim() || !formDataEditar.apellido.trim() ||
-        !formDataEditar.email.trim() || !formDataEditar.telefono.trim() ||
-        !formDataEditar.vehiculo.trim() || !formDataEditar.estado) {
+      !formDataEditar.email.trim() || !formDataEditar.telefono.trim() ||
+      !formDataEditar.vehiculo.trim() || !formDataEditar.estado) {
       setAlerta({ tipo: 'error', mensaje: 'Debe completar todos los campos obligatorios con un formato válido.' });
       return;
     }
@@ -209,7 +209,7 @@ export default function TransportistasPage() {
       try {
         const prev = JSON.parse(localStorage.getItem('sistema_errores') || '[]');
         localStorage.setItem('sistema_errores', JSON.stringify([...prev, logError]));
-      } catch (_) {}
+      } catch (_) { }
       console.error('[SISTEMA / LOGS / ERRORES]:', logError);
       setAlerta({ tipo: 'error', mensaje: 'Ocurrió un error al intentar eliminar el transportista. El error fue registrado en el sistema para su verificación.' });
     }
