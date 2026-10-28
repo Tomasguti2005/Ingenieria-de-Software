@@ -8,14 +8,14 @@ import { fetchAPI } from './api.js';
 // En 'true' mientras la API /api/admin/transportistas esté en desarrollo.
 export const USAR_MOCK = true;
 
-// Mock inicial de transportistas para pruebas:
+// Mock mutable de transportistas para pruebas (array compartido entre funciones):
 export const MOCK_TRANSPORTISTAS = [
   {
     id: 1,
     nombre: 'Lucas',
     apellido: 'Gómez',
     email: 'lucas.gomez@repartosya.com',
-    telefono: '+54 221 456-7890',
+    telefono: '+54221456789',
     rol: 'REPARTIDOR',
     estado: 'ACTIVO',
     vehiculo: 'Moto',
@@ -26,7 +26,7 @@ export const MOCK_TRANSPORTISTAS = [
     nombre: 'Matías',
     apellido: 'Fernández',
     email: 'matias.f@repartosya.com',
-    telefono: '+54 221 654-3210',
+    telefono: '+54221654321',
     rol: 'REPARTIDOR',
     estado: 'ACTIVO',
     vehiculo: 'Camioneta',
@@ -37,7 +37,7 @@ export const MOCK_TRANSPORTISTAS = [
     nombre: 'Agustina',
     apellido: 'Álvarez',
     email: 'agustina.alvarez@repartosya.com',
-    telefono: '+54 221 987-6543',
+    telefono: '+54221987654',
     rol: 'REPARTIDOR',
     estado: 'ACTIVO',
     vehiculo: 'Auto',
@@ -48,7 +48,7 @@ export const MOCK_TRANSPORTISTAS = [
     nombre: 'Joaquín',
     apellido: 'Benítez',
     email: 'j.benitez@repartosya.com',
-    telefono: '+54 221 321-4567',
+    telefono: '+54221321456',
     rol: 'REPARTIDOR',
     estado: 'INACTIVO',
     vehiculo: 'Moto',
@@ -59,7 +59,7 @@ export const MOCK_TRANSPORTISTAS = [
     nombre: 'Carolina',
     apellido: 'Romero',
     email: 'caro.romero@repartosya.com',
-    telefono: '+54 221 112-2334',
+    telefono: '+54221112233',
     rol: 'REPARTIDOR',
     estado: 'ACTIVO',
     vehiculo: 'Bicicleta',
@@ -70,7 +70,7 @@ export const MOCK_TRANSPORTISTAS = [
     nombre: 'Esteban',
     apellido: 'Quaranta',
     email: 'esteban.q@repartosya.com',
-    telefono: '+54 221 998-8776',
+    telefono: '+54221998877',
     rol: 'REPARTIDOR',
     estado: 'INACTIVO',
     vehiculo: 'Auto',
@@ -80,17 +80,14 @@ export const MOCK_TRANSPORTISTAS = [
 
 /**
  * Obtiene la lista completa de transportistas.
- * @returns {Promise<Array<object>>} Lista de usuarios con rol REPARTIDOR.
+ * @returns {Promise<Array<object>>}
  */
 export async function obtenerTransportistas() {
   if (USAR_MOCK) {
     return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([...MOCK_TRANSPORTISTAS]);
-      }, 300);
+      setTimeout(() => resolve([...MOCK_TRANSPORTISTAS]), 300);
     });
   }
-
   const respuesta = await fetchAPI('/admin/transportistas');
   return respuesta.data || [];
 }
@@ -98,7 +95,7 @@ export async function obtenerTransportistas() {
 /**
  * Registrar un nuevo transportista (Historia: Crear Cuenta al Transportista)
  * @param {Object} nuevoTransportista
- * @returns {Promise<object>}
+ * @returns {Promise<{success: boolean, data: object}>}
  */
 export async function crearTransportista(nuevoTransportista) {
   if (USAR_MOCK) {
@@ -116,7 +113,6 @@ export async function crearTransportista(nuevoTransportista) {
       }, 300);
     });
   }
-
   const respuesta = await fetchAPI('/admin/transportistas', {
     method: 'POST',
     body: JSON.stringify(nuevoTransportista),
@@ -125,9 +121,57 @@ export async function crearTransportista(nuevoTransportista) {
 }
 
 /**
- * Eliminar / dar de baja un transportista (Historia: Eliminar Transportista)
+ * Modificar los datos de un transportista (Historia: Modificar Transportista)
+ * Escenario 1 → 200: datos actualizados con éxito
+ * Escenario 2 → 400: campos inválidos o vacíos
+ * Escenario 3 → 409: correo ya registrado
  * @param {number|string} id
- * @returns {Promise<object>}
+ * @param {Object} datos - { nombre, apellido, email, telefono, vehiculo, estado }
+ * @returns {Promise<{success: boolean, data: object}>}
+ */
+export async function modificarTransportista(id, datos) {
+  const idNum = Number(id);
+
+  if (USAR_MOCK) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const index = MOCK_TRANSPORTISTAS.findIndex((t) => t.id === idNum);
+        if (index === -1) {
+          reject(new Error('El transportista no existe o no corresponde a un repartidor.'));
+          return;
+        }
+
+        // Escenario 3 (mock): correo duplicado
+        const emailNorm = datos.email?.trim().toLowerCase();
+        const duplicado = MOCK_TRANSPORTISTAS.find(
+          (t) => t.email.toLowerCase() === emailNorm && t.id !== idNum
+        );
+        if (duplicado) {
+          reject(new Error('El correo electrónico ya se encuentra registrado'));
+          return;
+        }
+
+        // Escenario 1 (mock): actualización exitosa
+        const actualizado = { ...MOCK_TRANSPORTISTAS[index], ...datos, email: emailNorm };
+        MOCK_TRANSPORTISTAS[index] = actualizado;
+        resolve({ success: true, data: { mensaje: 'Los datos del transportista han sido actualizados con éxito', transportista: actualizado } });
+      }, 300);
+    });
+  }
+
+  const respuesta = await fetchAPI(`/admin/transportistas/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(datos),
+  });
+  return respuesta;
+}
+
+/**
+ * Eliminar / dar de baja a un transportista (Historia: Eliminar Transportista)
+ * Escenario 1 → éxito
+ * Escenario 3 → error registrado en log del sistema
+ * @param {number|string} id
+ * @returns {Promise<{success: boolean, data: object}>}
  */
 export async function eliminarTransportista(id) {
   const idNum = Number(id);
@@ -144,7 +188,6 @@ export async function eliminarTransportista(id) {
       }, 300);
     });
   }
-
   const respuesta = await fetchAPI(`/admin/transportistas/${id}`, {
     method: 'DELETE',
   });
