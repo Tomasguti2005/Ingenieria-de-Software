@@ -1,0 +1,489 @@
+/* Estilos para Gestión de Transportistas - Mobile First */
+
+.gestion-layout {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem;
+  box-sizing: border-box;
+  text-align: left;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #1f2937;
+}
+
+/* Encabezado */
+.gestion-header {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 680px) {
+  .gestion-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.gestion-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.4rem 0;
+}
+
+.gestion-header p {
+  color: #4b5563;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* Botón principal de Eliminar Transportista */
+.btn-abrir-eliminar {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  padding: 0.65rem 1.1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+}
+
+.btn-abrir-eliminar:hover {
+  background-color: #fecaca;
+  border-color: #ef4444;
+}
+
+/* Alertas de Feedback Flotantes (Toast en la parte superior) */
+.alert {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  min-width: 320px;
+  max-width: 90%;
+  padding: 0.9rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  animation: slideDownToast 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideDownToast {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.alert-content {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.alert-icono {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.alert-texto {
+  line-height: 1.4;
+}
+
+.alert-success {
+  background-color: #065f46;
+  color: #ffffff;
+  border: 1px solid #047857;
+}
+
+.alert-error {
+  background-color: #991b1b;
+  color: #ffffff;
+  border: 1px solid #b91c1c;
+}
+
+.alert-close {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: #ffffff;
+  opacity: 0.8;
+  line-height: 1;
+  padding: 0 0.2rem;
+}
+
+.alert-close:hover {
+  opacity: 1;
+}
+
+/* Disposición en cuadrícula */
+.gestion-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@media (min-width: 860px) {
+  .gestion-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    align-items: start;
+  }
+}
+
+/* Paneles / Tarjetas */
+.panel {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.panel-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem 0;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Formulario */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.35rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  background-color: #fff;
+  color: #111827;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.form-hint {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  margin-top: 0.5rem;
+}
+
+.btn-submit:hover {
+  background-color: #1d4ed8;
+}
+
+.btn-submit:active {
+  transform: scale(0.99);
+}
+
+/* Listado de Transportistas */
+.lista-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.lista-contador {
+  font-size: 0.85rem;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  font-weight: 600;
+}
+
+.buscador-input {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  margin-bottom: 1rem;
+}
+
+.transportistas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.transportista-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1rem;
+  background-color: #fafafa;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.transportista-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.transportista-nombre {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-activo {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.badge-inactivo {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.transportista-datos {
+  font-size: 0.875rem;
+  color: #4b5563;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.35rem;
+}
+
+@media (min-width: 500px) {
+  .transportista-datos {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.dato-item strong {
+  color: #374151;
+}
+
+.card-acciones {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.btn-eliminar {
+  background-color: #fff;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-eliminar:hover {
+  background-color: #fee2e2;
+  border-color: #ef4444;
+}
+
+.lista-vacia {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+/* Modal y Tabla de Eliminación de Transportistas */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 999;
+}
+
+.modal-box {
+  background-color: #ffffff;
+  border-radius: 12px;
+  max-width: 460px;
+  width: 100%;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+}
+
+.modal-box-amplio {
+  max-width: 650px;
+}
+
+.modal-header h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.3rem;
+  color: #111827;
+}
+
+.modal-header p {
+  color: #4b5563;
+  font-size: 0.95rem;
+  margin: 0 0 1.25rem 0;
+  line-height: 1.4;
+}
+
+.tabla-seleccion-contenedor {
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.tabla-seleccion {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tabla-seleccion th {
+  background-color: #f9fafb;
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+}
+
+.tabla-seleccion td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #f3f4f6;
+  color: #4b5563;
+}
+
+.tabla-seleccion tr {
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.tabla-seleccion tr:hover {
+  background-color: #f8fafc;
+}
+
+.tabla-seleccion tr.fila-seleccionada {
+  background-color: #fef2f2;
+}
+
+.tabla-seleccion tr.fila-seleccionada td {
+  color: #991b1b;
+}
+
+.modal-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.btn-cancelar {
+  padding: 0.6rem 1.1rem;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-cancelar:hover {
+  background-color: #e5e7eb;
+}
+
+.btn-confirmar-eliminar {
+  padding: 0.6rem 1.2rem;
+  background-color: #dc2626;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-confirmar-eliminar:hover {
+  background-color: #b91c1c;
+}
