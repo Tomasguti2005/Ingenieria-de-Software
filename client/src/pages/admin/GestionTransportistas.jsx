@@ -244,7 +244,7 @@ export default function GestionTransportistas() {
         const erroresGuardados = JSON.parse(localStorage.getItem('sistema_errores') || '[]')
         erroresGuardados.push(logError)
         localStorage.setItem('sistema_errores', JSON.stringify(erroresGuardados))
-      } catch (_) {}
+      } catch (_) { }
 
       console.error('[SISTEMA / LOGS / ERRORES]:', logError)
 
@@ -427,9 +427,8 @@ export default function GestionTransportistas() {
                       {t.nombre} {t.apellido}
                     </h3>
                     <span
-                      className={`badge ${
-                        t.estado === 'ACTIVO' ? 'badge-activo' : 'badge-inactivo'
-                      }`}
+                      className={`badge ${t.estado === 'ACTIVO' ? 'badge-activo' : 'badge-inactivo'
+                        }`}
                     >
                       {t.estado}
                     </span>
