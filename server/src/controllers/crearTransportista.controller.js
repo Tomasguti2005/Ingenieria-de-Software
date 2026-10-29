@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 const crearTransportista = async (req, res) => {
   try {
-    const { nombre, apellido, email, telefono, vehiculo, password } = req.body;
+    const { nombre, apellido, email, telefono, password } = req.body;
 
     // Regla: Los campos obligatorios a completar son: Nombre, Apellido, Correo electrónico, Contraseña y Teléfono.
     if (!nombre || !apellido || !email || !telefono || !password) {
@@ -46,7 +46,7 @@ const crearTransportista = async (req, res) => {
         apellido: apellido.trim(),
         email: emailNormalizado,
         telefono: telefono.trim(),
-        vehiculo: vehiculo ? vehiculo.trim() : null,
+        vehiculo: null,
         password: hashedPassword,
         rol: 'REPARTIDOR',
         estado: 'ACTIVO'

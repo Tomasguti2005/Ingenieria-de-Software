@@ -29,7 +29,7 @@ export default function TransportistasPage() {
   // Modal: Cargar transportista (Alta)
   const [mostrarModalCrear, setMostrarModalCrear] = useState(false);
   const [formDataCrear, setFormDataCrear] = useState({
-    nombre: '', apellido: '', email: '', telefono: '', vehiculo: '', password: '',
+    nombre: '', apellido: '', email: '', telefono: '', password: '',
   });
 
   // Ficha Personal del Empleado
@@ -122,7 +122,7 @@ export default function TransportistasPage() {
     const emailNorm = formDataCrear.email.trim().toLowerCase();
 
     if (!formDataCrear.nombre.trim() || !formDataCrear.apellido.trim() || !formDataCrear.email.trim() ||
-      !formDataCrear.telefono.trim() || !formDataCrear.vehiculo.trim() || !formDataCrear.password.trim()) {
+      !formDataCrear.telefono.trim() || !formDataCrear.password.trim()) {
       setAlerta({ tipo: 'error', mensaje: 'Por favor, completá todos los campos requeridos.' });
       return;
     }
@@ -147,12 +147,11 @@ export default function TransportistasPage() {
         apellido: formDataCrear.apellido.trim(),
         email: emailNorm,
         telefono: formDataCrear.telefono.trim(),
-        vehiculo: formDataCrear.vehiculo.trim(),
         password: pwd,
       });
       const creado = res.data || { ...formDataCrear, id: Date.now(), email: emailNorm, createdAt: new Date().toISOString(), estado: 'ACTIVO', rol: 'REPARTIDOR' };
       setTransportistas((p) => [creado, ...p]);
-      setFormDataCrear({ nombre: '', apellido: '', email: '', telefono: '', vehiculo: '', password: '' });
+      setFormDataCrear({ nombre: '', apellido: '', email: '', telefono: '', password: '' });
       setMostrarModalCrear(false);
       setAlerta({ tipo: 'success', mensaje: 'El usuario transportista ha sido creado con éxito' });
     } catch (err) {
@@ -305,7 +304,7 @@ export default function TransportistasPage() {
               <tr>
                 <th className="col-user">Repartidor</th>
                 <th className="col-phone">Teléfono</th>
-                <th className="col-vehicle">Vehículo</th>
+                <th className="col-vehicle">Patente del vehículo</th>
                 <th className="col-status">Estado</th>
                 <th className="col-date">Alta en Sistema</th>
               </tr>
@@ -376,15 +375,9 @@ export default function TransportistasPage() {
                 <label htmlFor="crear-email">Correo Electrónico *</label>
                 <input id="crear-email" type="email" name="email" placeholder="repartidor@repartosya.com" value={formDataCrear.email} onChange={handleChangeCrear} />
               </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="crear-telefono">Teléfono *</label>
-                  <input id="crear-telefono" type="tel" name="telefono" placeholder="+54221456789" value={formDataCrear.telefono} onChange={handleChangeCrear} />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="crear-vehiculo">Vehículo *</label>
-                  <input id="crear-vehiculo" type="text" name="vehiculo" placeholder="Ej. Moto / Camioneta" value={formDataCrear.vehiculo} onChange={handleChangeCrear} />
-                </div>
+              <div className="form-group">
+                <label htmlFor="crear-telefono">Teléfono *</label>
+                <input id="crear-telefono" type="tel" name="telefono" placeholder="+54221456789" value={formDataCrear.telefono} onChange={handleChangeCrear} />
               </div>
               <div className="form-group">
                 <label htmlFor="crear-password">Contraseña Temporal *</label>
@@ -439,7 +432,7 @@ export default function TransportistasPage() {
                     <span className="ficha-dato-valor">{fichaTransportista.telefono || '—'}</span>
                   </div>
                   <div className="ficha-dato-item">
-                    <span className="ficha-dato-label">Vehículo / Modelo</span>
+                    <span className="ficha-dato-label">Patente del vehículo</span>
                     <span className="ficha-dato-valor">{fichaTransportista.vehiculo || '—'}</span>
                   </div>
                   <div className="ficha-dato-item">
