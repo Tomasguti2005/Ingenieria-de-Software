@@ -25,6 +25,7 @@ app.use('/api/vehiculos', vehiculoRoutes);
 app.use('/api/transportistasVehiculo', transportistaVehiculoRoutes);
 app.use('/api/admin/transportistas', transportistasRoutes);
 
+
 // 4. Definimos el puerto (usamos el del archivo .env que configuraste antes, o el 3000 por defecto)
 const PORT = process.env.PORT || 3000;
 

@@ -9,6 +9,8 @@ const router = Router();
 // GET /api/transportistas/activos
 router.get('/activos', obtenerTransportistasActivos);
 
+router.get('/', obtenerTransportistasActivos);
+
 // POST /api/transportistas/asignar-vehiculo
 router.post('/asignar-vehiculo', asignarVehiculoATransportista);
 

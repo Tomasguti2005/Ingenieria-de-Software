@@ -41,7 +41,7 @@ export default function EditarTransportistaPage() {
           setError('No se pudieron cargar los datos del transportista.');
         }
       } catch (err) {
-        setError('No se pudo conectar con el servidor.');
+        setError(err || 'No se pudo conectar con el servidor.');
       } finally {
         setCargandoDatos(false);
       }
@@ -112,7 +112,7 @@ export default function EditarTransportistaPage() {
       }
 
     } catch (err) {
-      setError('No se pudo conectar con el servidor.');
+      setError(err || 'No se pudo conectar con el servidor.');
     } finally {
       setCargandoGuardado(false);
     }
