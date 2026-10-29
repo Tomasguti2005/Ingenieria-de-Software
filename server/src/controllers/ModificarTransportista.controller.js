@@ -10,10 +10,10 @@ const prisma = require('../config/prisma');
 const { success, error } = require('../utils/response');
 
 // Expresión regular para validar formato nombre@gmail.com
-const REGEX_EMAIL_GMAIL = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+const REGEX_EMAIL_GMAIL = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 // Expresión regular para teléfono: todo seguido sin espacios (admite código de país opcional + seguido de dígitos)
-const REGEX_TELEFONO_SIN_ESPACIOS = /^\+?[0-9]{7,15}$/;
+const REGEX_TELEFONO_SIN_ESPACIOS = /^\+?[0-9]{9,15}$/;
 
 /**
  * Controlador para modificar los datos de un transportista.

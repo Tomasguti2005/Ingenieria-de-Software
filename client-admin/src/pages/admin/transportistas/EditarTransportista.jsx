@@ -66,14 +66,14 @@ export default function EditarTransportistaPage() {
     }
 
     // Validación 2: Formato de mail exacto (nombre@gmail.com)
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(emailLimpio)) {
       setError('Debe completar todos los campos obligatorios con un formato válido');
       return;
     }
 
     // Validación 3: Teléfono todo seguido sin espacios
-    const telefonoRegex = /^\+?[0-9]+$/;
+    const telefonoRegex = /^\+?[0-9]{9,15}$/;
     if (!telefonoRegex.test(telefonoLimpio)) {
       setError('Debe completar todos los campos obligatorios con un formato válido');
       return;
