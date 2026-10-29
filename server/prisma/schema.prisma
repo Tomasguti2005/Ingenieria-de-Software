@@ -45,7 +45,17 @@ model Usuario {
   estado    EstadoRepartidor @default(ACTIVO)
   vehiculo  String?
   pedidos   Pedido[]         @relation("TransportistaPedidos")
+  rutas     Ruta[]           @relation("TransportistaRutas")
   createdAt DateTime         @default(now())
+}
+
+model Ruta {
+  id              Int      @id @default(autoincrement())
+  nombre          String
+  transportistaId Int
+  transportista   Usuario  @relation("TransportistaRutas", fields: [transportistaId], references: [id])
+  pedidos         Pedido[]
+  createdAt       DateTime @default(now())
 }
 
 model Pedido {
@@ -60,6 +70,8 @@ model Pedido {
   estado               EstadoPedido @default(REGISTRADO)
   repartidorId         Int?
   repartidor           Usuario?     @relation("TransportistaPedidos", fields: [repartidorId], references: [id])
+  rutaId               Int?
+  ruta                 Ruta?        @relation(fields: [rutaId], references: [id])
   ordenEntrega         Int?
   metodoPagoCobrado    MetodoPago?
   montoCobrado         Float?
