@@ -1,6 +1,7 @@
 const cors= require('cors');
 const express = require('express');
 const vehiculoRoutes = require('./routes/vehiculo.routes');
+const transportistaRoutes = require('./routes/transportistasVehiculo.routes');
 
 const clientOrigin = process.env.ADMIN_ORIGIN;
 
@@ -15,6 +16,8 @@ app.use(express.json());
 
 // 3. Conectamos tus rutas de vehículos
 app.use('/api/vehiculos', vehiculoRoutes);
+
+app.use('/api/transportistasVehiculo', transportistaRoutes);
 
 // 4. Definimos el puerto (usamos el del archivo .env que configuraste antes, o el 3000 por defecto)
 const PORT = process.env.PORT || 3000;
