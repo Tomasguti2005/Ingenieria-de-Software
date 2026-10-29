@@ -6,7 +6,7 @@ import { fetchAPI } from './api.js';
 
 // ─── MODO MOCK ────────────────────────────────────────────────────────────────
 // Ponelo en false cuando el backend esté listo.
-const USAR_MOCK = true;
+const USAR_MOCK = false;
 
 // Usuarios de prueba que simula el mock:
 //   repartidor@repartosya.com / repartidor123  → login exitoso como REPARTIDOR

@@ -24,10 +24,11 @@ async function main() {
     );
   }
 
+  const emailNormalizado = ADMIN_EMAIL.trim().toLowerCase();
   const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
 
   const admin = await prisma.usuario.upsert({
-    where: { email: ADMIN_EMAIL },
+    where: { email: emailNormalizado },
     update: {
       nombre: ADMIN_NOMBRE,
       apellido: ADMIN_APELLIDO,
@@ -35,7 +36,7 @@ async function main() {
       password: passwordHash,
     },
     create: {
-      email: ADMIN_EMAIL,
+      email: emailNormalizado,
       password: passwordHash,
       nombre: ADMIN_NOMBRE,
       apellido: ADMIN_APELLIDO,
@@ -46,6 +47,35 @@ async function main() {
   });
 
   console.log(`✅ Admin creado/actualizado: ${admin.email} (id: ${admin.id})`);
+
+  // Repartidor inicial para pruebas en client-mobile
+  const repartidorEmail = 'repartidor@repartosya.com';
+  const repartidorPasswordHash = await bcrypt.hash('repartidor123', 10);
+
+  const repartidor = await prisma.usuario.upsert({
+    where: { email: repartidorEmail },
+    update: {
+      nombre: 'Carlos',
+      apellido: 'Gómez',
+      telefono: '+5492211234567',
+      password: repartidorPasswordHash,
+      rol: 'REPARTIDOR',
+      estado: 'ACTIVO',
+      vehiculo: 'Moto Honda Wave',
+    },
+    create: {
+      email: repartidorEmail,
+      password: repartidorPasswordHash,
+      nombre: 'Carlos',
+      apellido: 'Gómez',
+      telefono: '+5492211234567',
+      rol: 'REPARTIDOR',
+      estado: 'ACTIVO',
+      vehiculo: 'Moto Honda Wave',
+    },
+  });
+
+  console.log(`✅ Repartidor creado/actualizado: ${repartidor.email} (id: ${repartidor.id})`);
 }
 
 main()

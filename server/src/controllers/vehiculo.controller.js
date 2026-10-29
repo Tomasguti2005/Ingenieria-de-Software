@@ -1,6 +1,17 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+// Obtener todos los vehículos (para el select del frontend)
+const obtenerVehiculos = async (req, res) => {
+  try {
+    const vehiculos = await prisma.vehiculo.findMany();
+    return res.status(200).json({ success: true, data: vehiculos });
+  } catch (error) {
+    console.error('Error al obtener vehículos:', error);
+    return res.status(500).json({ success: false, error: 'Error al obtener vehículos.' });
+  }
+};
+
 const registrarVehiculo = async (req, res) => {
   try {
     
@@ -16,7 +27,7 @@ const registrarVehiculo = async (req, res) => {
     });
 
     if (vehiculoExistente) {
-      return res.status(400).json({ 
+      return res.status(401).json({ 
         error: 'La patente ingresada ya se encuentra registrada en el sistema' 
       });
     }
@@ -45,8 +56,11 @@ const registrarVehiculo = async (req, res) => {
 
   } catch (error) {
     console.error('Error al registrar vehículo:', error);
-    return res.status(500).json({ error: 'Hubo un error interno en el servidor' });
+    return res.status(500).json({ error });
   }
 };
 
-module.exports = { registrarVehiculo };
+module.exports = {
+  registrarVehiculo,
+  obtenerVehiculos
+};
