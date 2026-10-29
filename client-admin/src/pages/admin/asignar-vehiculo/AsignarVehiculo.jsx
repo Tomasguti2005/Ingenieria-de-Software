@@ -39,6 +39,7 @@ export default function AsignarVehiculo() {
 
   // 2. El useEffect solo invoca la función al inicio
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     cargarDatos()
   }, [])
 
@@ -87,7 +88,7 @@ export default function AsignarVehiculo() {
       }
 
     } catch (err) {
-      setError('No se pudo conectar con el servidor.');
+      setError(err || 'No se pudo conectar con el servidor.');
     } finally {
       setEnviando(false);
     }
@@ -108,7 +109,7 @@ export default function AsignarVehiculo() {
             {transportistas.map((t) => (
               <option key={t.id} value={t.id}>
                 {t.nombre} {t.apellido}
-                {t.estado !== 'ACTIVO' ? ' (inactivo)' : ''}
+                { ' (activo)' }
               </option>
             ))}
           </select>

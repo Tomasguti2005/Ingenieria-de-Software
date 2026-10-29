@@ -40,7 +40,7 @@ const modificarTransportista = async (req, res) => {
   );
 
   if (tieneCamposVacios) {
-    return error(res, 'BE campos vacios:Debe completar todos los campos obligatorios con un formato válido', 400);
+    return error(res, 'Debe completar todos los campos obligatorios con un formato válido', 400);
   }
 
   const nombreLimpio = String(nombre).trim();
@@ -51,17 +51,17 @@ const modificarTransportista = async (req, res) => {
 
   // Escenario 2: Validación de formato de email (debe ser @gmail.com)
   if (!REGEX_EMAIL_GMAIL.test(emailLimpio)) {
-    return error(res, 'BE email:Debe completar todos los campos obligatorios con un formato válido', 400);
+    return error(res, 'Debe completar todos los campos obligatorios con un formato válido', 400);
   }
 
   // Escenario 2: Validación de formato de teléfono (todo seguido sin espacios)
   if (telefonoLimpio.includes(' ') || !REGEX_TELEFONO_SIN_ESPACIOS.test(telefonoLimpio)) {
-    return error(res, 'BE tel:Debe completar todos los campos obligatorios con un formato válido', 400);
+    return error(res, 'Debe completar todos los campos obligatorios con un formato válido', 400);
   }
 
   // Validación de enumerativo de estado del repartidor (ACTIVO / INACTIVO)
   if (!['ACTIVO', 'INACTIVO'].includes(estadoLimpio)) {
-    return error(res, 'BE estado:Debe completar todos los campos obligatorios con un formato válido', 400);
+    return error(res, 'Debe completar todos los campos obligatorios con un formato válido', 400);
   }
 
   try {
