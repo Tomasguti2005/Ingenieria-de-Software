@@ -52,8 +52,8 @@ model Usuario {
 model Ruta {
   id              Int      @id @default(autoincrement())
   nombre          String
-  transportistaId Int
-  transportista   Usuario  @relation("TransportistaRutas", fields: [transportistaId], references: [id])
+  transportistaId Int?
+  transportista   Usuario?  @relation("TransportistaRutas", fields: [transportistaId], references: [id])
   pedidos         Pedido[]
   createdAt       DateTime @default(now())
 }
