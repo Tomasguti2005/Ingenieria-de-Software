@@ -78,7 +78,7 @@
 .login-title {
   font-size: 22px;
   font-weight: 700;
-  color: var(--color-white);
+  color: var(--color-text);
   margin: 0 0 4px;
   letter-spacing: -0.3px;
 }
@@ -291,37 +291,65 @@
   z-index: 20;
 }
 
-/* ─── Modo Claro Sobrio (Blanco y Grises Suaves) ────────────── */
+/* ─── Modo Claro Sobrio (Fondo blanco, tarjeta gris perceptible, inputs blancos) ─── */
 .theme-light .login-page {
-  --color-bg: #f8fafc;
-  --color-surface: #ffffff;
-  --color-surface-hover: #f1f5f9;
-  --color-border: #e2e8f0;
+  --color-bg: #ffffff;
+  --color-surface: #d5dde6;
+  --color-surface-hover: #cbd5e1;
+  --color-border: #94a3b8;
   --color-border-focus: #2563eb;
   --color-text: #0f172a;
-  --color-text-muted: #64748b;
+  --color-text-muted: #334155;
   background-color: var(--color-bg);
-  background-image:
-    radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, rgba(148, 163, 184, 0.08) 0%, transparent 50%);
+  background-image: none;
 }
 
 .theme-light .login-card {
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  box-shadow:
+    0 16px 36px -4px rgba(15, 23, 42, 0.16),
+    0 6px 16px -2px rgba(15, 23, 42, 0.10);
 }
 
-.theme-light .login-input {
-  background: #f8fafc;
+.theme-light .login-title {
   color: #0f172a;
-  border-color: #cbd5e1;
 }
 
-.theme-light .login-input:focus {
+.theme-light .login-subtitle {
+  color: #475569;
+  font-weight: 500;
+}
+
+.theme-light .form-label {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.theme-light .form-input {
   background: #ffffff;
+  color: #0f172a;
+  border: 1.5px solid #94a3b8;
+  font-weight: 500;
 }
 
-.theme-light .login-input-icon,
-.theme-light .login-toggle-password {
+.theme-light .form-input::placeholder {
   color: #64748b;
 }
+
+.theme-light .form-input:focus {
+  background: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.2);
+}
+
+.theme-light .toggle-password {
+  color: #64748b;
+}
+
+.theme-light .toggle-password:hover {
+  color: #0f172a;
+}
+
+
 

@@ -1,22 +1,25 @@
-const cors= require('cors');
+require('dotenv').config();
+const cors = require('cors');
 const express = require('express');
+const authRoutes = require('./routes/auth.routes');
 const vehiculoRoutes = require('./routes/vehiculo.routes');
 const transportistaRoutes = require('./routes/transportistasVehiculo.routes');
 
-const clientOrigin = process.env.ADMIN_ORIGIN;
+const clientOrigin = process.env.ADMIN_ORIGIN || 'http://localhost:5173';
 
 // 1. Inicializamos la aplicación de Express
 const app = express();
 app.use(cors({
   origin: clientOrigin,
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }));
 // 2. Middleware crucial: le dice a Express que procese y entienda el formato JSON
 app.use(express.json());
 
-// 3. Conectamos tus rutas de vehículos
+// 3. Conectamos las rutas
+app.use('/api/auth', authRoutes);
 app.use('/api/vehiculos', vehiculoRoutes);
-
 app.use('/api/transportistasVehiculo', transportistaRoutes);
 
 // 4. Definimos el puerto (usamos el del archivo .env que configuraste antes, o el 3000 por defecto)
