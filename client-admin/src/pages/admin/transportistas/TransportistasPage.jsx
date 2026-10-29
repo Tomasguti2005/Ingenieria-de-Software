@@ -6,10 +6,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { obtenerTransportistas } from '../../../services/transportistas.service.js';
 import './TransportistasPage.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function TransportistasPage() {
   const [transportistas, setTransportistas] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const navigate = useNavigate();
 
   // Estados de filtros y ordenamiento
   const [busqueda, setBusqueda] = useState('');
@@ -316,6 +318,7 @@ export default function TransportistasPage() {
                 <th className="col-phone">Teléfono</th>
                 <th className="col-status">Estado</th>
                 <th className="col-date">Alta en Sistema</th>
+                <th className="col-date"></th>
               </tr>
             </thead>
             <tbody>
@@ -355,6 +358,11 @@ export default function TransportistasPage() {
                     <span className="cell-date font-mono">
                       {formatearFecha(item.createdAt)}
                     </span>
+                  </td>
+                   <td className="col-date">
+                    <button onClick={() => navigate(`/admin/transportistas/${item.id}/editar`)} className="btn-action-primary">
+                      Editar
+                    </button>
                   </td>
                 </tr>
               ))}

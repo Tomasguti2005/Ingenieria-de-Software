@@ -7,7 +7,8 @@ const obtenerTransportistasActivos = async (req, res) => {
     const transportistas = await prisma.usuario.findMany({
       where: {
         rol: 'REPARTIDOR',
-        estado: 'ACTIVO'
+        estado: 'ACTIVO',
+        vehiculo: null
       },
       select: { id: true, nombre: true, apellido: true, vehiculo: true }
     });
@@ -44,7 +45,7 @@ const asignarVehiculoATransportista = async (req, res) => {
 
     // ESCENARIO 3: Transportista inactivo
     if (transportista.estado !== 'ACTIVO') {
-      return res.status(400).json({
+      return res.status(403).json({
         success: false,
         error: 'El transportista no está activo.'
       });
@@ -72,7 +73,7 @@ const asignarVehiculoATransportista = async (req, res) => {
     });
 
     if (asignacionExistente) {
-      return res.status(400).json({
+      return res.status(409).json({
         success: false,
         error: 'El vehículo ya se encuentra asignado a otro transportista activo.'
       });
