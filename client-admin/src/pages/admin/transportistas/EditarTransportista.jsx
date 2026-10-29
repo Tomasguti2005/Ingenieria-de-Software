@@ -16,7 +16,6 @@ export default function EditarTransportistaPage() {
   const [email, setEmail] = useState('');
   const [telefono, setTelefono] = useState('');
   const [estado, setEstado] = useState('ACTIVO');
-
   const [cargandoDatos, setCargandoDatos] = useState(true);
   const [error, setError] = useState('');
   const [exito, setExito] = useState('');
@@ -27,10 +26,9 @@ export default function EditarTransportistaPage() {
     async function obtenerTransportistaPorId() {
       try {
         const res = await fetch(`${API_URL}/transportistas/${id}`);
-        const data = await res.json();
+        const {data} = await res.json();
 
         console.log('Datos del transportista obtenidos:', data);
-
         if (res.ok) {
           setNombre(data.nombre || '');
           setApellido(data.apellido || '');
@@ -41,7 +39,7 @@ export default function EditarTransportistaPage() {
           setError('No se pudieron cargar los datos del transportista.');
         }
       } catch (err) {
-        setError('No se pudo conectar con el servidor.');
+        setError(err || 'No se pudo conectar con el servidor.');
       } finally {
         setCargandoDatos(false);
       }
@@ -101,18 +99,18 @@ export default function EditarTransportistaPage() {
 
       if (!res.ok) {
         // Escenario 3: Modificación rechazada por correo duplicado
-        if(res.status===201){
-          setExito('Los datos del transportista han sido actualizados con éxito');
-          return navigate('/admin/transportistas');
-        }
+       
         if (res.status === 409 ) {
           return setError('El correo electrónico ya se encuentra registrado');
         } 
         return setError(json.error || 'Debe completar todos los campos obligatorios con un formato válido');
       }
-
+       if(res.status===200){
+          setExito('Los datos del transportista han sido actualizados con éxito');
+          return navigate('/admin/transportistas');
+        }
     } catch (err) {
-      setError('No se pudo conectar con el servidor.');
+      setError(err || 'No se pudo conectar con el servidor.');
     } finally {
       setCargandoGuardado(false);
     }
