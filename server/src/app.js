@@ -6,6 +6,7 @@ const vehiculoRoutes = require('./routes/vehiculo.routes');
 const transportistaVehiculoRoutes = require('./routes/transportistasVehiculo.routes');
 const transportistasRoutes = require('./routes/crearTransportista.routes');
 const transportistaEdicionRoutes = require('./routes/transportistas.routes');
+const obtenerTransportistasRoutes = require('./routes/obtenerTransportistas.routes');
 
 const clientOrigin = process.env.ADMIN_ORIGIN || 'http://localhost:5173';
 
@@ -25,9 +26,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/vehiculos', vehiculoRoutes);
 app.use('/api/transportistasVehiculo', transportistaVehiculoRoutes);
 app.use('/api/admin/transportistas', transportistasRoutes);
+app.use('/api/admin/transportistas', obtenerTransportistasRoutes);
 app.use('/api/transportistas', transportistaEdicionRoutes);
-
-
 
 // 4. Definimos el puerto (usamos el del archivo .env que configuraste antes, o el 3000 por defecto)
 const PORT = process.env.PORT || 3000;
