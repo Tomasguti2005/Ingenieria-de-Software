@@ -6,6 +6,9 @@ const vehiculoRoutes = require('./routes/vehiculo.routes');
 const transportistaVehiculoRoutes = require('./routes/transportistasVehiculo.routes');
 const transportistasRoutes = require('./routes/crearTransportista.routes');
 
+// 1. IMPORTAR LA NUEVA RUTA ACÁ:
+const obtenerTransportistasRoutes = require('./routes/obtenerTransportistas.routes');
+
 const clientOrigin = process.env.ADMIN_ORIGIN || 'http://localhost:5173';
 
 // 1. Inicializamos la aplicación de Express
@@ -23,9 +26,13 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/vehiculos', vehiculoRoutes);
 app.use('/api/transportistasVehiculo', transportistaVehiculoRoutes);
-app.use('/api/admin/transportistas', transportistasRoutes);
 
-// 4. Definimos el puerto (usamos el del archivo .env que configuraste antes, o el 3000 por defecto)
+// El POST/DELETE de transportistas que ya tenías
+app.use('/api/admin/transportistas', transportistasRoutes);
+// 2. CONECTAR EL GET DE TRANSPORTISTAS ACÁ:
+app.use('/api/admin/transportistas', obtenerTransportistasRoutes);
+
+// 4. Definimos el puerto
 const PORT = process.env.PORT || 3000;
 
 // 5. Encendemos el servidor

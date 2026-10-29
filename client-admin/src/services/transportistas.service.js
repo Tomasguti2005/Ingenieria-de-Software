@@ -6,7 +6,7 @@ import { fetchAPI } from './api.js';
 
 // ─── MODO MOCK ────────────────────────────────────────────────────────────────
 // En 'true' mientras la API /api/admin/transportistas esté en desarrollo.
-export const USAR_MOCK = true;
+export const USAR_MOCK = false;
 
 // Mock mutable de transportistas para pruebas (array compartido entre funciones):
 export const MOCK_TRANSPORTISTAS = [
