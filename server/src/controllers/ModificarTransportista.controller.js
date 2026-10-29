@@ -34,35 +34,34 @@ const modificarTransportista = async (req, res) => {
   const { nombre, apellido, email, telefono, vehiculo, estado } = req.body || {};
 
   // Escenario 2: Verificación de que todos los campos obligatorios estén presentes y no vacíos
-  const camposRequeridos = [nombre, apellido, email, telefono, vehiculo, estado];
+  const camposRequeridos = [nombre, apellido, email, telefono, estado];
   const tieneCamposVacios = camposRequeridos.some(
     (campo) => campo === undefined || campo === null || String(campo).trim() === ''
   );
 
   if (tieneCamposVacios) {
-    return error(res, 'Debe completar todos los campos obligatorios con un formato válido', 400);
+    return error(res, 'BE campos vacios:Debe completar todos los campos obligatorios con un formato válido', 400);
   }
 
   const nombreLimpio = String(nombre).trim();
   const apellidoLimpio = String(apellido).trim();
   const emailLimpio = String(email).trim().toLowerCase();
   const telefonoLimpio = String(telefono).trim();
-  const vehiculoLimpio = String(vehiculo).trim();
   const estadoLimpio = String(estado).trim().toUpperCase();
 
   // Escenario 2: Validación de formato de email (debe ser @gmail.com)
   if (!REGEX_EMAIL_GMAIL.test(emailLimpio)) {
-    return error(res, 'Debe completar todos los campos obligatorios con un formato válido', 400);
+    return error(res, 'BE email:Debe completar todos los campos obligatorios con un formato válido', 400);
   }
 
   // Escenario 2: Validación de formato de teléfono (todo seguido sin espacios)
   if (telefonoLimpio.includes(' ') || !REGEX_TELEFONO_SIN_ESPACIOS.test(telefonoLimpio)) {
-    return error(res, 'Debe completar todos los campos obligatorios con un formato válido', 400);
+    return error(res, 'BE tel:Debe completar todos los campos obligatorios con un formato válido', 400);
   }
 
   // Validación de enumerativo de estado del repartidor (ACTIVO / INACTIVO)
   if (!['ACTIVO', 'INACTIVO'].includes(estadoLimpio)) {
-    return error(res, 'Debe completar todos los campos obligatorios con un formato válido', 400);
+    return error(res, 'BE estado:Debe completar todos los campos obligatorios con un formato válido', 400);
   }
 
   try {
@@ -94,7 +93,6 @@ const modificarTransportista = async (req, res) => {
         apellido: apellidoLimpio,
         email: emailLimpio,
         telefono: telefonoLimpio,
-        vehiculo: vehiculoLimpio,
         estado: estadoLimpio,
       },
     });
@@ -113,7 +111,6 @@ const modificarTransportista = async (req, res) => {
           telefono: transportistaActualizado.telefono,
           email: transportistaActualizado.email,
           estado: transportistaActualizado.estado,
-          vehiculo: transportistaActualizado.vehiculo,
         },
       },
       200

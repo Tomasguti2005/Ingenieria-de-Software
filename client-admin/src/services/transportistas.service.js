@@ -129,42 +129,6 @@ export async function crearTransportista(nuevoTransportista) {
  * @param {Object} datos - { nombre, apellido, email, telefono, vehiculo, estado }
  * @returns {Promise<{success: boolean, data: object}>}
  */
-export async function modificarTransportista(id, datos) {
-  const idNum = Number(id);
-
-  if (USAR_MOCK) {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const index = MOCK_TRANSPORTISTAS.findIndex((t) => t.id === idNum);
-        if (index === -1) {
-          reject(new Error('El transportista no existe o no corresponde a un repartidor.'));
-          return;
-        }
-
-        // Escenario 3 (mock): correo duplicado
-        const emailNorm = datos.email?.trim().toLowerCase();
-        const duplicado = MOCK_TRANSPORTISTAS.find(
-          (t) => t.email.toLowerCase() === emailNorm && t.id !== idNum
-        );
-        if (duplicado) {
-          reject(new Error('El correo electrónico ya se encuentra registrado'));
-          return;
-        }
-
-        // Escenario 1 (mock): actualización exitosa
-        const actualizado = { ...MOCK_TRANSPORTISTAS[index], ...datos, email: emailNorm };
-        MOCK_TRANSPORTISTAS[index] = actualizado;
-        resolve({ success: true, data: { mensaje: 'Los datos del transportista han sido actualizados con éxito', transportista: actualizado } });
-      }, 300);
-    });
-  }
-
-  const respuesta = await fetchAPI(`/admin/transportistas/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(datos),
-  });
-  return respuesta;
-}
 
 /**
  * Eliminar / dar de baja a un transportista (Historia: Eliminar Transportista)

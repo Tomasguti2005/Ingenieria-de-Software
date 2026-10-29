@@ -6,14 +6,15 @@ import { useState, useEffect, useMemo } from 'react';
 import {
   obtenerTransportistas,
   crearTransportista,
-  modificarTransportista,
   eliminarTransportista,
 } from '../../../services/transportistas.service.js';
 import './TransportistasPage.css';
+import {  useNavigate } from 'react-router-dom';
 
 export default function TransportistasPage() {
   const [transportistas, setTransportistas] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const navigate = useNavigate();
 
   // Filtros y ordenamiento
   const [busqueda, setBusqueda] = useState('');
@@ -34,8 +35,7 @@ export default function TransportistasPage() {
   // Ficha Personal del Empleado
   const [fichaTransportista, setFichaTransportista] = useState(null); // transportista seleccionado
   const [modoFicha, setModoFicha] = useState('ver');   // 'ver' | 'editar' | 'confirmarEliminar'
-  const [formDataEditar, setFormDataEditar] = useState({});
-
+ 
   // Auto-cierre de alerta a los 5 segundos
   useEffect(() => {
     if (!alerta) return;
@@ -100,18 +100,9 @@ export default function TransportistasPage() {
   }, [criterioOrden, direccionOrden]);
 
   const hayFiltrosActivos = busqueda.trim() !== '' || filtroEstado !== 'TODOS' || criterioOrden !== 'alfabetico' || direccionOrden !== 'asc';
-
   // ── Abrir Ficha Personal ─────────────────────────────────────────
   function handleAbrirFicha(transportista) {
     setFichaTransportista(transportista);
-    setFormDataEditar({
-      nombre: transportista.nombre,
-      apellido: transportista.apellido,
-      email: transportista.email,
-      telefono: transportista.telefono,
-      vehiculo: transportista.vehiculo || '',
-      estado: transportista.estado,
-    });
     setModoFicha('ver');
   }
 
@@ -169,32 +160,7 @@ export default function TransportistasPage() {
     }
   }
 
-  // ── HISTORIA: MODIFICAR TRANSPORTISTA ────────────────────────────
-  function handleChangeEditar(e) {
-    const { name, value } = e.target;
-    setFormDataEditar((p) => ({ ...p, [name]: value }));
-  }
-
-  async function handleSubmitEditar(e) {
-    e.preventDefault();
-    if (!formDataEditar.nombre.trim() || !formDataEditar.apellido.trim() ||
-      !formDataEditar.email.trim() || !formDataEditar.telefono.trim() ||
-      !formDataEditar.vehiculo.trim() || !formDataEditar.estado) {
-      setAlerta({ tipo: 'error', mensaje: 'Debe completar todos los campos obligatorios con un formato válido.' });
-      return;
-    }
-
-    try {
-      const res = await modificarTransportista(fichaTransportista.id, formDataEditar);
-      const actualizado = res.data?.transportista || { ...fichaTransportista, ...formDataEditar };
-      setTransportistas((p) => p.map((t) => t.id === fichaTransportista.id ? actualizado : t));
-      setFichaTransportista(actualizado);
-      setModoFicha('ver');
-      setAlerta({ tipo: 'success', mensaje: 'Los datos del transportista han sido actualizados con éxito.' });
-    } catch (err) {
-      setAlerta({ tipo: 'error', mensaje: err.message || 'Error al actualizar los datos.' });
-    }
-  }
+ 
 
   // ── HISTORIA 2: ELIMINAR TRANSPORTISTA ───────────────────────────
   async function handleConfirmarEliminar() {
@@ -493,61 +459,11 @@ export default function TransportistasPage() {
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
                     Eliminar transportista
                   </button>
-                  <button type="button" className="btn-modal-submit" onClick={() => setModoFicha('editar')}>
+                  <button type="button" className="btn-modal-submit" onClick={() => navigate(`/admin/transportistas/${fichaTransportista.id}/editar`)}>
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                     Modificar datos
                   </button>
                 </div>
-              </>
-            )}
-
-            {/* ── Modo: EDITAR DATOS ── */}
-            {modoFicha === 'editar' && (
-              <>
-                <div className="modal-header">
-                  <h2 className="modal-title">Modificar datos — {fichaTransportista.nombre} {fichaTransportista.apellido}</h2>
-                  <button type="button" className="modal-close-btn" onClick={() => setModoFicha('ver')}>&times;</button>
-                </div>
-                <form onSubmit={handleSubmitEditar} noValidate className="modal-form">
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="editar-nombre">Nombre *</label>
-                      <input id="editar-nombre" type="text" name="nombre" value={formDataEditar.nombre} onChange={handleChangeEditar} />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="editar-apellido">Apellido *</label>
-                      <input id="editar-apellido" type="text" name="apellido" value={formDataEditar.apellido} onChange={handleChangeEditar} />
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="editar-email">Correo Electrónico *</label>
-                    <input id="editar-email" type="email" name="email" value={formDataEditar.email} onChange={handleChangeEditar} />
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="editar-telefono">Teléfono *</label>
-                      <input id="editar-telefono" type="tel" name="telefono" value={formDataEditar.telefono} onChange={handleChangeEditar} />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="editar-vehiculo">Vehículo *</label>
-                      <input id="editar-vehiculo" type="text" name="vehiculo" value={formDataEditar.vehiculo} onChange={handleChangeEditar} />
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="editar-estado">Estado *</label>
-                    <div className="select-wrapper select-wrapper-full">
-                      <select id="editar-estado" name="estado" className="minimal-select select-full" value={formDataEditar.estado} onChange={handleChangeEditar}>
-                        <option value="ACTIVO">ACTIVO</option>
-                        <option value="INACTIVO">INACTIVO</option>
-                      </select>
-                      <svg className="select-arrow" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
-                    </div>
-                  </div>
-                  <div className="modal-actions">
-                    <button type="button" className="btn-modal-cancel" onClick={() => setModoFicha('ver')}>← Volver</button>
-                    <button type="submit" className="btn-modal-submit">Guardar cambios</button>
-                  </div>
-                </form>
               </>
             )}
 
