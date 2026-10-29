@@ -4,6 +4,8 @@ const cors = require('cors');
 const vehiculoRoutes = require('./routes/vehiculo.routes');
 const authRoutes = require('./routes/auth.routes');
 const rutaTransportistaRoutes = require('./routes/modificarTransportistaRuta.routes');
+
+const rutasGenerales = require('./routes/rutas.routes');
 // 1. Inicializamos la aplicación de Express
 const app = express();
 
@@ -21,6 +23,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/vehiculos', vehiculoRoutes);
 
 app.use('/api/rutaTransportista', rutaTransportistaRoutes);
+
+app.use('/api/rutas', rutasGenerales);
 
 // 4. Definimos el puerto (usamos el del archivo .env que configuraste antes, o el 3000 por defecto)
 const PORT = process.env.PORT || 3000;
