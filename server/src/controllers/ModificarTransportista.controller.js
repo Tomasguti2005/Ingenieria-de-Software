@@ -10,10 +10,10 @@ const prisma = require('../config/prisma');
 const { success, error } = require('../utils/response');
 
 // Expresión regular para validar formato nombre@gmail.com
-const REGEX_EMAIL_GMAIL = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+const REGEX_EMAIL_GMAIL = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 // Expresión regular para teléfono: todo seguido sin espacios (admite código de país opcional + seguido de dígitos)
-const REGEX_TELEFONO_SIN_ESPACIOS = /^\+?[0-9]{7,15}$/;
+const REGEX_TELEFONO_SIN_ESPACIOS = /^\+?[0-9]{9,15}$/;
 
 /**
  * Controlador para modificar los datos de un transportista.
@@ -34,7 +34,7 @@ const modificarTransportista = async (req, res) => {
   const { nombre, apellido, email, telefono, vehiculo, estado } = req.body || {};
 
   // Escenario 2: Verificación de que todos los campos obligatorios estén presentes y no vacíos
-  const camposRequeridos = [nombre, apellido, email, telefono, vehiculo, estado];
+  const camposRequeridos = [nombre, apellido, email, telefono, estado];
   const tieneCamposVacios = camposRequeridos.some(
     (campo) => campo === undefined || campo === null || String(campo).trim() === ''
   );
@@ -47,7 +47,6 @@ const modificarTransportista = async (req, res) => {
   const apellidoLimpio = String(apellido).trim();
   const emailLimpio = String(email).trim().toLowerCase();
   const telefonoLimpio = String(telefono).trim();
-  const vehiculoLimpio = String(vehiculo).trim();
   const estadoLimpio = String(estado).trim().toUpperCase();
 
   // Escenario 2: Validación de formato de email (debe ser @gmail.com)
@@ -94,7 +93,6 @@ const modificarTransportista = async (req, res) => {
         apellido: apellidoLimpio,
         email: emailLimpio,
         telefono: telefonoLimpio,
-        vehiculo: vehiculoLimpio,
         estado: estadoLimpio,
       },
     });
@@ -113,7 +111,6 @@ const modificarTransportista = async (req, res) => {
           telefono: transportistaActualizado.telefono,
           email: transportistaActualizado.email,
           estado: transportistaActualizado.estado,
-          vehiculo: transportistaActualizado.vehiculo,
         },
       },
       200

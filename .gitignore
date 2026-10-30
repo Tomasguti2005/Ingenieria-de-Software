@@ -1,19 +1,10 @@
 # Dependencias
 node_modules/
 
-# Base de datos SQLite — cada integrante tiene la suya local
-*.db
+# Base de datos SQLite
 *.db-journal
 *.db-wal
 *.db-shm
-server/prisma/dev.db
-
-# Entornos y credenciales (NUNCA SUBIR)
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 
 # Compilados de Frontend
 dist/
@@ -38,4 +29,4 @@ server/uploads/
 # React Native / Expo
 .expo/
 client-mobile/ios/
-client-mobile/android/
+client-mobile/android/

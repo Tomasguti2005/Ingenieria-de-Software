@@ -551,22 +551,6 @@
   line-height: 1.5;
 }
 
-.btn-action-primary {
-  background: #238636;
-  border: 1px solid rgba(240, 246, 252, 0.1);
-  color: #ffffff;
-  border-radius: 6px;
-  padding: 7px 14px;
-  font-size: 12.5px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-action-primary:hover {
-  background: #2ea043;
-}
-
 /* Estado de Carga */
 .state-card.loading {
   padding: 60px 20px;
@@ -786,3 +770,583 @@
   color: #64748b;
 }
 
+
+/* ─── Botones de Acción en el Encabezado ───────────────────────────────────── */
+.btn-action-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #238636;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 6px 12px;
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-action-primary:hover {
+  background: #2ea043;
+}
+
+.btn-action-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #da3633;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 6px 12px;
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-action-danger:hover {
+  background: #f85149;
+}
+
+/* Columna de vehículo */
+.col-vehicle {
+  font-size: 13px;
+  color: #8b949e;
+}
+
+.cell-vehicle {
+  color: #8b949e;
+}
+
+/* ─── Alertas Flotantes (Toast) ────────────────────────────────────────────── */
+.toast-notification {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  min-width: 320px;
+  max-width: 90%;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  animation: slideToast 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideToast {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -15px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.toast-success {
+  background: #1f6feb;
+  color: #ffffff;
+}
+
+.toast-error {
+  background: #da3633;
+  color: #ffffff;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #ffffff;
+  opacity: 0.8;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+}
+
+.toast-close:hover {
+  opacity: 1;
+}
+
+/* ─── Modales (Dark Minimalist) ────────────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 9999;
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-window {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  max-width: 480px;
+  width: 100%;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  box-sizing: border-box;
+  color: #f0f6fc;
+}
+
+.modal-window-wide {
+  max-width: 680px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #21262d;
+}
+
+.modal-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: #f0f6fc;
+  margin: 0;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #8b949e;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.modal-close-btn:hover {
+  color: #f0f6fc;
+}
+
+.modal-description {
+  font-size: 13px;
+  color: #8b949e;
+  margin: 0 0 16px 0;
+  line-height: 1.45;
+}
+
+/* Formulario Modal */
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #8b949e;
+}
+
+.form-group input {
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: #f0f6fc;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-group input:focus {
+  border-color: #58a6ff;
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+}
+
+.field-hint {
+  font-size: 11px;
+  color: #6e7681;
+}
+
+/* Tabla de Selección para Eliminar */
+.modal-table-wrap {
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.modal-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  text-align: left;
+}
+
+.modal-table th {
+  background: #0d1117;
+  padding: 9px 12px;
+  color: #8b949e;
+  font-weight: 600;
+  border-bottom: 1px solid #30363d;
+}
+
+.modal-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #21262d;
+  color: #8b949e;
+}
+
+.modal-table tr {
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.modal-table tr:hover {
+  background: #161b22;
+}
+
+.modal-table tr.row-selected {
+  background: rgba(218, 54, 51, 0.15);
+}
+
+.modal-table tr.row-selected td {
+  color: #f85149;
+}
+
+/* Acciones del Modal */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn-modal-cancel {
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 7px 14px;
+  color: #c9d1d9;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-modal-cancel:hover {
+  background: #30363d;
+}
+
+.btn-modal-submit {
+  background: #238636;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 7px 16px;
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-modal-submit:hover {
+  background: #2ea043;
+}
+
+.btn-modal-danger {
+  background: #da3633;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 7px 16px;
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-modal-danger:hover {
+  background: #f85149;
+}
+
+/* ─── Soporte para Tema Claro (.theme-light) ───────────────────────────────── */
+.theme-light .modal-window {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  color: #0f172a;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.theme-light .modal-header {
+  border-bottom-color: #f1f5f9;
+}
+
+.theme-light .modal-title {
+  color: #0f172a;
+}
+
+.theme-light .modal-close-btn {
+  color: #64748b;
+}
+
+.theme-light .modal-close-btn:hover {
+  color: #0f172a;
+}
+
+.theme-light .modal-description {
+  color: #64748b;
+}
+
+.theme-light .form-group label {
+  color: #475569;
+}
+
+.theme-light .form-group input {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.theme-light .form-group input:focus {
+  background: #ffffff;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.theme-light .field-hint {
+  color: #64748b;
+}
+
+.theme-light .modal-table-wrap {
+  border-color: #e2e8f0;
+}
+
+.theme-light .modal-table th {
+  background: #f8fafc;
+  color: #475569;
+  border-bottom-color: #e2e8f0;
+}
+
+.theme-light .modal-table td {
+  border-bottom-color: #f1f5f9;
+  color: #475569;
+}
+
+.theme-light .modal-table tr:hover {
+  background: #f8fafc;
+}
+
+.theme-light .modal-table tr.row-selected {
+  background: #fee2e2;
+}
+
+.theme-light .modal-table tr.row-selected td {
+  color: #b91c1c;
+}
+
+.theme-light .btn-modal-cancel {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.theme-light .btn-modal-cancel:hover {
+  background: #e2e8f0;
+}
+
+.theme-light .col-vehicle,
+.theme-light .cell-vehicle {
+  color: #64748b;
+}
+
+/* ── Nombre interactivo en la tabla (abre Ficha Personal) ───────────────── */
+.user-name-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #58a6ff;
+  text-align: left;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.user-name-btn:hover {
+  color: #79c0ff;
+  text-decoration: underline;
+}
+
+/* ── Ficha Personal del Empleado ─────────────────────────────────────────── */
+.ficha-perfil {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid #21262d;
+  margin-bottom: 20px;
+}
+
+.ficha-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #1f6feb;
+  border: 1px solid rgba(88, 166, 255, 0.3);
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+}
+
+.ficha-avatar.inactivo {
+  background: #21262d;
+  border-color: #30363d;
+  color: #6e7681;
+}
+
+.ficha-identidad {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ficha-nombre {
+  font-size: 18px;
+  font-weight: 600;
+  color: #f0f6fc;
+  margin: 0;
+}
+
+.ficha-datos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 480px) {
+  .ficha-datos {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ficha-dato-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ficha-dato-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #6e7681;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ficha-dato-valor {
+  font-size: 13.5px;
+  color: #c9d1d9;
+}
+
+.ficha-acciones {
+  border-top: 1px solid #21262d;
+  padding-top: 16px;
+}
+
+/* Selector de estado en edición */
+.select-wrapper-full {
+  width: 100%;
+}
+
+.select-full {
+  width: 100%;
+}
+
+/* ── Soporte tema claro para la ficha ────────────────────────────────────── */
+.theme-light .user-name-btn {
+  color: #0969da;
+}
+
+.theme-light .user-name-btn:hover {
+  color: #0550ae;
+}
+
+.theme-light .ficha-perfil {
+  border-bottom-color: #f1f5f9;
+}
+
+.theme-light .ficha-avatar {
+  background: #dbeafe;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+.theme-light .ficha-avatar.inactivo {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #64748b;
+}
+
+.theme-light .ficha-nombre {
+  color: #0f172a;
+}
+
+.theme-light .ficha-dato-label {
+  color: #64748b;
+}
+
+.theme-light .ficha-dato-valor {
+  color: #1e293b;
+}
+
+.theme-light .ficha-acciones {
+  border-top-color: #f1f5f9;
+}

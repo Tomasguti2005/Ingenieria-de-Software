@@ -126,31 +126,42 @@
   padding: 6px 10px 8px;
 }
 
-.sidebar-link {
-  display: flex;
-  align-items: center;
+/* Estilo unificado y forzado a la izquierda para NavLink y botones (Vehículos) */
+.sidebar-link,
+button.sidebar-link {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  background: transparent !important;
+  font-family: inherit !important;
+  color: #c9d1d9 !important;
   gap: 12px;
   padding: 9px 12px;
   border-radius: 8px;
-  color: #c9d1d9;
   text-decoration: none;
   font-size: 13.5px;
   font-weight: 500;
   transition: all 0.15s ease;
   position: relative;
-  border: 1px solid transparent;
+  border: 1px solid transparent !important;
+  cursor: pointer;
+  box-sizing: border-box;
 }
 
-.sidebar-link:hover:not(.deshabilitado) {
-  background: rgba(255, 255, 255, 0.04);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.08);
+.sidebar-link:hover:not(.deshabilitado),
+button.sidebar-link:hover:not(.deshabilitado) {
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
-.sidebar-link.activo {
-  background: rgba(56, 139, 253, 0.12);
-  color: #58a6ff;
-  border-color: rgba(56, 139, 253, 0.3);
+.sidebar-link.activo,
+button.sidebar-link.activo {
+  background: rgba(56, 139, 253, 0.12) !important;
+  color: #58a6ff !important;
+  border-color: rgba(56, 139, 253, 0.3) !important;
   font-weight: 600;
 }
 
@@ -170,6 +181,7 @@
 
 .sidebar-label {
   flex: 1;
+  text-align: left !important;
 }
 
 .sidebar-active-indicator {
@@ -178,6 +190,77 @@
   border-radius: 50%;
   background: #58a6ff;
   box-shadow: 0 0 8px rgba(88, 166, 255, 0.7);
+}
+
+/* --- Desplegable y Submenú de Vehículos --- */
+.sidebar-dropdown-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.sidebar-chevron {
+  transition: transform 0.2s ease;
+  opacity: 0.7;
+  flex-shrink: 0;
+  margin-left: auto !important;
+}
+
+.sidebar-chevron.rotado {
+  transform: rotate(180deg);
+}
+
+.sidebar-submenu {
+  display: flex;
+  flex-direction: column;
+  width: 100% !important;
+  padding-left: 28px !important;
+  padding-right: 6px !important;
+  gap: 3px;
+  margin-top: 3px;
+  margin-bottom: 6px;
+  box-sizing: border-box;
+}
+
+.sidebar-sublink {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: #8b949e;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.sidebar-sublink:hover {
+  background: rgba(255, 255, 255, 0.03);
+  color: #f0f6fc;
+}
+
+.sidebar-sublink.activo {
+  background: rgba(56, 139, 253, 0.08);
+  color: #58a6ff;
+  font-weight: 600;
+}
+
+.sidebar-sublink-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: currentColor;
+  opacity: 0.4;
+  flex-shrink: 0;
+}
+
+.sidebar-sublink.activo .sidebar-sublink-dot {
+  opacity: 1;
+  box-shadow: 0 0 6px rgba(88, 166, 255, 0.6);
 }
 
 /* Footer del Drawer */
