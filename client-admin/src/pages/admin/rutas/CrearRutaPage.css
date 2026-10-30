@@ -1,0 +1,455 @@
+/* CrearRutaPage.css — Estilos para el formulario de Creación de Rutas */
+
+.crear-ruta-container {
+  padding: 32px 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+  color: var(--text-primary, #ededed);
+}
+
+.crear-ruta-form {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Tarjetas de sección */
+.ruta-card-section {
+  background: var(--bg-card, #121316);
+  border: 1px solid var(--border-color, #22242a);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color, #22242a);
+  padding-bottom: 12px;
+}
+
+.section-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--text-primary, #f3f4f6);
+}
+
+.section-badge {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary, #9ca3af);
+  font-family: monospace;
+}
+
+/* Campos de entrada */
+.form-input-text,
+.form-select {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-input, #18191e);
+  border: 1px solid var(--border-color, #2d3039);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input-text:focus,
+.form-select:focus {
+  border-color: #3b82f6;
+}
+
+.form-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #9ca3af);
+  margin-top: 4px;
+}
+
+/* Info del transportista seleccionado */
+.transportista-preview {
+  margin-top: 12px;
+  padding: 14px 16px;
+  background: rgba(59, 130, 246, 0.05);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.transportista-preview-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.transportista-preview-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.preview-name {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.preview-tags {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.tag-attr {
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+}
+
+.tag-attr.tag-success {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.tag-attr.tag-warning {
+  background: rgba(234, 179, 8, 0.15);
+  color: #facc15;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+/* Lista interactiva de pedidos */
+.pedidos-selection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.pedido-select-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--bg-input, #16171b);
+  border: 1px solid var(--border-color, #272a33);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.pedido-select-item:hover:not(.deshabilitado) {
+  border-color: #3b82f6;
+  background: #1b1c22;
+}
+
+.pedido-select-item.seleccionado {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.pedido-select-item.deshabilitado {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: #111215;
+}
+
+.pedido-item-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.pedido-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.pedido-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pedido-codigo {
+  font-family: monospace;
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: #60a5fa;
+}
+
+.pedido-destino {
+  font-size: 0.88rem;
+  color: #e2e8f0;
+}
+
+.pedido-destinatario {
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.pedido-item-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Badges de estado de ruta */
+.badge-ruta {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-ruta.disponible {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.badge-ruta.asignado {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* Footer de acciones */
+.ruta-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.btn-crear-ruta {
+  padding: 12px 24px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-crear-ruta:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.btn-crear-ruta:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn-crear-ruta:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-cancelar-ruta {
+  padding: 12px 20px;
+  background: transparent;
+  color: #94a3b8;
+  border: 1px solid var(--border-color, #272a33);
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancelar-ruta:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+
+/* ── Custom Dropdown Selector de Transportistas ── */
+.custom-select-container {
+  position: relative;
+  width: 100%;
+}
+
+.custom-select-trigger {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-input, #18191e);
+  border: 1px solid var(--border-color, #2d3039);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.custom-select-trigger:focus,
+.custom-select-trigger.abierto {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.custom-select-placeholder {
+  color: #64748b;
+}
+
+.custom-select-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #14161b;
+  border: 1px solid var(--border-color, #2e323e);
+  border-radius: 10px;
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  gap: 4px;
+}
+
+.custom-select-option {
+  padding: 10px 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background 0.15s;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.custom-select-option:hover:not(.deshabilitado) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.custom-select-option.seleccionado {
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.custom-select-option.deshabilitado {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.option-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.option-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.option-name {
+  font-weight: 500;
+  font-size: 0.88rem;
+  color: #f1f5f9;
+}
+
+.option-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pill {
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pill-activo {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.pill-inactivo {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.pill-vehiculo {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.pill-sin-vehiculo {
+  background: rgba(148, 163, 184, 0.1);
+  color: #94a3b8;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.pill-apto {
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.pill-no-apto {
+  background: rgba(234, 179, 8, 0.12);
+  color: #eab308;
+  border: 1px solid rgba(234, 179, 8, 0.25);
+}
