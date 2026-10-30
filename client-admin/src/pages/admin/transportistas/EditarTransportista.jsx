@@ -176,8 +176,7 @@ export default function EditarTransportistaPage() {
             <label className="form-label" htmlFor="email">Correo electrónico (ej: nombre@gmail.com)</label>
             <input
               id="email"
-              type="email"
-              className="form-input font-mono"
+              className="form-input"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="usuario@gmail.com"
