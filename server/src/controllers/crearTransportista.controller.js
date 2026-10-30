@@ -3,10 +3,18 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
+// Expresión regular para validar formato nombre@gmail.com
+const REGEX_EMAIL_GMAIL = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+// Expresión regular para teléfono: todo seguido sin espacios (admite código de país opcional + seguido de dígitos)
+const REGEX_TELEFONO_SIN_ESPACIOS = /^\+?[0-9]{9,15}$/;
+
 const crearTransportista = async (req, res) => {
   try {
     const { nombre, apellido, email, telefono, password } = req.body;
 
+    const emailLimpio = String(email).trim().toLowerCase();
+    const telefonoLimpio = String(telefono).trim();
     // Regla: Los campos obligatorios a completar son: Nombre, Apellido, Correo electrónico, Contraseña y Teléfono.
     if (!nombre || !apellido || !email || !telefono || !password) {
       return res.status(400).json({ 
@@ -23,6 +31,20 @@ const crearTransportista = async (req, res) => {
       });
     }
 
+     // Escenario 2: Validación de formato de email (debe ser @gmail.com)
+// Escenario 2: Validación de formato de email (debe ser @gmail.com)
+  if (!REGEX_EMAIL_GMAIL.test(emailLimpio)) {
+    return res.status(400).json({ 
+      error: 'Debe completar todos los campos obligatorios con un formato válido' 
+    });
+  }
+
+  // Escenario 2: Validación de formato de teléfono (todo seguido sin espacios)
+  if (telefonoLimpio.includes(' ') || !REGEX_TELEFONO_SIN_ESPACIOS.test(telefonoLimpio)) {
+    return res.status(400).json({ 
+      error: 'Debe completar todos los campos obligatorios con un formato válido' 
+    });
+  }
     const emailNormalizado = email.toLowerCase().trim();
 
     // Escenario 2: Registro rechazado por mail duplicado
