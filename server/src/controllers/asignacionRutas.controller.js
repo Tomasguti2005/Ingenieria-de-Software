@@ -6,10 +6,11 @@ const { success, error } = require('../utils/response');
  */
 const asignarTransportistaARuta = async (req, res) => {
   const rutaId = Number(req.params.id);
-  const { transportistaId, forzarModificacion } = req.body; 
+  const transportistaId = Number(req.body?.transportistaId);
+  const { forzarModificacion } = req.body || {};
   // 'forzarModificacion' nos permite diferenciar el Escenario 2 (error) del Escenario 6 (modificación exitosa)
 
-  if (!transportistaId) {
+  if (!Number.isInteger(rutaId) || rutaId <= 0 || !Number.isInteger(transportistaId) || transportistaId <= 0) {
     return error(res, 'Debe proporcionar un ID de transportista.', 400);
   }
 
@@ -51,9 +52,18 @@ const asignarTransportistaARuta = async (req, res) => {
     }
 
     // ESCENARIO 1 y 6: Asignación / Modificación exitosa
-    const rutaActualizada = await prisma.ruta.update({
-      where: { id: rutaId },
-      data: { transportistaId: transportista.id }
+    const rutaActualizada = await prisma.$transaction(async (tx) => {
+      const actualizada = await tx.ruta.update({
+        where: { id: rutaId },
+        data: { transportistaId: transportista.id }
+      });
+
+      await tx.pedido.updateMany({
+        where: { rutaId },
+        data: { repartidorId: transportista.id }
+      });
+
+      return actualizada;
     });
 
     return success(res, {
@@ -73,14 +83,25 @@ const asignarTransportistaARuta = async (req, res) => {
 const removerTransportistaDeRuta = async (req, res) => {
   const rutaId = Number(req.params.id);
 
+  if (!Number.isInteger(rutaId) || rutaId <= 0) {
+    return error(res, 'Debe proporcionar un ID de ruta válido.', 400);
+  }
+
   try {
     const ruta = await prisma.ruta.findUnique({ where: { id: rutaId } });
 
     if (!ruta) return error(res, 'La ruta especificada no existe.', 404);
 
-    await prisma.ruta.update({
-      where: { id: rutaId },
-      data: { transportistaId: null }
+    await prisma.$transaction(async (tx) => {
+      await tx.ruta.update({
+        where: { id: rutaId },
+        data: { transportistaId: null }
+      });
+
+      await tx.pedido.updateMany({
+        where: { rutaId },
+        data: { repartidorId: null }
+      });
     });
 
     return success(res, {

@@ -1,6 +1,7 @@
 require('dotenv').config();
 const cors = require('cors');
 const express = require('express');
+const prisma = require('./config/prisma');
 const authRoutes = require('./routes/auth.routes');
 const vehiculoRoutes = require('./routes/vehiculo.routes');
 const transportistaVehiculoRoutes = require('./routes/transportistasVehiculo.routes');
@@ -32,6 +33,19 @@ app.use('/api/admin/transportistas', obtenerTransportistasRoutes);
 app.use('/api/transportistas', transportistaEdicionRoutes);
 app.use('/api/rutaTransportista', rutaTransportistaRoutes);
 app.use('/api/rutas', rutasGenerales);
+
+// Ruta para obtener pedidos disponibles para la asignación de rutas
+app.get('/api/pedidos', async (req, res) => {
+  try {
+    const pedidos = await prisma.pedido.findMany({
+      orderBy: { id: 'asc' },
+    });
+    return res.json({ success: true, data: pedidos });
+  } catch (err) {
+    console.error('Error al obtener pedidos:', err);
+    return res.status(500).json({ success: false, error: 'Error interno del servidor al obtener pedidos.' });
+  }
+});
 
 // 4. Definimos el puerto (usamos el del archivo .env que configuraste antes, o el 3000 por defecto)
 const PORT = process.env.PORT || 3000;

@@ -1,15 +1,19 @@
 const express = require('express');
 const router = express.Router();
-
-// Importamos las funciones del controlador
-// Asegurate de que la ruta al archivo del controlador sea la correcta
+// Controladores de rutas y pedidos
 const {
   obtenerRutas,
   crearRuta,
   asignarPedidoARuta,
   desasignarPedidosDeRuta,
   eliminarRuta
-} = require('../controllers/ruta.controller'); // Ajustá el nombre si tu archivo se llama distinto
+} = require('../controllers/ruta.controller');
+
+// Controladores de asignación de transportista a ruta
+const {
+  asignarTransportistaARuta,
+  removerTransportistaDeRuta
+} = require('../controllers/asignacionRutas.controller');
 
 // GET: Obtener todas las rutas
 router.get('/', obtenerRutas);
@@ -21,8 +25,13 @@ router.post('/', crearRuta);
 router.post('/:id/asignar-pedido', asignarPedidoARuta);
 
 // DELETE: Desasignar pedidos de una ruta específica
-// Usa DELETE porque remueve la relación, aunque recibe un body con pedidosIds
 router.delete('/:id/desasignar-pedidos', desasignarPedidosDeRuta);
+
+// POST: Asignar o modificar el transportista de una ruta
+router.post('/:id/asignar-transportista', asignarTransportistaARuta);
+
+// DELETE: Remover el transportista de la ruta
+router.delete('/:id/remover-transportista', removerTransportistaDeRuta);
 
 // DELETE: Eliminar una ruta completa
 router.delete('/:id', eliminarRuta);
