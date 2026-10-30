@@ -148,7 +148,7 @@ export default function EditarTransportistaPage() {
         </div>
       </header>
 
-      <div className="form-page-container" style={{ maxWidth: '600px', margin: '2rem auto', background: '#0f1117', padding: '2rem', border: '1px solid #1f2430', borderRadius: '8px' }}>
+      <div className="form-page-container" style={{ width: '100%', boxSizing: 'border-box', minHeight: '480px', maxWidth: '600px', margin: '2rem auto', background: '#0f1117', padding: '2rem', border: '1px solid #1f2430', borderRadius: '8px' }}>
         <form onSubmit={handleSubmit} className="modal-form">
           <div className="form-group" style={{ marginBottom: '1.25rem' }}>
             <label className="form-label" htmlFor="nombre">Nombre</label>
