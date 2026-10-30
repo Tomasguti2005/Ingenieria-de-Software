@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   obtenerTransportistasParaRuta,
   obtenerPedidosParaRuta,
+  obtenerRutasCreadas,
   crearRuta,
 } from '../../../services/rutas.service.js';
 import './CrearRutaPage.css';
@@ -19,9 +20,10 @@ export default function CrearRutaPage() {
   const [desplegableChoferAbierto, setDesplegableChoferAbierto] = useState(false);
   const [pedidosSeleccionados, setPedidosSeleccionados] = useState([]);
 
-  // Datos del backend
+  // Datos del backend / mock
   const [transportistas, setTransportistas] = useState([]);
   const [pedidos, setPedidos] = useState([]);
+  const [rutasExistentes, setRutasExistentes] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [enviando, setEnviando] = useState(false);
 
@@ -35,17 +37,19 @@ export default function CrearRutaPage() {
     return () => clearTimeout(t);
   }, [alerta]);
 
-  // Cargar transportistas y pedidos al montar
+  // Cargar transportistas, pedidos y rutas existentes al montar
   useEffect(() => {
     async function cargarDatosIniciales() {
       setCargando(true);
       try {
-        const [transpData, pedidosData] = await Promise.all([
+        const [transpData, pedidosData, rutasData] = await Promise.all([
           obtenerTransportistasParaRuta(),
           obtenerPedidosParaRuta(),
+          obtenerRutasCreadas(),
         ]);
         setTransportistas(transpData);
         setPedidos(pedidosData);
+        setRutasExistentes(rutasData);
       } catch (err) {
         console.error('Error al cargar datos:', err);
         setAlerta({ tipo: 'error', mensaje: 'No se pudieron cargar los datos necesarios.' });
@@ -63,20 +67,49 @@ export default function CrearRutaPage() {
     return transportistas.find((t) => t.id === Number(transportistaId)) || null;
   }, [transportistas, transportistaId]);
 
-  // Validación de requisitos del transportista
+  // Validación de requisitos del transportista seleccionado:
+  // 1. Debe estar ACTIVO
+  // 2. Debe tener un vehículo asignado
+  // 3. Debe estar DISPONIBLE (no asignado previamente a otra ruta)
   const transportistaCumpleRequisitos = useMemo(() => {
     if (!transportistaSeleccionado) return false;
     const estaActivo = transportistaSeleccionado.estado === 'ACTIVO';
     const tieneVehiculo = Boolean(
-      transportistaSeleccionado.vehiculo && transportistaSeleccionado.vehiculo.trim() !== ''
+      transportistaSeleccionado.vehiculo && String(transportistaSeleccionado.vehiculo).trim() !== ''
     );
-    return estaActivo && tieneVehiculo;
-  }, [transportistaSeleccionado]);
+    const yaTieneRuta = rutasExistentes.some((r) => r.transportistaId === transportistaSeleccionado.id);
+    return estaActivo && tieneVehiculo && !yaTieneRuta;
+  }, [transportistaSeleccionado, rutasExistentes]);
+
+  // Selección de transportista con validación de requisitos
+  function handleSeleccionarTransportista(t) {
+    const estaActivo = t.estado === 'ACTIVO';
+    const tieneVehiculo = Boolean(t.vehiculo && String(t.vehiculo).trim() !== '');
+    const yaTieneRuta = rutasExistentes.some((r) => r.transportistaId === t.id);
+    const esApto = estaActivo && tieneVehiculo && !yaTieneRuta;
+
+    // Regla: "Un transportista no puede ser asignado a una ruta si no cumple con los requisitos establecidos"
+    if (!esApto) {
+      let motivo = 'El transportista no puede ser asignado: ';
+      if (!estaActivo) motivo += 'debe estar ACTIVO en el sistema.';
+      else if (!tieneVehiculo) motivo += 'debe tener un vehículo asignado.';
+      else if (yaTieneRuta) motivo += 'ya se encuentra asignado a otra ruta de entrega.';
+      setAlerta({ tipo: 'error', mensaje: motivo });
+      return;
+    }
+
+    setTransportistaId(String(t.id));
+    setDesplegableChoferAbierto(false);
+  }
 
   // Manejo de selección múltiple de pedidos
   function toggleSeleccionPedido(pedido) {
-    // Si ya está asignado a otra ruta, no se puede seleccionar
+    // Regla: "Un pedido no puede estar asignado a más de una ruta"
     if (pedido.rutaId !== null && pedido.rutaId !== undefined) {
+      setAlerta({
+        tipo: 'error',
+        mensaje: 'Este pedido ya está asignado a otra ruta y no puede ser seleccionado.',
+      });
       return;
     }
 
@@ -123,7 +156,7 @@ export default function CrearRutaPage() {
     if (!transportistaCumpleRequisitos) {
       setAlerta({
         tipo: 'error',
-        mensaje: 'El transportista seleccionado debe estar activo y tener un vehículo asignado.',
+        mensaje: 'El transportista seleccionado debe estar activo, disponible y tener un vehículo asignado.',
       });
       return;
     }
@@ -147,9 +180,13 @@ export default function CrearRutaPage() {
       setTransportistaId('');
       setPedidosSeleccionados([]);
 
-      // Opcional: recargar lista de pedidos para reflejar los recién asignados
-      const pedidosActualizados = await obtenerPedidosParaRuta();
+      // Recargar pedidos y rutas para actualizar estados
+      const [pedidosActualizados, rutasActualizadas] = await Promise.all([
+        obtenerPedidosParaRuta(),
+        obtenerRutasCreadas(),
+      ]);
       setPedidos(pedidosActualizados);
+      setRutasExistentes(rutasActualizadas);
     } catch (err) {
       setAlerta({
         tipo: 'error',
@@ -186,11 +223,11 @@ export default function CrearRutaPage() {
           <div className="header-breadcrumb">
             <span>Repartos Ya</span>
             <span className="breadcrumb-separator">/</span>
-            <span>Pedidos</span>
+            <span>Rutas</span>
             <span className="breadcrumb-separator">/</span>
-            <span className="breadcrumb-current">Asignar ruta</span>
+            <span className="breadcrumb-current">Crear ruta</span>
           </div>
-          <h1 className="header-title">Asignar Nueva Ruta</h1>
+          <h1 className="header-title">Creación de Rutas</h1>
           <p className="page-subtitle" style={{ color: 'var(--text-secondary, #9ca3af)', marginTop: '4px' }}>
             Asigná sus respectivos pedidos, seleccioná un transportista disponible con vehículo y describí la ruta.
           </p>
@@ -257,7 +294,10 @@ export default function CrearRutaPage() {
                         {transportistaSeleccionado.estado}
                       </span>
                       <span className={`pill ${transportistaSeleccionado.vehiculo ? 'pill-vehiculo' : 'pill-sin-vehiculo'}`}>
-                        {transportistaSeleccionado.vehiculo ? `Patente: ${transportistaSeleccionado.vehiculo}` : 'Sin vehículo'}
+                        {transportistaSeleccionado.vehiculo ? `Vehículo: ${transportistaSeleccionado.vehiculo}` : 'Sin vehículo'}
+                      </span>
+                      <span className={`pill ${transportistaCumpleRequisitos ? 'pill-apto' : 'pill-no-apto'}`}>
+                        {transportistaCumpleRequisitos ? 'Disponible para trabajar' : 'No disponible'}
                       </span>
                     </div>
                   </div>
@@ -286,8 +326,10 @@ export default function CrearRutaPage() {
                     </div>
                   ) : (
                     transportistas.map((t) => {
-                      const tieneVehiculo = Boolean(t.vehiculo && t.vehiculo.trim() !== '');
-                      const esApto = t.estado === 'ACTIVO' && tieneVehiculo;
+                      const tieneVehiculo = Boolean(t.vehiculo && String(t.vehiculo).trim() !== '');
+                      const estaActivo = t.estado === 'ACTIVO';
+                      const yaTieneRuta = rutasExistentes.some((r) => r.transportistaId === t.id);
+                      const esApto = estaActivo && tieneVehiculo && !yaTieneRuta;
                       const estaSeleccionado = Number(transportistaId) === t.id;
 
                       return (
@@ -295,10 +337,8 @@ export default function CrearRutaPage() {
                           type="button"
                           key={t.id}
                           className={`custom-select-option ${estaSeleccionado ? 'seleccionado' : ''} ${!esApto ? 'deshabilitado' : ''}`}
-                          onClick={() => {
-                            setTransportistaId(String(t.id));
-                            setDesplegableChoferAbierto(false);
-                          }}
+                          onClick={() => handleSeleccionarTransportista(t)}
+                          title={!esApto ? 'No cumple con los requisitos para ser asignado' : 'Seleccionar chofer'}
                         >
                           <div className="option-left">
                             <div className="option-avatar">
@@ -307,15 +347,16 @@ export default function CrearRutaPage() {
                             <span className="option-name">{t.nombre} {t.apellido}</span>
                           </div>
 
+                          {/* Atributos indicados en la lista según criterios de aceptación */}
                           <div className="option-pills">
-                            <span className={`pill ${t.estado === 'ACTIVO' ? 'pill-activo' : 'pill-inactivo'}`}>
-                              {t.estado}
+                            <span className={`pill ${estaActivo ? 'pill-activo' : 'pill-inactivo'}`}>
+                              {estaActivo ? 'Activo' : 'Inactivo'}
                             </span>
                             <span className={`pill ${tieneVehiculo ? 'pill-vehiculo' : 'pill-sin-vehiculo'}`}>
-                              {tieneVehiculo ? `Patente: ${t.vehiculo}` : 'Sin vehículo'}
+                              {tieneVehiculo ? `Vehículo: ${t.vehiculo}` : 'Sin vehículo'}
                             </span>
                             <span className={`pill ${esApto ? 'pill-apto' : 'pill-no-apto'}`}>
-                              {esApto ? '✓ Apto' : 'No disponible'}
+                              {esApto ? 'Disponible para trabajar' : yaTieneRuta ? 'En otra ruta' : 'No disponible'}
                             </span>
                           </div>
                         </button>
@@ -326,7 +367,7 @@ export default function CrearRutaPage() {
               )}
             </div>
             <div className="form-hint">
-              Requisito: el transportista debe estar activo, disponible y contar con una patente de vehículo asignada.
+              Requisitos: el transportista debe estar registrado, activo, disponible y contar con un vehículo asignado.
             </div>
 
             {/* Vista previa de atributos del transportista seleccionado */}
@@ -340,10 +381,10 @@ export default function CrearRutaPage() {
                     <div className="preview-name">{transportistaSeleccionado.nombre} {transportistaSeleccionado.apellido}</div>
                     <div className="preview-tags">
                       <span className={`tag-attr ${transportistaSeleccionado.estado === 'ACTIVO' ? 'tag-success' : 'tag-warning'}`}>
-                        {transportistaSeleccionado.estado}
+                        {transportistaSeleccionado.estado === 'ACTIVO' ? 'Estado: Activo' : 'Estado: Inactivo'}
                       </span>
                       <span className={`tag-attr ${transportistaSeleccionado.vehiculo ? 'tag-success' : 'tag-warning'}`}>
-                        {transportistaSeleccionado.vehiculo ? `Patente: ${transportistaSeleccionado.vehiculo}` : 'Sin vehículo'}
+                        {transportistaSeleccionado.vehiculo ? `Vehículo: ${transportistaSeleccionado.vehiculo}` : 'Sin vehículo'}
                       </span>
                       <span className={`tag-attr ${transportistaCumpleRequisitos ? 'tag-success' : 'tag-warning'}`}>
                         {transportistaCumpleRequisitos ? 'Disponible para trabajar' : 'No cumple requisitos'}
@@ -406,6 +447,7 @@ export default function CrearRutaPage() {
                       </div>
                     </div>
 
+                    {/* El pedido indicará a su costado si está asignado a otra ruta */}
                     <div className="pedido-item-right">
                       {estaAsignadoAOtraRuta ? (
                         <span className="badge-ruta asignado">
@@ -431,7 +473,7 @@ export default function CrearRutaPage() {
           <button
             type="button"
             className="btn-cancelar-ruta"
-            onClick={() => navigate('/admin/transportistas')}
+            onClick={() => navigate('/admin/rutas')}
           >
             Cancelar
           </button>
@@ -451,4 +493,3 @@ export default function CrearRutaPage() {
     </div>
   );
 }
-

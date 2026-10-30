@@ -57,7 +57,33 @@ export default function RutasCreadasPage() {
   }
 
   useEffect(() => {
-    cargarDatos();
+    let componenteActivo = true;
+
+    async function cargarDatosIniciales() {
+      try {
+        const [rutasData, transData, pedidosData] = await Promise.all([
+          obtenerRutasCreadas(),
+          obtenerTransportistasParaRuta(),
+          obtenerPedidosParaRuta(),
+        ]);
+        if (!componenteActivo) return;
+        setRutas(rutasData);
+        setTransportistas(transData);
+        setPedidos(pedidosData);
+      } catch (err) {
+        console.error('Error al cargar datos:', err);
+        if (componenteActivo) {
+          setAlerta({ tipo: 'error', mensaje: 'No se pudieron cargar las rutas y los datos relacionados.' });
+        }
+      } finally {
+        if (componenteActivo) setCargando(false);
+      }
+    }
+
+    cargarDatosIniciales();
+    return () => {
+      componenteActivo = false;
+    };
   }, []);
 
   // Formatear fecha
@@ -119,7 +145,12 @@ export default function RutasCreadasPage() {
     }
 
     try {
-      await asignarTransportistaARuta(rutaEditarTransportista.id, Number(nuevoTransportistaId));
+      const modificarAsignacion = Boolean(rutaEditarTransportista.transportistaId);
+      await asignarTransportistaARuta(
+        rutaEditarTransportista.id,
+        Number(nuevoTransportistaId),
+        modificarAsignacion
+      );
       setAlerta({ tipo: 'success', mensaje: 'Transportista asignado correctamente a la ruta.' });
       setRutaEditarTransportista(null);
       setNuevoTransportistaId('');

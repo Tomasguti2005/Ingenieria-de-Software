@@ -1,7 +1,7 @@
 // Servicio base para llamadas a la API del backend.
 // Usa VITE_API_URL definida en .env
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace(/\/+$/, '');
 
 /**
  * Wrapper de fetch con headers de autenticación y manejo de errores.
@@ -22,7 +22,16 @@ export async function fetchAPI(endpoint, opciones = {}) {
   };
 
   const respuesta = await fetch(`${API_URL}${endpoint}`, config);
-  const datos = await respuesta.json();
+  const texto = await respuesta.text();
+  let datos = {};
+
+  if (texto) {
+    try {
+      datos = JSON.parse(texto);
+    } catch {
+      throw new Error('El servidor devolvió una respuesta inválida.');
+    }
+  }
 
   if (!respuesta.ok) {
     throw new Error(datos.error || 'Error en la solicitud');
