@@ -282,3 +282,110 @@ button.sidebar-link.activo {
   box-shadow: 0 0 6px rgba(35, 134, 54, 0.6);
   flex-shrink: 0;
 }
+
+
+/* ========================================================================= */
+/* ─── Soporte para Tema Claro (.theme-light) en Sidebar ─────────────────── */
+/* ========================================================================= */
+
+.theme-light .admin-sidebar-drawer {
+  background-color: #ffffff !important;
+  border-right: 1px solid #94a3b8 !important;
+  box-shadow: 12px 0 36px rgba(0, 0, 0, 0.15) !important;
+}
+
+.theme-light .sidebar-header {
+  border-bottom: 1px solid #cbd5e1 !important;
+}
+
+.theme-light .sidebar-brand-title {
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+
+.theme-light .sidebar-brand-sub {
+  color: #475569 !important;
+}
+
+.theme-light .sidebar-close-btn {
+  border: 1px solid #94a3b8 !important;
+  color: #0f172a !important;
+  background: #ffffff !important;
+}
+
+.theme-light .sidebar-close-btn:hover {
+  background: #f1f5f9 !important;
+  border-color: #64748b !important;
+}
+
+.theme-light .sidebar-section-label {
+  color: #1e293b !important;
+  font-weight: 700 !important;
+}
+
+.theme-light .sidebar-link,
+.theme-light button.sidebar-link {
+  color: #0f172a !important;
+  font-weight: 600 !important;
+  background: transparent !important;
+}
+
+.theme-light .sidebar-link .sidebar-icon,
+.theme-light button.sidebar-link .sidebar-icon {
+  color: #1e293b !important;
+}
+
+.theme-light .sidebar-chevron {
+  color: #334155 !important;
+  opacity: 0.9 !important;
+}
+
+.theme-light .sidebar-link:hover:not(.deshabilitado),
+.theme-light button.sidebar-link:hover:not(.deshabilitado) {
+  background: #f1f5f9 !important;
+  color: #000000 !important;
+  border-color: #94a3b8 !important;
+}
+
+.theme-light .sidebar-link.activo,
+.theme-light button.sidebar-link.activo {
+  background: rgba(37, 99, 235, 0.1) !important;
+  color: #1d4ed8 !important;
+  border-color: rgba(37, 99, 235, 0.35) !important;
+}
+
+.theme-light .sidebar-link.activo .sidebar-icon,
+.theme-light button.sidebar-link.activo .sidebar-icon {
+  color: #1d4ed8 !important;
+}
+
+.theme-light .sidebar-sublink {
+  color: #334155 !important;
+  font-weight: 500 !important;
+}
+
+.theme-light .sidebar-sublink:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.theme-light .sidebar-sublink.activo {
+  background: rgba(37, 99, 235, 0.1) !important;
+  color: #1d4ed8 !important;
+  font-weight: 700 !important;
+}
+
+.theme-light .sidebar-link.deshabilitado {
+  color: #94a3b8 !important;
+  opacity: 0.7 !important;
+}
+
+.theme-light .sidebar-link.deshabilitado .sidebar-icon {
+  color: #94a3b8 !important;
+}
+
+.theme-light .sidebar-footer {
+  border-top: 1px solid #cbd5e1 !important;
+  color: #475569 !important;
+  font-weight: 500 !important;
+}

@@ -1,0 +1,306 @@
+/* CrearPedidoPage.css — Estética Minimalista (Linear / Vercel design system) */
+/* Soporte completo para Tema Oscuro (default) y Tema Claro (.theme-light) */
+
+.crear-pedido-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 860px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.crear-pedido-container .page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 4px;
+}
+
+.crear-pedido-container .header-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.crear-pedido-container .header-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: #6e7681;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.crear-pedido-container .breadcrumb-separator {
+  color: #30363d;
+}
+
+.crear-pedido-container .breadcrumb-current {
+  color: #8b949e;
+}
+
+.crear-pedido-container .header-title {
+  font-size: 21px;
+  font-weight: 600;
+  color: #f0f6fc;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+/* Card Principal */
+.crear-pedido-card {
+  background: #0d1117;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.formulario-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 20px;
+}
+
+.campo-completo {
+  grid-column: 1 / -1;
+}
+
+.campo-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo-grupo label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #c9d1d9;
+}
+
+.campo-requerido {
+  color: #f85149;
+}
+
+.campo-opcional {
+  color: #6e7681;
+  font-weight: 400;
+  font-size: 11.5px;
+}
+
+.campo-grupo input,
+.campo-grupo select,
+.campo-grupo textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #161b22;
+  color: #f0f6fc;
+  font-size: 13px;
+  outline: none;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.campo-grupo textarea {
+  resize: none;
+}
+
+.campo-grupo input:focus,
+.campo-grupo select:focus,
+.campo-grupo textarea:focus {
+  border-color: #388bfd;
+  box-shadow: 0 0 0 3px rgba(56, 139, 253, 0.15);
+}
+
+.campo-grupo input.error,
+.campo-grupo select.error {
+  border-color: #f85149;
+  background: rgba(248, 81, 73, 0.06);
+}
+
+.campo-error-texto {
+  font-size: 11.5px;
+  color: #f85149;
+  margin-top: 2px;
+}
+
+/* Toast de Alerta Flotante / Inline */
+.alerta-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  animation: fadeIn 0.2s ease;
+}
+
+.alerta-container.exito {
+  background: rgba(35, 134, 54, 0.15);
+  border: 1px solid rgba(35, 134, 54, 0.4);
+  color: #3fb950;
+}
+
+.alerta-container.error {
+  background: rgba(248, 81, 73, 0.12);
+  border: 1px solid rgba(248, 81, 73, 0.3);
+  color: #f85149;
+}
+
+/* Acciones del Formulario */
+.crear-pedido-acciones {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btn-secundario {
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: #c9d1d9;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-secundario:hover {
+  background: #21262d;
+  color: #f0f6fc;
+}
+
+.btn-primario {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #238636;
+  border: 1px solid rgba(240, 246, 252, 0.1);
+  border-radius: 6px;
+  padding: 6px 14px;
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-primario:hover:not(:disabled) {
+  background: #2ea043;
+}
+
+.btn-primario:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+  .formulario-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========================================================================= */
+/* ─── Soporte para Tema Claro (.theme-light) ────────────────────────────── */
+/* ========================================================================= */
+
+.theme-light .crear-pedido-container .header-title {
+  color: #0f172a;
+}
+
+.theme-light .crear-pedido-container .header-breadcrumb {
+  color: #94a3b8;
+}
+
+.theme-light .crear-pedido-container .breadcrumb-separator {
+  color: #cbd5e1;
+}
+
+.theme-light .crear-pedido-container .breadcrumb-current {
+  color: #475569;
+}
+
+.theme-light .crear-pedido-card {
+  background: #ffffff;
+  border: 1px solid #94a3b8;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.theme-light .campo-grupo label {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.theme-light .campo-opcional {
+  color: #64748b;
+}
+
+.theme-light .campo-grupo input,
+.theme-light .campo-grupo select,
+.theme-light .campo-grupo textarea {
+  background: #ffffff;
+  border: 1px solid #94a3b8;
+  color: #0f172a;
+}
+
+.theme-light .campo-grupo input:focus,
+.theme-light .campo-grupo select:focus,
+.theme-light .campo-grupo textarea:focus {
+  background: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.theme-light .campo-grupo input.error,
+.theme-light .campo-grupo select.error {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.theme-light .crear-pedido-acciones {
+  border-top: 1px solid #cbd5e1;
+}
+
+.theme-light .btn-secundario {
+  background: #ffffff;
+  border: 1px solid #94a3b8;
+  color: #334155;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.theme-light .btn-secundario:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #64748b;
+}
+
+.theme-light .alerta-container.exito {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+.theme-light .alerta-container.error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
