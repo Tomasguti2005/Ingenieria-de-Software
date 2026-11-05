@@ -148,7 +148,7 @@ export default function EditarTransportistaPage() {
         </div>
       </header>
 
-      <div className="form-page-container" style={{ width: '100%', boxSizing: 'border-box', minHeight: '480px', maxWidth: '600px', margin: '2rem auto', background: '#0f1117', padding: '2rem', border: '1px solid #1f2430', borderRadius: '8px' }}>
+      <div className="form-page-container editar-transportista-card">
         <form onSubmit={handleSubmit} className="modal-form">
           <div className="form-group" style={{ marginBottom: '1.25rem' }}>
             <label className="form-label" htmlFor="nombre">Nombre</label>
@@ -202,7 +202,6 @@ export default function EditarTransportistaPage() {
               className="minimal-select full-width"
               value={estado}
               onChange={(e) => setEstado(e.target.value)}
-              style={{ width: '100%', padding: '0.625rem', background: '#161b22', color: '#e6edf3', border: '1px solid #30363d', borderRadius: '6px' }}
             >
               <option value="ACTIVO">ACTIVO</option>
               <option value="INACTIVO">INACTIVO</option>
@@ -217,7 +216,6 @@ export default function EditarTransportistaPage() {
               type="button"
               className="btn-action-secondary"
               onClick={() => navigate('/admin/transportistas')}
-              style={{ background: 'transparent', border: '1px solid #30363d', color: '#c9d1d9', padding: '0.625rem 1rem', borderRadius: '6px', cursor: 'pointer' }}
             >
               Cancelar
             </button>
@@ -225,7 +223,6 @@ export default function EditarTransportistaPage() {
               type="submit"
               className="btn-action-primary"
               disabled={cargandoGuardado}
-              style={{ background: '#238636', border: 'none', color: '#ffffff', padding: '0.625rem 1.25rem', borderRadius: '6px', cursor: 'pointer', fontWeight: 500 }}
             >
               {cargandoGuardado ? 'Guardando...' : 'Guardar cambios'}
             </button>

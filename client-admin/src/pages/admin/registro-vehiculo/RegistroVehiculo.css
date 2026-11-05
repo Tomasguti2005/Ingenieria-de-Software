@@ -1,42 +1,114 @@
+/* RegistroVehiculo.css — Estilo moderno y adaptable a tema claro/oscuro */
+
 .container {
   display: flex;
-  height: 100%;
   justify-content: center;
-}
-
-.title {
-  margin-bottom: 20px;
+  align-items: center;
+  min-height: 70vh;
+  padding: 1.5rem;
 }
 
 .form {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  width: 60%
+  width: 100%;
+  max-width: 520px;
+  padding: 28px;
+  background-color: var(--bg-surface, #161b22);
+  color: var(--text-primary, #f0f6fc);
+  border: 1px solid var(--border-default, #30363d);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.title {
+  margin-bottom: 8px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary, #f0f6fc);
 }
 
 .label {
   display: flex;
-  gap: 20px;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #8b949e);
 }
 
 .input {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 50%;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  font-size: 13.5px;
+  background: var(--bg-canvas, #0d1117);
+  color: var(--text-primary, #f0f6fc);
+  border: 1px solid var(--border-default, #30363d);
+  border-radius: 6px;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.input:focus {
+  border-color: #58a6ff;
+  box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.15);
 }
 
 .button {
-  margin-top: 20px;
-  padding: 15px 20px;
-  background-color: #007BFF;
+  margin-top: 10px;
+  padding: 12px 18px;
+  background-color: #238636;
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 6px;
   cursor: pointer;
-  &:hover {
-    background-color: #0056b3;
-  }
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.15s ease;
+}
+
+.button:hover:not(:disabled) {
+  background-color: #2ea043;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ─── Soporte para Tema Claro (.theme-light - WCAG Optimizada) ─── */
+.theme-light .form {
+  background-color: #FFFFFF;
+  color: #0F172A;
+  border: 1px solid #D5DCE6;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.theme-light .title {
+  color: #0F172A;
+}
+
+.theme-light .label {
+  color: #0F172A;
+}
+
+.theme-light .input {
+  background: #FFFFFF;
+  color: #0F172A;
+  border: 1px solid #7B8BA1;
+}
+
+.theme-light .input:focus {
+  border-color: #2563EB;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+}
+
+.theme-light .button {
+  background-color: #15803D;
+}
+
+.theme-light .button:hover:not(:disabled) {
+  background-color: #166534;
 }

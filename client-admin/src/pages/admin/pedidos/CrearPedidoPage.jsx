@@ -21,6 +21,8 @@ export default function CrearPedidoPage() {
     direccionOrigen: '',
     direccionDestino: '',
     destinatarioNombre: '',
+    destinatarioTelefono: '',
+    descripcionProductos: '',
     nombreTransportista: '',
     repartidorId: '',
     notas: '',
@@ -179,6 +181,14 @@ export default function CrearPedidoPage() {
       }
     }
 
+    // 3b. Teléfono del destinatario
+    const telTrim = (formData.destinatarioTelefono || '').trim();
+    if (!telTrim) {
+      nuevosErrores.destinatarioTelefono = 'El teléfono de contacto es obligatorio.';
+    } else if (!/^\+?[0-9\s-]{6,20}$/.test(telTrim)) {
+      nuevosErrores.destinatarioTelefono = 'Ingrese un teléfono válido (números, mínimo 6 dígitos).';
+    }
+
     // 4. Nombre del transportista
     if (!formData.nombreTransportista.trim()) {
       nuevosErrores.nombreTransportista = 'Debe seleccionar un transportista asignado.';
@@ -205,6 +215,7 @@ export default function CrearPedidoPage() {
     try {
       const res = await crearPedido({
         ...formData,
+        descripcionProductos: formData.descripcionProductos.trim() || 'Paquete general',
         diaEntrega: resFecha.iso,
       });
 
@@ -218,6 +229,8 @@ export default function CrearPedidoPage() {
         direccionOrigen: '',
         direccionDestino: '',
         destinatarioNombre: '',
+        destinatarioTelefono: '',
+        descripcionProductos: '',
         nombreTransportista: '',
         repartidorId: '',
         notas: '',
@@ -276,134 +289,200 @@ export default function CrearPedidoPage() {
       {/* Card del Formulario */}
       <div className="crear-pedido-card">
         <form onSubmit={handleSubmit} noValidate>
-          <div className="formulario-grid">
-            {/* Dirección de Origen (Obligatorio) */}
-            <div className="campo-grupo">
-              <label htmlFor="direccionOrigen">
-                Dirección de origen <span className="campo-requerido">*</span>
-              </label>
-              <input
-                id="direccionOrigen"
-                type="text"
-                name="direccionOrigen"
-                placeholder="Ej. Calle 12 #450, La Plata"
-                value={formData.direccionOrigen}
-                onChange={handleChange}
-                className={intentadoEnviar && erroresCampos.direccionOrigen ? 'error' : ''}
-              />
-              {intentadoEnviar && erroresCampos.direccionOrigen && (
-                <span className="campo-error-texto">{erroresCampos.direccionOrigen}</span>
-              )}
+          <div className="formulario-secciones">
+            {/* Sección 1: Planificación y Asignación */}
+            <div className="seccion-formulario">
+              <div className="seccion-header">
+                <span className="seccion-titulo">1. Planificación y Asignación</span>
+              </div>
+              <div className="formulario-grid">
+                {/* Fecha / Día de Entrega */}
+                <div className="campo-grupo">
+                  <label htmlFor="diaEntrega">
+                    Día de entrega <span className="campo-requerido">* (DD/MM/AAAA)</span>
+                  </label>
+                  <input
+                    ref={fechaRef}
+                    id="diaEntrega"
+                    type="text"
+                    name="diaEntrega"
+                    placeholder="DD/MM/AAAA"
+                    value={fechaInput}
+                    onChange={handleFechaChange}
+                    onFocus={(e) => {
+                      if (!fechaInput) {
+                        e.target.setSelectionRange(0, 0);
+                      }
+                    }}
+                    maxLength={10}
+                    className={intentadoEnviar && erroresCampos.diaEntrega ? 'error' : ''}
+                  />
+                  {intentadoEnviar && erroresCampos.diaEntrega && (
+                    <span className="campo-error-texto">{erroresCampos.diaEntrega}</span>
+                  )}
+                </div>
+
+                {/* Nombre del Transportista */}
+                <div className="campo-grupo">
+                  <label htmlFor="nombreTransportista">
+                    Nombre del transportista <span className="campo-requerido">*</span>
+                  </label>
+                  <select
+                    id="nombreTransportista"
+                    name="nombreTransportista"
+                    value={formData.nombreTransportista}
+                    onChange={handleChange}
+                    className={intentadoEnviar && erroresCampos.nombreTransportista ? 'error' : ''}
+                  >
+                    <option value="">-- Seleccionar transportista asignado --</option>
+                    {transportistas.map((t) => {
+                      const nombre = t.nombreCompleto || `${t.nombre} ${t.apellido}`;
+                      return (
+                        <option key={t.id} value={nombre}>
+                          {nombre}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  {intentadoEnviar && erroresCampos.nombreTransportista && (
+                    <span className="campo-error-texto">{erroresCampos.nombreTransportista}</span>
+                  )}
+                </div>
+              </div>
             </div>
 
-            {/* Dirección de Destino (Obligatorio) */}
-            <div className="campo-grupo">
-              <label htmlFor="direccionDestino">
-                Dirección de destino <span className="campo-requerido">*</span>
-              </label>
-              <input
-                id="direccionDestino"
-                type="text"
-                name="direccionDestino"
-                placeholder="Ej. Av. 7 #1220, La Plata"
-                value={formData.direccionDestino}
-                onChange={handleChange}
-                className={intentadoEnviar && erroresCampos.direccionDestino ? 'error' : ''}
-              />
-              {intentadoEnviar && erroresCampos.direccionDestino && (
-                <span className="campo-error-texto">{erroresCampos.direccionDestino}</span>
-              )}
+            {/* Sección 2: Puntos de Trayecto */}
+            <div className="seccion-formulario">
+              <div className="seccion-header">
+                <span className="seccion-titulo">2. Puntos de Trayecto</span>
+              </div>
+              <div className="formulario-grid">
+                {/* Dirección de Origen */}
+                <div className="campo-grupo">
+                  <label htmlFor="direccionOrigen">
+                    Dirección de origen <span className="campo-requerido">*</span>
+                  </label>
+                  <input
+                    id="direccionOrigen"
+                    type="text"
+                    name="direccionOrigen"
+                    placeholder="Ej. Calle 12 #450, La Plata"
+                    value={formData.direccionOrigen}
+                    onChange={handleChange}
+                    className={intentadoEnviar && erroresCampos.direccionOrigen ? 'error' : ''}
+                  />
+                  {intentadoEnviar && erroresCampos.direccionOrigen && (
+                    <span className="campo-error-texto">{erroresCampos.direccionOrigen}</span>
+                  )}
+                </div>
+
+                {/* Dirección de Destino */}
+                <div className="campo-grupo">
+                  <label htmlFor="direccionDestino">
+                    Dirección de destino <span className="campo-requerido">*</span>
+                  </label>
+                  <input
+                    id="direccionDestino"
+                    type="text"
+                    name="direccionDestino"
+                    placeholder="Ej. Av. 7 #1220, La Plata"
+                    value={formData.direccionDestino}
+                    onChange={handleChange}
+                    className={intentadoEnviar && erroresCampos.direccionDestino ? 'error' : ''}
+                  />
+                  {intentadoEnviar && erroresCampos.direccionDestino && (
+                    <span className="campo-error-texto">{erroresCampos.direccionDestino}</span>
+                  )}
+                </div>
+              </div>
             </div>
 
-            {/* Fecha / Día de Entrega unificado (Obligatorio) */}
-            <div className="campo-grupo">
-              <label htmlFor="diaEntrega">
-                Día de entrega <span className="campo-requerido">* (DD/MM/AAAA)</span>
-              </label>
-              <input
-                ref={fechaRef}
-                id="diaEntrega"
-                type="text"
-                name="diaEntrega"
-                placeholder="DD/MM/AAAA"
-                value={fechaInput}
-                onChange={handleFechaChange}
-                onFocus={(e) => {
-                  if (!fechaInput) {
-                    e.target.setSelectionRange(0, 0);
-                  }
-                }}
-                maxLength={10}
-                className={intentadoEnviar && erroresCampos.diaEntrega ? 'error' : ''}
-              />
-              {intentadoEnviar && erroresCampos.diaEntrega && (
-                <span className="campo-error-texto">{erroresCampos.diaEntrega}</span>
-              )}
+            {/* Sección 3: Cliente Destinatario */}
+            <div className="seccion-formulario">
+              <div className="seccion-header">
+                <span className="seccion-titulo">3. Cliente Destinatario</span>
+              </div>
+              <div className="formulario-grid">
+                {/* Nombre del Destinatario */}
+                <div className="campo-grupo">
+                  <label htmlFor="destinatarioNombre">
+                    Nombre del destinatario <span className="campo-requerido">*</span>
+                  </label>
+                  <input
+                    id="destinatarioNombre"
+                    type="text"
+                    name="destinatarioNombre"
+                    placeholder="Ej. Juan Carlos Pérez"
+                    value={formData.destinatarioNombre}
+                    onChange={handleChange}
+                    className={intentadoEnviar && erroresCampos.destinatarioNombre ? 'error' : ''}
+                  />
+                  {intentadoEnviar && erroresCampos.destinatarioNombre && (
+                    <span className="campo-error-texto">{erroresCampos.destinatarioNombre}</span>
+                  )}
+                </div>
+
+                {/* Teléfono del Destinatario */}
+                <div className="campo-grupo">
+                  <label htmlFor="destinatarioTelefono">
+                    Teléfono de contacto <span className="campo-requerido">*</span>
+                  </label>
+                  <input
+                    id="destinatarioTelefono"
+                    type="text"
+                    name="destinatarioTelefono"
+                    placeholder="Ej. 2214567890"
+                    value={formData.destinatarioTelefono}
+                    onChange={handleChange}
+                    className={intentadoEnviar && erroresCampos.destinatarioTelefono ? 'error' : ''}
+                  />
+                  {intentadoEnviar && erroresCampos.destinatarioTelefono && (
+                    <span className="campo-error-texto">{erroresCampos.destinatarioTelefono}</span>
+                  )}
+                </div>
+              </div>
             </div>
 
-            {/* Nombre del Destinatario (Obligatorio, solo letras) */}
-            <div className="campo-grupo">
-              <label htmlFor="destinatarioNombre">
-                Nombre del destinatario <span className="campo-requerido">*</span>
-              </label>
-              <input
-                id="destinatarioNombre"
-                type="text"
-                name="destinatarioNombre"
-                placeholder="Ej. Juan Carlos Pérez"
-                value={formData.destinatarioNombre}
-                onChange={handleChange}
-                className={intentadoEnviar && erroresCampos.destinatarioNombre ? 'error' : ''}
-              />
-              {intentadoEnviar && erroresCampos.destinatarioNombre && (
-                <span className="campo-error-texto">{erroresCampos.destinatarioNombre}</span>
-              )}
-            </div>
+            {/* Sección 4: Detalle e Indicaciones (Opcionales en 2 columnas simétricas) */}
+            <div className="seccion-formulario">
+              <div className="seccion-header">
+                <span className="seccion-titulo">4. Detalle e Indicaciones</span>
+              </div>
+              <div className="formulario-grid">
+                {/* Descripción de Productos / Contenido */}
+                <div className="campo-grupo">
+                  <label htmlFor="descripcionProductos">
+                    Descripción de productos <span className="campo-opcional">(opcional)</span>
+                  </label>
+                  <textarea
+                    id="descripcionProductos"
+                    name="descripcionProductos"
+                    rows="3"
+                    placeholder="Contenido del paquete (ej. Indumentaria, insumos)..."
+                    value={formData.descripcionProductos}
+                    onChange={handleChange}
+                  />
+                </div>
 
-            {/* Nombre del Transportista (Obligatorio) */}
-            <div className="campo-grupo campo-completo">
-              <label htmlFor="nombreTransportista">
-                Nombre del transportista <span className="campo-requerido">*</span>
-              </label>
-              <select
-                id="nombreTransportista"
-                name="nombreTransportista"
-                value={formData.nombreTransportista}
-                onChange={handleChange}
-                className={intentadoEnviar && erroresCampos.nombreTransportista ? 'error' : ''}
-              >
-                <option value="">-- Seleccionar transportista asignado --</option>
-                {transportistas.map((t) => {
-                  const nombre = t.nombreCompleto || `${t.nombre} ${t.apellido}`;
-                  return (
-                    <option key={t.id} value={nombre}>
-                      {nombre}
-                    </option>
-                  );
-                })}
-              </select>
-              {intentadoEnviar && erroresCampos.nombreTransportista && (
-                <span className="campo-error-texto">{erroresCampos.nombreTransportista}</span>
-              )}
-            </div>
-
-            {/* Comentario adicional (Opcional) */}
-            <div className="campo-grupo campo-completo">
-              <label htmlFor="notas">
-                Comentario adicional <span className="campo-opcional">(opcional)</span>
-              </label>
-              <textarea
-                id="notas"
-                name="notas"
-                rows="3"
-                placeholder="Observaciones de entrega, referencias, timbres o indicaciones especiales..."
-                value={formData.notas}
-                onChange={handleChange}
-              />
+                {/* Comentario adicional / Notas */}
+                <div className="campo-grupo">
+                  <label htmlFor="notas">
+                    Notas adicionales <span className="campo-opcional">(opcional)</span>
+                  </label>
+                  <textarea
+                    id="notas"
+                    name="notas"
+                    rows="3"
+                    placeholder="Observaciones de entrega, timbres, horarios o indicaciones..."
+                    value={formData.notas}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="crear-pedido-acciones">
+          <div className="crear-pedido-acciones" style={{ marginTop: '24px' }}>
             <button
               type="button"
               className="btn-secundario"

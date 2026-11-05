@@ -785,3 +785,64 @@
 .theme-light .empty-description {
   color: #64748b;
 }
+
+/* ─── Card de Editar Transportista ─── */
+.editar-transportista-card {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 480px;
+  max-width: 600px;
+  margin: 2rem auto;
+  background: #0f1117;
+  padding: 2rem;
+  border: 1px solid #1f2430;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.theme-light .editar-transportista-card {
+  background: #FFFFFF;
+  border: 1px solid #D5DCE6;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.theme-light .editar-transportista-card .form-label {
+  color: #0F172A;
+  font-weight: 600;
+}
+
+.theme-light .editar-transportista-card .form-input {
+  background: #FFFFFF;
+  border: 1px solid #7B8BA1;
+  color: #0F172A;
+}
+
+.theme-light .editar-transportista-card .form-input:focus {
+  border-color: #2563EB;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+}
+
+.theme-light .editar-transportista-card .minimal-select {
+  background: #FFFFFF;
+  border: 1px solid #7B8BA1;
+  color: #0F172A;
+}
+
+.theme-light .editar-transportista-card .btn-action-secondary {
+  background: #FFFFFF;
+  border: 1px solid #7B8BA1;
+  color: #0F172A;
+}
+
+.theme-light .editar-transportista-card .btn-action-secondary:hover {
+  background: #EFF4FB;
+}
+
+.theme-light .editar-transportista-card .btn-action-primary {
+  background: #15803D;
+  color: #FFFFFF;
+}
+
+.theme-light .editar-transportista-card .btn-action-primary:hover:not(:disabled) {
+  background: #166534;
+}

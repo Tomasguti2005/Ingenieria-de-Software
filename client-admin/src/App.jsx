@@ -11,6 +11,7 @@ import CrearRutaPage from './pages/admin/rutas/CrearRutaPage.jsx';
 import RutasCreadasPage from './pages/admin/rutas/RutasCreadasPage.jsx';
 import CrearPedidoPage from './pages/admin/pedidos/CrearPedidoPage.jsx';
 import PedidosVigentesPage from './pages/admin/pedidos/PedidosVigentesPage.jsx';
+import EditarPedidoPage from './pages/admin/pedidos/EditarPedidoPage.jsx';
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
               <Route path="pedidos" element={<Navigate to="vigentes" replace />} />
               <Route path="pedidos/crear" element={<CrearPedidoPage />} />
               <Route path="pedidos/vigentes" element={<PedidosVigentesPage />} />
+              <Route path="pedidos/:id/editar" element={<EditarPedidoPage />} />
             </Route>
 
             {/* Cualquier ruta desconocida → login */}

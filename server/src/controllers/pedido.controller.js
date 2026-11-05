@@ -67,6 +67,8 @@ const crearPedido = async (req, res) => {
       notas,
       montoCobrado,
       codigoSeguimiento,
+      repartidorId,
+      fechaEntrega,
     } = req.body || {};
 
     // Validación de campos obligatorios
@@ -106,10 +108,12 @@ const crearPedido = async (req, res) => {
         direccionDestino: String(direccionDestino).trim(),
         destinatarioNombre: String(destinatarioNombre).trim(),
         destinatarioTelefono: String(destinatarioTelefono).trim(),
-        descripcionProductos: String(descripcionProductos).trim(),
+        descripcionProductos: String(descripcionProductos || 'Paquete general').trim(),
         notas: notas ? String(notas).trim() : null,
         montoCobrado: montoCobrado ? Number(montoCobrado) : null,
-        estado: 'REGISTRADO',
+        repartidorId: repartidorId ? Number(repartidorId) : null,
+        fechaEntrega: fechaEntrega ? new Date(fechaEntrega) : null,
+        estado: repartidorId ? 'ASIGNADO' : 'REGISTRADO',
       },
     });
 
@@ -227,11 +231,11 @@ const modificarPedido = async (req, res) => {
 
     // --- ESCENARIO 3: Falla por fecha pasada ---
     if (fechaEntrega) {
-      const fechaIngresada = new Date(fechaEntrega);
-      const hoy = new Date();
-      hoy.setHours(0, 0, 0, 0); // Seteamos a la medianoche para comparar solo los días, no las horas
+      // Normalizamos ambas fechas a formato YYYY-MM-DD para evitar problemas de horas y zonas horarias
+      const fechaIngresadaStr = new Date(fechaEntrega).toISOString().split('T')[0];
+      const hoyStr = new Date().toISOString().split('T')[0];
 
-      if (fechaIngresada < hoy) {
+      if (fechaIngresadaStr < hoyStr) {
         // Retornamos 400. El frontend capturará este error y mostrará el mensaje emergente.
         return error(
           res,

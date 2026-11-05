@@ -270,3 +270,93 @@
   margin-top: 10px;
 }
 
+/* ========================================================================= */
+/* ─── Soporte para Tema Claro (.theme-light - WCAG Optimizada) ──────────── */
+/* ========================================================================= */
+
+.theme-light .rutas-creadas-container {
+  color: #0F172A;
+}
+
+.theme-light .ruta-card {
+  background: #FFFFFF;
+  border: 1px solid #D5DCE6;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.theme-light .ruta-card:hover {
+  border-color: #7B8BA1;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.theme-light .ruta-card-header {
+  border-bottom: 1px solid #D5DCE6;
+}
+
+.theme-light .ruta-card-title {
+  color: #0F172A;
+}
+
+.theme-light .ruta-card-date {
+  color: #475569;
+}
+
+.theme-light .btn-ruta-action {
+  background: #FFFFFF;
+  border: 1px solid #7B8BA1;
+  color: #0F172A;
+}
+
+.theme-light .btn-ruta-action:hover {
+  background: #EFF4FB;
+  border-color: #2563EB;
+  color: #1D4ED8;
+}
+
+.theme-light .btn-ruta-action.btn-danger {
+  color: #DC2626;
+  border-color: #FCA5A5;
+}
+
+.theme-light .btn-ruta-action.btn-danger:hover {
+  background: #FEE2E2;
+  border-color: #DC2626;
+  color: #DC2626;
+}
+
+.theme-light .ruta-info-badge {
+  background: #F4F6FA;
+  border: 1px solid #D5DCE6;
+  color: #475569;
+}
+
+.theme-light .ruta-info-badge strong {
+  color: #0F172A;
+}
+
+.theme-light .pedido-mini-card {
+  background: #FFFFFF;
+  border: 1px solid #D5DCE6;
+}
+
+.theme-light .pedido-mini-code {
+  color: #1E40AF;
+  background: #DBEAFE;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.theme-light .pedido-mini-dest {
+  color: #475569;
+}
+
+.theme-light .modal-content-card {
+  background: #FFFFFF;
+  border: 1px solid #D5DCE6;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+.theme-light .modal-content-card h3 {
+  color: #0F172A;
+}
+

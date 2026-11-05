@@ -350,20 +350,20 @@
   overflow-y: auto;
 }
 
-/* ─── Modo Claro Sobrio (Blanco y Grises Suaves) ────────────── */
+/* ─── Modo Claro Sobrio (Paleta WCAG #EEF2F7 / #FFFFFF / #D5DCE6) ────────────── */
 .theme-light .admin-layout {
-  background-color: #f1f5f9;
-  color: #0f172a;
+  background-color: #EEF2F7;
+  color: #0F172A;
 }
 
 .theme-light .admin-topbar {
-  background-color: #ffffff;
-  border-bottom: 1px solid #94a3b8;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #D5DCE6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .theme-light .admin-topbar-title {
-  color: #0f172a;
+  color: #0F172A;
 }
 
 .theme-light .admin-topbar-subtitle {
@@ -371,106 +371,106 @@
 }
 
 .theme-light .admin-menu-toggle-btn {
-  background: #ffffff;
-  border: 1px solid #94a3b8;
-  color: #1e293b;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  background: #FFFFFF;
+  border: 1px solid #D5DCE6;
+  color: #0F172A;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
 .theme-light .admin-menu-toggle-btn:hover {
-  background: #f8fafc;
-  border-color: #64748b;
-  color: #0f172a;
+  background: #EFF4FB;
+  border-color: #7B8BA1;
+  color: #0F172A;
 }
 
 .theme-light .admin-menu-toggle-btn.activo {
   background: rgba(37, 99, 235, 0.08);
-  border-color: #2563eb;
-  color: #1d4ed8;
+  border-color: #2563EB;
+  color: #1D4ED8;
 }
 
 .theme-light .admin-topbar-divider {
-  background: #94a3b8;
+  background: #D5DCE6;
 }
 
 .theme-light .admin-user-btn {
-  background: #ffffff;
-  border: 1px solid #94a3b8;
-  color: #0f172a;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  background: #FFFFFF;
+  border: 1px solid #D5DCE6;
+  color: #0F172A;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .theme-light .admin-user-btn:hover {
-  background: #f8fafc;
-  border-color: #64748b;
+  background: #EFF4FB;
+  border-color: #7B8BA1;
 }
 
 .theme-light .admin-user-btn.activo {
-  border-color: #2563eb;
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  border-color: #2563EB;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
 }
 
 .theme-light .admin-user-name {
-  color: #0f172a;
+  color: #0F172A;
 }
 
 .theme-light .admin-user-avatar {
-  background: #e2e8f0;
-  border: 1px solid #94a3b8;
+  background: #E2E8F0;
+  border: 1px solid #D5DCE6;
   color: #334155;
 }
 
 .theme-light .admin-user-badge {
   background: rgba(37, 99, 235, 0.08);
-  color: #1d4ed8;
+  color: #1D4ED8;
   border-color: rgba(37, 99, 235, 0.3);
 }
 
 .theme-light .admin-dropdown-menu {
-  background: #ffffff;
-  border: 1px solid #94a3b8;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  background: #FFFFFF;
+  border: 1px solid #D5DCE6;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 .theme-light .admin-dropdown-user {
-  color: #0f172a;
+  color: #0F172A;
 }
 
 .theme-light .admin-dropdown-email {
-  color: #64748b;
+  color: #64748B;
 }
 
 .theme-light .admin-dropdown-divider {
-  background: #f1f5f9;
+  background: #E2E8F0;
 }
 
 .theme-light .admin-dropdown-item {
-  color: #1e293b;
+  color: #0F172A;
 }
 
 .theme-light .admin-dropdown-item:hover:not(.item-disabled):not(.item-danger) {
-  background: #f1f5f9;
-  color: #0f172a;
+  background: #EFF4FB;
+  color: #1D4ED8;
 }
 
 .theme-light .admin-dropdown-item.item-danger {
-  color: #ef4444;
+  color: #DC2626;
 }
 
 .theme-light .admin-dropdown-item.item-danger:hover {
-  background: rgba(239, 68, 68, 0.12);
-  color: #dc2626;
+  background: #FEE2E2;
+  color: #DC2626;
 }
 
 .theme-light .modal-card {
-  background: #ffffff;
-  border: 1px solid #94a3b8;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  background: #FFFFFF;
+  border: 1px solid #D5DCE6;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
 }
 
 .theme-light .modal-title {
-  color: #0f172a;
+  color: #0F172A;
 }
 
 .theme-light .modal-description {
@@ -478,29 +478,29 @@
 }
 
 .theme-light .btn-modal.btn-cancelar {
-  background: #f1f5f9;
-  color: #1e293b;
-  border-color: #94a3b8;
+  background: #FFFFFF;
+  color: #0F172A;
+  border: 1px solid #7B8BA1;
 }
 
 .theme-light .btn-modal.btn-cancelar:hover {
-  background: #e2e8f0;
-  color: #0f172a;
+  background: #EFF4FB;
+  color: #0F172A;
 }
 
 /* Sidebar Drawer en Modo Claro */
 .theme-light .admin-sidebar-drawer {
-  background-color: #ffffff;
-  border-right: 1px solid #94a3b8;
-  box-shadow: 12px 0 36px rgba(0, 0, 0, 0.15);
+  background-color: #FFFFFF;
+  border-right: 1px solid #D5DCE6;
+  box-shadow: 12px 0 36px rgba(0, 0, 0, 0.1);
 }
 
 .theme-light .sidebar-header {
-  border-bottom: 1px solid #cbd5e1;
+  border-bottom: 1px solid #D5DCE6;
 }
 
 .theme-light .sidebar-brand-title {
-  color: #0f172a;
+  color: #0F172A;
 }
 
 .theme-light .sidebar-brand-sub {
@@ -508,14 +508,14 @@
 }
 
 .theme-light .sidebar-close-btn {
-  border: 1px solid #94a3b8;
-  color: #334155;
+  border: 1px solid #D5DCE6;
+  color: #475569;
 }
 
 .theme-light .sidebar-close-btn:hover {
-  background: #f1f5f9;
-  border-color: #64748b;
-  color: #0f172a;
+  background: #EFF4FB;
+  border-color: #7B8BA1;
+  color: #0F172A;
 }
 
 .theme-light .sidebar-section-label {
@@ -524,41 +524,41 @@
 }
 
 .theme-light .sidebar-link {
-  color: #0f172a;
+  color: #0F172A;
   font-weight: 600;
 }
 
 .theme-light .sidebar-link .sidebar-icon {
-  color: #1e293b;
+  color: #475569;
 }
 
 .theme-light .sidebar-link:hover:not(.deshabilitado) {
-  background: #f1f5f9;
-  color: #0f172a;
-  border-color: #cbd5e1;
+  background: #EFF4FB;
+  color: #0F172A;
+  border-color: #D5DCE6;
 }
 
 .theme-light .sidebar-link.activo {
-  background: rgba(37, 99, 235, 0.1);
-  color: #1d4ed8;
+  background: rgba(37, 99, 235, 0.08);
+  color: #1D4ED8;
   border-color: rgba(37, 99, 235, 0.35);
 }
 
 .theme-light .sidebar-link.activo .sidebar-icon {
-  color: #1d4ed8;
+  color: #1D4ED8;
 }
 
 .theme-light .sidebar-link.deshabilitado {
-  color: #64748b;
+  color: #64748B;
   opacity: 0.65;
 }
 
 .theme-light .sidebar-link.deshabilitado .sidebar-icon {
-  color: #64748b;
+  color: #64748B;
 }
 
 .theme-light .sidebar-footer {
-  border-top: 1px solid #cbd5e1;
-  color: #64748b;
+  border-top: 1px solid #D5DCE6;
+  color: #64748B;
 }
 

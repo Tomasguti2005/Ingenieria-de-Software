@@ -34,7 +34,10 @@ export async function fetchAPI(endpoint, opciones = {}) {
   }
 
   if (!respuesta.ok) {
-    throw new Error(datos.error || 'Error en la solicitud');
+    const err = new Error(datos.error || 'Error en la solicitud');
+    err.status = respuesta.status;
+    err.data = datos;
+    throw err;
   }
 
   return datos;

@@ -453,3 +453,177 @@
   color: #eab308;
   border: 1px solid rgba(234, 179, 8, 0.25);
 }
+
+/* ========================================================================= */
+/* ─── Soporte para Tema Claro (.theme-light - WCAG Optimizada) ──────────── */
+/* ========================================================================= */
+
+.theme-light .crear-ruta-container {
+  color: #0F172A;
+}
+
+.theme-light .ruta-card-section {
+  background: #FFFFFF;
+  border: 1px solid #D5DCE6;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.theme-light .section-header {
+  border-bottom: 1px solid #D5DCE6;
+}
+
+.theme-light .section-title {
+  color: #0F172A;
+}
+
+.theme-light .section-badge {
+  background: #F4F6FA;
+  color: #475569;
+  border: 1px solid #D5DCE6;
+}
+
+.theme-light .form-input-text,
+.theme-light .form-select {
+  background: #FFFFFF;
+  border: 1px solid #7B8BA1;
+  color: #0F172A;
+}
+
+.theme-light .form-input-text::placeholder {
+  color: #64748B;
+}
+
+.theme-light .form-input-text:focus,
+.theme-light .form-select:focus {
+  background: #FFFFFF;
+  border-color: #2563EB;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+}
+
+.theme-light .form-hint {
+  color: #64748B;
+}
+
+.theme-light .transportista-info-card {
+  background: #F4F6FA;
+  border: 1px solid #D5DCE6;
+}
+
+.theme-light .t-nombre {
+  color: #0F172A;
+}
+
+.theme-light .t-detalle {
+  color: #475569;
+}
+
+.theme-light .t-badge-vehiculo {
+  background: #DBEAFE;
+  color: #1E40AF;
+  border: 1px solid #BFDBFE;
+}
+
+.theme-light .t-badge-sin-vehiculo {
+  background: #FEE2E2;
+  color: #991B1B;
+  border: 1px solid #FECACA;
+}
+
+.theme-light .filtro-pedidos-bar {
+  background: #F4F6FA;
+  border: 1px solid #D5DCE6;
+}
+
+.theme-light .input-buscar-pedido {
+  background: #FFFFFF;
+  border: 1px solid #7B8BA1;
+  color: #0F172A;
+}
+
+.theme-light .input-buscar-pedido::placeholder {
+  color: #64748B;
+}
+
+.theme-light .pedido-item-checkable {
+  background: #FFFFFF;
+  border: 1px solid #D5DCE6;
+}
+
+.theme-light .pedido-item-checkable:hover {
+  background: #EFF4FB;
+  border-color: #2563EB;
+}
+
+.theme-light .pedido-item-checkable.selected {
+  background: #EFF4FB;
+  border-color: #2563EB;
+}
+
+.theme-light .pedido-item-codigo {
+  background: #DBEAFE;
+  color: #1E40AF;
+  border: 1px solid #BFDBFE;
+}
+
+.theme-light .pedido-item-destinatario {
+  color: #0F172A;
+  font-weight: 600;
+}
+
+.theme-light .pedido-item-direccion {
+  color: #475569;
+}
+
+.theme-light .custom-select-trigger {
+  background: #FFFFFF;
+  border: 1px solid #7B8BA1;
+  color: #0F172A;
+}
+
+.theme-light .custom-select-trigger:focus,
+.theme-light .custom-select-wrapper.open .custom-select-trigger {
+  border-color: #2563EB;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+}
+
+.theme-light .custom-select-dropdown {
+  background: #FFFFFF;
+  border: 1px solid #D5DCE6;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.theme-light .custom-select-option {
+  border-bottom: 1px solid #F4F6FA;
+}
+
+.theme-light .custom-select-option:hover {
+  background: #EFF4FB;
+}
+
+.theme-light .custom-select-option.selected {
+  background: #EFF4FB;
+}
+
+.theme-light .option-name {
+  color: #0F172A;
+}
+
+.theme-light .btn-cancelar {
+  background: #FFFFFF;
+  border: 1px solid #7B8BA1;
+  color: #0F172A;
+}
+
+.theme-light .btn-cancelar:hover {
+  background: #EFF4FB;
+  color: #0F172A;
+}
+
+.theme-light .btn-crear-ruta {
+  background: #15803D;
+  color: #FFFFFF;
+}
+
+.theme-light .btn-crear-ruta:hover:not(:disabled) {
+  background: #166534;
+}
