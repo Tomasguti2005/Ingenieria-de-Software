@@ -1,3 +1,5 @@
+/* AsignarVehiculo.css — Asignación de Vehículo con Tokens de Tema */
+
 .asignar-container {
   display: flex;
   justify-content: center;
@@ -12,33 +14,60 @@
   gap: 20px;
   width: 100%;
   max-width: 520px;
-  padding: 25px;
-  background-color: #f9f9f9;
-  color: #222;
-  border-radius: 12px;
+  padding: 28px;
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
 }
 
 .asignar-label {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
 }
+
 .asignar-form select {
-  height: 40px;
-  padding: 0 10px;
-  font-size: 14px;
+  height: 42px;
+  padding: 0 12px;
+  font-size: 13.5px;
+  background: var(--bg-input);
+  color: var(--text-main);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.asignar-form select:focus {
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
 }
 
 .asignar-boton {
-  margin-top: 20px;
-  padding: 14px;
-  background-color: #007BFF;
-  color: white;
-  border: none;
-  border-radius: 10px;
+  margin-top: 10px;
+  padding: 12px 18px;
+  background-color: var(--success);
+  color: var(--text-on-accent);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: 15px;
-    &:hover {
-        background-color: #0056b3;
-    }
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.15s ease;
+}
+
+.asignar-boton:hover:not(:disabled) {
+  background-color: var(--success-strong);
+  box-shadow: 0 2px 6px rgba(22, 101, 52, 0.3);
+}
+
+.asignar-boton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

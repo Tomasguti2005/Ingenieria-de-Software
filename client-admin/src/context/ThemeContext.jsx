@@ -6,7 +6,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const ThemeContext = createContext(null);
 
 export function ThemeProvider({ children }) {
-  // Modo inicial: 'dark' por defecto salvo que el usuario haya guardado 'light'
+  // Modo inicial: 'dark' por defecto estricto
   const [tema, setTema] = useState(() => {
     try {
       const guardado = localStorage.getItem('theme_preference');
@@ -23,12 +23,21 @@ export function ThemeProvider({ children }) {
       // localStorage no disponible
     }
 
+    const root = document.documentElement;
+    const body = document.body;
+
     if (tema === 'light') {
-      document.documentElement.classList.add('theme-light');
-      document.body.classList.add('theme-light');
+      root.classList.remove('theme-dark');
+      body.classList.remove('theme-dark');
+      root.classList.add('theme-light');
+      body.classList.add('theme-light');
+      root.style.colorScheme = 'light';
     } else {
-      document.documentElement.classList.remove('theme-light');
-      document.body.classList.remove('theme-light');
+      root.classList.remove('theme-light');
+      body.classList.remove('theme-light');
+      root.classList.add('theme-dark');
+      body.classList.add('theme-dark');
+      root.style.colorScheme = 'dark';
     }
   }, [tema]);
 

@@ -10,6 +10,7 @@ const transportistaEdicionRoutes = require('./routes/transportistas.routes');
 const obtenerTransportistasRoutes = require('./routes/obtenerTransportistas.routes');
 const rutaTransportistaRoutes = require('./routes/modificarTransportistaRuta.routes');
 const rutasGenerales = require('./routes/rutas.routes');
+const pedidoRoutes = require('./routes/pedido.routes');
 
 const clientOrigin = process.env.ADMIN_ORIGIN || 'http://localhost:5173';
 
@@ -33,19 +34,7 @@ app.use('/api/admin/transportistas', obtenerTransportistasRoutes);
 app.use('/api/transportistas', transportistaEdicionRoutes);
 app.use('/api/rutaTransportista', rutaTransportistaRoutes);
 app.use('/api/rutas', rutasGenerales);
-
-// Ruta para obtener pedidos disponibles para la asignación de rutas
-app.get('/api/pedidos', async (req, res) => {
-  try {
-    const pedidos = await prisma.pedido.findMany({
-      orderBy: { id: 'asc' },
-    });
-    return res.json({ success: true, data: pedidos });
-  } catch (err) {
-    console.error('Error al obtener pedidos:', err);
-    return res.status(500).json({ success: false, error: 'Error interno del servidor al obtener pedidos.' });
-  }
-});
+app.use('/api/pedidos', pedidoRoutes);
 
 // 4. Definimos el puerto (usamos el del archivo .env que configuraste antes, o el 3000 por defecto)
 const PORT = process.env.PORT || 3000;

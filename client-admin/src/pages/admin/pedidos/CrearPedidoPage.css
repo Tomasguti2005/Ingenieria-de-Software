@@ -1,0 +1,254 @@
+/* CrearPedidoPage.css — Formulario de Creación de Pedido con Tokens de Tema */
+
+.crear-pedido-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 860px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.crear-pedido-container .page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 4px;
+}
+
+.crear-pedido-container .header-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.crear-pedido-container .header-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-subtle);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.crear-pedido-container .breadcrumb-separator {
+  color: var(--border-divider);
+}
+
+.crear-pedido-container .breadcrumb-current {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.crear-pedido-container .header-title {
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+/* Card Principal */
+.crear-pedido-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+}
+
+.formulario-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 20px;
+}
+
+.campo-completo {
+  grid-column: 1 / -1;
+}
+
+.campo-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo-grupo label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.campo-requerido {
+  color: var(--danger);
+}
+
+.campo-opcional {
+  color: var(--text-muted);
+  font-weight: 400;
+  font-size: 11.5px;
+}
+
+.campo-grupo input,
+.campo-grupo select,
+.campo-grupo textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-input);
+  background: var(--bg-input);
+  color: var(--text-main);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  font-family: inherit;
+}
+
+.campo-grupo textarea {
+  resize: none;
+  font-family: inherit;
+  line-height: 1.45;
+}
+
+/* ── Secciones temáticas del Formulario ── */
+.seccion-formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.seccion-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-divider);
+}
+
+.seccion-titulo {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent-strong);
+}
+
+.formulario-secciones {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.campo-grupo input:focus,
+.campo-grupo select:focus,
+.campo-grupo textarea:focus {
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+
+.campo-grupo input.error,
+.campo-grupo select.error {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.campo-error-texto {
+  font-size: 11.5px;
+  color: var(--danger);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+/* Toast de Alerta Flotante / Inline */
+.alerta-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  animation: fadeIn 0.2s ease;
+}
+
+.alerta-container.exito {
+  background: var(--badge-activo-bg);
+  border: 1px solid var(--badge-activo-border);
+  color: var(--badge-activo-text);
+}
+
+.alerta-container.error {
+  background: var(--badge-inactivo-bg);
+  border: 1px solid var(--badge-inactivo-border);
+  color: var(--badge-inactivo-text);
+}
+
+/* Acciones del Formulario */
+.crear-pedido-acciones {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-divider);
+}
+
+.btn-secundario {
+  padding: 7px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-secundario:hover {
+  background: var(--bg-row-hover);
+  border-color: var(--border-input-hover);
+}
+
+.btn-primario {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--success);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 7px 16px;
+  color: var(--text-on-accent);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: all 0.15s ease;
+}
+
+.btn-primario:hover:not(:disabled) {
+  background: var(--success-strong);
+  box-shadow: 0 2px 6px rgba(22, 101, 52, 0.3);
+}
+
+.btn-primario:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+  .formulario-grid {
+    grid-template-columns: 1fr;
+  }
+}

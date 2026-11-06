@@ -67,6 +67,8 @@ const crearPedido = async (req, res) => {
       notas,
       montoCobrado,
       codigoSeguimiento,
+      repartidorId,
+      fechaEntrega,
     } = req.body || {};
 
     // Validación de campos obligatorios
@@ -106,10 +108,12 @@ const crearPedido = async (req, res) => {
         direccionDestino: String(direccionDestino).trim(),
         destinatarioNombre: String(destinatarioNombre).trim(),
         destinatarioTelefono: String(destinatarioTelefono).trim(),
-        descripcionProductos: String(descripcionProductos).trim(),
+        descripcionProductos: String(descripcionProductos || 'Paquete general').trim(),
         notas: notas ? String(notas).trim() : null,
         montoCobrado: montoCobrado ? Number(montoCobrado) : null,
-        estado: 'REGISTRADO',
+        repartidorId: repartidorId ? Number(repartidorId) : null,
+        fechaEntrega: fechaEntrega ? new Date(fechaEntrega) : null,
+        estado: repartidorId ? 'ASIGNADO' : 'REGISTRADO',
       },
     });
 
@@ -165,8 +169,131 @@ const eliminarPedido = async (req, res) => {
   }
 };
 
+const modificarPedido = async (req, res) => {
+  try {
+    // Tomamos el ID interno del pedido desde los parámetros de la URL (ej: /pedidos/5)
+    const pedidoId = Number(req.params.id);
+    
+    if (Number.isNaN(pedidoId)) {
+      return error(res, 'ID de pedido inválido.', 400);
+    }
+
+    const {
+      codigoSeguimiento, // En tu HU se menciona como "ID de pedido único"
+      rutaId,            // ruta asignada
+      repartidorId,      // transportista asignado
+      direccionOrigen,
+      direccionDestino,
+      destinatarioNombre,
+      descripcionProductos,
+      fechaEntrega,
+      notas,
+      estado
+    } = req.body || {};
+
+    // 1. Buscamos el pedido actual en la base de datos
+    const pedidoExistente = await prisma.pedido.findUnique({
+      where: { id: pedidoId },
+    });
+
+    if (!pedidoExistente) {
+      return error(res, 'El pedido no existe en el sistema.', 404);
+    }
+
+    // --- ESCENARIO 4: Bloqueo de modificación por pedido en distribución ---
+    // Regla: Solo se permite si el estado es REGISTRADO o ASIGNADO
+    const estadosBloqueados = ['RETIRADO', 'EN_CAMINO', 'ENTREGADO', 'FALLIDO', 'CANCELADO'];
+    
+    if (estadosBloqueados.includes(pedidoExistente.estado)) {
+      return error(
+        res,
+        'Operación no permitida: no se pueden modificar los datos de un pedido que ya se encuentra en camino con el transportista.',
+        400
+      );
+    }
+
+    // --- ESCENARIO 2: Falla por ID repetido ---
+    // Verificamos si están intentando cambiar el código por uno que ya tiene otro pedido
+    if (codigoSeguimiento && String(codigoSeguimiento).trim() !== pedidoExistente.codigoSeguimiento) {
+      const idRepetido = await prisma.pedido.findUnique({
+        where: { codigoSeguimiento: String(codigoSeguimiento).trim() },
+      });
+
+      if (idRepetido) {
+        // Retornamos un 409 Conflict. El frontend deberá capturar esto y mostrar el alert de "¿desea eliminar?"
+        return error(
+          res,
+          'El identificador del pedido ya existe. ¿Desea eliminar el pedido actual?',
+          409 
+        );
+      }
+    }
+
+    // --- ESCENARIO 3: Falla por fecha pasada ---
+    if (fechaEntrega) {
+      // Normalizamos ambas fechas a formato YYYY-MM-DD para evitar problemas de horas y zonas horarias
+      const fechaIngresadaStr = new Date(fechaEntrega).toISOString().split('T')[0];
+      const hoyStr = new Date().toISOString().split('T')[0];
+
+      if (fechaIngresadaStr < hoyStr) {
+        // Retornamos 400. El frontend capturará este error y mostrará el mensaje emergente.
+        return error(
+          res,
+          'La fecha de entrega ingresada es anterior a la actual. Debe cambiarla o eliminar el pedido.',
+          400
+        );
+      }
+    }
+
+    // Preparamos el objeto con los datos a actualizar (solo agregamos los que vengan en el req.body)
+    const datosActualizados = {};
+    
+    if (codigoSeguimiento) datosActualizados.codigoSeguimiento = String(codigoSeguimiento).trim();
+    if (direccionOrigen) datosActualizados.direccionOrigen = String(direccionOrigen).trim();
+    if (direccionDestino) datosActualizados.direccionDestino = String(direccionDestino).trim();
+    if (destinatarioNombre) datosActualizados.destinatarioNombre = String(destinatarioNombre).trim();
+    if (descripcionProductos) datosActualizados.descripcionProductos = String(descripcionProductos).trim();
+    if (notas !== undefined) datosActualizados.notas = notas ? String(notas).trim() : null;
+    if (fechaEntrega) datosActualizados.fechaEntrega = new Date(fechaEntrega);
+    if (estado) datosActualizados.estado = estado; 
+
+    // Regla: Debe estar asignado a una única ruta y transportista (se actualiza mediante sus IDs)
+    if (rutaId) datosActualizados.rutaId = Number(rutaId);
+    if (repartidorId) datosActualizados.repartidorId = Number(repartidorId);
+
+    // --- ESCENARIO 1: Éxito (Se modifican y guardan los campos) ---
+    const pedidoActualizado = await prisma.pedido.update({
+      where: { id: pedidoId },
+      data: datosActualizados,
+      // Hacemos el include para devolver la versión completa/actualizada y mostrarla en frontend
+      include: {
+        repartidor: {
+          select: { id: true, nombre: true, apellido: true }
+        },
+        ruta: {
+          select: { id: true, nombre: true }
+        }
+      }
+    });
+
+    return success(
+      res,
+      {
+        mensaje: 'El pedido ha sido modificado con éxito',
+        pedido: pedidoActualizado,
+      },
+      200
+    );
+
+  } catch (err) {
+    console.error('Error al modificar el pedido:', err);
+    return error(res, 'Error interno del servidor al modificar el pedido.', 500);
+  }
+};
+
 module.exports = {
   obtenerPedidos,
   crearPedido,
   eliminarPedido,
+  modificarPedido,
 };

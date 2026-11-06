@@ -318,8 +318,12 @@ const asignarPedidoARuta = async (req, res) => {
       },
     });
 
-    // La ruta debe estar registrada y su transportista debe estar activo y disponible
-    if (!ruta || !ruta.transportista || ruta.transportista.estado !== 'ACTIVO') {
+    if (!ruta) {
+      return error(res, 'La ruta especificada no existe en el sistema.', 404);
+    }
+
+    // Si la ruta tiene transportista asignado, este debe estar ACTIVO para operar
+    if (ruta.transportista && ruta.transportista.estado !== 'ACTIVO') {
       return error(res, 'Ruta no disponible', 400);
     }
 

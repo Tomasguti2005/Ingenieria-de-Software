@@ -325,7 +325,7 @@ export default function RutasCreadasPage() {
                     Pedidos asignados ({ruta.pedidos?.length || 0})
                   </div>
                   {(!ruta.pedidos || ruta.pedidos.length === 0) ? (
-                    <div style={{ padding: '16px', background: '#16181e', borderRadius: '8px', color: '#94a3b8', fontSize: '0.85rem' }}>
+                    <div className="ruta-empty-box">
                       No hay pedidos vinculados a esta ruta.
                     </div>
                   ) : (
@@ -364,12 +364,12 @@ export default function RutasCreadasPage() {
 
             {/* Pedidos actuales de la ruta */}
             <div>
-              <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9rem', color: '#60a5fa' }}>
+              <h4 className="modal-section-title-pedidos">
                 Pedidos en la ruta ({rutaEditarPedidos.pedidos?.length || 0})
               </h4>
               <div className="pedidos-mini-list" style={{ maxHeight: '180px' }}>
                 {rutaEditarPedidos.pedidos?.length === 0 ? (
-                  <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>No hay pedidos en la ruta.</div>
+                  <div className="ruta-empty-box-compact">No hay pedidos en la ruta.</div>
                 ) : (
                   rutaEditarPedidos.pedidos?.map((p) => (
                     <div key={p.id} className="pedido-mini-item">
@@ -392,12 +392,12 @@ export default function RutasCreadasPage() {
 
             {/* Pedidos libres para sumar */}
             <div>
-              <h4 style={{ margin: '12px 0 8px 0', fontSize: '0.9rem', color: '#4ade80' }}>
+              <h4 className="modal-section-title-libres">
                 Pedidos disponibles en el sistema ({pedidosLibres.length})
               </h4>
               <div className="pedidos-mini-list" style={{ maxHeight: '180px' }}>
                 {pedidosLibres.length === 0 ? (
-                  <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>No hay pedidos libres disponibles.</div>
+                  <div className="ruta-empty-box-compact">No hay pedidos libres disponibles.</div>
                 ) : (
                   pedidosLibres.map((p) => (
                     <div key={p.id} className="pedido-mini-item">
@@ -407,8 +407,7 @@ export default function RutasCreadasPage() {
                       </div>
                       <button
                         type="button"
-                        className="btn-ruta-action"
-                        style={{ borderColor: 'rgba(34, 197, 94, 0.4)', color: '#4ade80' }}
+                        className="btn-ruta-action btn-agregar-pedido-action"
                         onClick={() => handleAgregarPedidoARuta(p.id)}
                       >
                         + Agregar a ruta
@@ -439,13 +438,13 @@ export default function RutasCreadasPage() {
 
             {/* Transportista actual con botón para quitar */}
             {rutaEditarTransportista.transportista ? (
-              <div style={{ padding: '14px', background: '#16181e', borderRadius: '8px', border: '1px solid #282b36', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div className="chofer-box chofer-box-current">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div className="chofer-avatar">
                     {rutaEditarTransportista.transportista.nombre.charAt(0)}{rutaEditarTransportista.transportista.apellido.charAt(0)}
                   </div>
                   <div>
-                    <div style={{ fontWeight: 600, color: '#fff' }}>
+                    <div className="chofer-nombre">
                       {rutaEditarTransportista.transportista.nombre} {rutaEditarTransportista.transportista.apellido}
                     </div>
                     <div style={{ display: 'flex', gap: '6px', marginTop: '4px' }}>
@@ -468,14 +467,14 @@ export default function RutasCreadasPage() {
                 </button>
               </div>
             ) : (
-              <div style={{ color: '#eab308', fontSize: '0.9rem', padding: '12px', background: '#1a1915', borderRadius: '8px', border: '1px solid #332d18' }}>
+              <div className="ruta-empty-box-warning">
                 Esta ruta actualmente no cuenta con ningún transportista asignado.
               </div>
             )}
 
             {/* Asignar nuevo transportista con Selector de Burbujitas */}
             <form onSubmit={handleAsignarNuevoTransportista} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <label style={{ fontSize: '0.9rem', color: '#cbd5e1', fontWeight: 500 }}>
+              <label style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 500 }}>
                 Asignar otro transportista disponible:
               </label>
 
@@ -584,7 +583,7 @@ export default function RutasCreadasPage() {
               <button type="button" className="toast-close" onClick={() => setRutaConfirmarEliminar(null)}>&times;</button>
             </div>
 
-            <p style={{ color: '#cbd5e1', fontSize: '0.95rem', lineHeight: '1.5', margin: 0 }}>
+            <p className="modal-confirm-text">
               ¿Estás seguro de que deseás eliminar la ruta <strong>"{rutaConfirmarEliminar.nombre}"</strong>?
               <br /><br />
               Esta acción desvinculará todos los pedidos asociados (quedando libres para asignarse a otra ruta) y preservará al transportista en el sistema.
