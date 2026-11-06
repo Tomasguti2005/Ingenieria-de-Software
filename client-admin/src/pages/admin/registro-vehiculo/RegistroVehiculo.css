@@ -1,4 +1,4 @@
-/* RegistroVehiculo.css — Estilo moderno y adaptable a tema claro/oscuro */
+/* RegistroVehiculo.css — Estilo moderno con Tokens de Tema */
 
 .container {
   display: flex;
@@ -15,18 +15,18 @@
   width: 100%;
   max-width: 520px;
   padding: 28px;
-  background-color: var(--bg-surface, #161b22);
-  color: var(--text-primary, #f0f6fc);
-  border: 1px solid var(--border-default, #30363d);
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
 }
 
 .title {
   margin-bottom: 8px;
   font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text-primary, #f0f6fc);
+  font-weight: 700;
+  color: var(--text-main);
 }
 
 .label {
@@ -35,7 +35,7 @@
   gap: 8px;
   font-size: 13px;
   font-weight: 600;
-  color: var(--text-secondary, #8b949e);
+  color: var(--text-main);
 }
 
 .input {
@@ -43,72 +43,39 @@
   box-sizing: border-box;
   padding: 10px 12px;
   font-size: 13.5px;
-  background: var(--bg-canvas, #0d1117);
-  color: var(--text-primary, #f0f6fc);
-  border: 1px solid var(--border-default, #30363d);
-  border-radius: 6px;
+  background: var(--bg-input);
+  color: var(--text-main);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-sm);
   outline: none;
-  transition: all 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .input:focus {
-  border-color: #58a6ff;
-  box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.15);
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
 }
 
 .button {
   margin-top: 10px;
   padding: 12px 18px;
-  background-color: #238636;
-  color: white;
-  border: none;
-  border-radius: 6px;
+  background-color: var(--success);
+  color: var(--text-on-accent);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
-  transition: background 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.15s ease;
 }
 
 .button:hover:not(:disabled) {
-  background-color: #2ea043;
+  background-color: var(--success-strong);
+  box-shadow: 0 2px 6px rgba(22, 101, 52, 0.3);
 }
 
 .button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-/* ─── Soporte para Tema Claro (.theme-light - WCAG Optimizada) ─── */
-.theme-light .form {
-  background-color: #FFFFFF;
-  color: #0F172A;
-  border: 1px solid #D5DCE6;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
-}
-
-.theme-light .title {
-  color: #0F172A;
-}
-
-.theme-light .label {
-  color: #0F172A;
-}
-
-.theme-light .input {
-  background: #FFFFFF;
-  color: #0F172A;
-  border: 1px solid #7B8BA1;
-}
-
-.theme-light .input:focus {
-  border-color: #2563EB;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
-}
-
-.theme-light .button {
-  background-color: #15803D;
-}
-
-.theme-light .button:hover:not(:disabled) {
-  background-color: #166534;
 }

@@ -376,7 +376,7 @@ export default function PedidosVigentesPage() {
                     </span>
                   </td>
                   <td>
-                    <span style={{ color: pedido.nombreTransportista ? '#f0f6fc' : '#6e7681', fontSize: '12.5px' }}>
+                    <span className="cell-transportista" style={{ color: pedido.nombreTransportista ? 'var(--text-main)' : 'var(--text-muted)', fontSize: '12.5px' }}>
                       {pedido.nombreTransportista || 'Sin asignar'}
                     </span>
                   </td>

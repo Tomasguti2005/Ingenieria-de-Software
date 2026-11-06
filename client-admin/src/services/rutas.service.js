@@ -214,7 +214,7 @@ export async function asignarPedidoARuta(rutaId, pedidoId) {
     const ruta = MOCK_RUTAS.find((r) => r.id === Number(rutaId));
     const pedido = MOCK_PEDIDOS.find((p) => p.id === Number(pedidoId));
 
-    if (!ruta || !ruta.transportista || ruta.transportista.estado !== 'ACTIVO') {
+    if (!ruta || (ruta.transportista && ruta.transportista.estado !== 'ACTIVO')) {
       throw new Error('Ruta no disponible');
     }
 

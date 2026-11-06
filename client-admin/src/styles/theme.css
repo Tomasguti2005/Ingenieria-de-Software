@@ -1,0 +1,186 @@
+/* =========================================================================
+   theme.css — Repartos Ya (client-admin)
+   Tokens de diseño centralizados para Modo Oscuro (por defecto) y Modo Claro.
+   Basado en la Guía de Tema Claro (WCAG AA) y la estética Dark minimalista.
+   ========================================================================= */
+
+/* ─── Variables Comunes (Independientes del tema) ─── */
+:root {
+  --radius-sm: 6px;   /* inputs, botones, badges */
+  --radius-md: 10px;  /* cards, tablas */
+  --radius-lg: 14px;  /* modales, sidebar */
+}
+
+/* ─── MODO OSCURO (Predeterminado en :root) ─── */
+:root {
+  color-scheme: dark;
+
+  /* Superficies */
+  --bg-page: #090d16;
+  --bg-card: #161b22;
+  --bg-table-head: #161b22;
+  --bg-row-hover: rgba(255, 255, 255, 0.04);
+  --bg-input: #0d1117;
+  --bg-overlay: rgba(9, 9, 11, 0.7);
+  --bg-disabled: #21262d;
+
+  /* Bordes */
+  --border-card: rgba(255, 255, 255, 0.08);
+  --border-input: rgba(255, 255, 255, 0.16);
+  --border-input-hover: rgba(255, 255, 255, 0.28);
+  --border-divider: rgba(255, 255, 255, 0.07);
+
+  /* Texto */
+  --text-main: #f0f6fc;
+  --text-muted: #8b949e;
+  --text-subtle: #6e7681;
+  --text-disabled: #484f58;
+  --text-on-accent: #ffffff;
+
+  /* Acentos y Semánticos */
+  --accent: #1f6feb;
+  --accent-strong: #388bfd;
+  --accent-soft: rgba(56, 139, 253, 0.15);
+  --success: #238636;
+  --success-strong: #2ea043;
+  --danger: #da3633;
+  --danger-soft: rgba(248, 81, 73, 0.15);
+
+  /* Sombras y Foco */
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.25);
+  --shadow-popover: 0 12px 36px rgba(0, 0, 0, 0.6);
+  --focus-ring: 0 0 0 2px #0d1117, 0 0 0 4px #388bfd;
+
+  /* Badges de Estado (Modo Oscuro con contraste equilibrado y bordes luminosos) */
+  --badge-activo-bg: rgba(35, 134, 54, 0.2);
+  --badge-activo-text: #3fb950;
+  --badge-activo-border: rgba(35, 134, 54, 0.4);
+
+  --badge-inactivo-bg: rgba(248, 81, 73, 0.18);
+  --badge-inactivo-text: #f85149;
+  --badge-inactivo-border: rgba(248, 81, 73, 0.35);
+
+  --badge-registrado-bg: rgba(110, 118, 129, 0.2);
+  --badge-registrado-text: #8b949e;
+  --badge-registrado-border: rgba(110, 118, 129, 0.35);
+
+  --badge-asignado-bg: rgba(56, 139, 253, 0.18);
+  --badge-asignado-text: #58a6ff;
+  --badge-asignado-border: rgba(56, 139, 253, 0.35);
+
+  --badge-retirado-bg: rgba(210, 153, 34, 0.18);
+  --badge-retirado-text: #e3b341;
+  --badge-retirado-border: rgba(210, 153, 34, 0.35);
+
+  --badge-encamino-bg: rgba(57, 211, 83, 0.18);
+  --badge-encamino-text: #56d364;
+  --badge-encamino-border: rgba(57, 211, 83, 0.35);
+
+  --badge-entregado-bg: var(--badge-activo-bg);
+  --badge-entregado-text: var(--badge-activo-text);
+  --badge-entregado-border: var(--badge-activo-border);
+
+  --badge-cancelado-bg: var(--badge-inactivo-bg);
+  --badge-cancelado-text: var(--badge-inactivo-text);
+  --badge-cancelado-border: var(--badge-inactivo-border);
+
+  /* ── Alias de compatibilidad ── */
+  --bg-surface: var(--bg-card);
+  --bg-table-header: var(--bg-table-head);
+  --border-default: var(--border-card);
+  --border-focus: var(--accent);
+  --accent-blue: var(--accent-strong);
+  --btn-primary: var(--accent);
+  --btn-primary-hover: var(--accent-strong);
+  --btn-success: var(--success);
+  --btn-success-hover: var(--success-strong);
+  --danger-text: var(--danger);
+  --danger-bg-hover: var(--danger-soft);
+}
+
+/* ─── MODO CLARO (.theme-light) ─── */
+.theme-light {
+  color-scheme: light;
+
+  /* Superficies */
+  --bg-page: #EEF2F7;
+  --bg-card: #FFFFFF;
+  --bg-table-head: #F4F6FA;
+  --bg-row-hover: #EFF4FB;
+  --bg-input: #FFFFFF;
+  --bg-overlay: rgba(15, 23, 42, 0.45);
+  --bg-disabled: #F1F5F9;
+
+  /* Bordes */
+  --border-card: #D5DCE6;
+  --border-input: #7B8BA1;
+  --border-input-hover: #475569;
+  --border-divider: #E3E8EF;
+
+  /* Texto */
+  --text-main: #0F172A;
+  --text-muted: #475569;
+  --text-subtle: #64748B;
+  --text-disabled: #94A3B8;
+  --text-on-accent: #FFFFFF;
+
+  /* Acentos y Semánticos */
+  --accent: #2563EB;
+  --accent-strong: #1D4ED8;
+  --accent-soft: #DBEAFE;
+  --success: #15803D;
+  --success-strong: #166534;
+  --danger: #DC2626;
+  --danger-soft: #FEE2E2;
+
+  /* Sombras y Foco */
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --shadow-popover: 0 8px 24px rgba(15, 23, 42, 0.14);
+  --focus-ring: 0 0 0 2px #FFFFFF, 0 0 0 4px #2563EB;
+
+  /* Badges de Estado (Colores sólidos con cuerpo, bordes nítidos y alto contraste sin desvanecer) */
+  --badge-activo-bg: #BBF7D0;
+  --badge-activo-text: #14532D;
+  --badge-activo-border: #4ADE80;
+
+  --badge-inactivo-bg: #FECACA;
+  --badge-inactivo-text: #7F1D1D;
+  --badge-inactivo-border: #F87171;
+
+  --badge-registrado-bg: #E2E8F0;
+  --badge-registrado-text: #1E293B;
+  --badge-registrado-border: #CBD5E1;
+
+  --badge-asignado-bg: #BFDBFE;
+  --badge-asignado-text: #1E3A8A;
+  --badge-asignado-border: #60A5FA;
+
+  --badge-retirado-bg: #FDE68A;
+  --badge-retirado-text: #78350F;
+  --badge-retirado-border: #F59E0B;
+
+  --badge-encamino-bg: #99F6E4;
+  --badge-encamino-text: #134E4A;
+  --badge-encamino-border: #2DD4BF;
+
+  --badge-entregado-bg: var(--badge-activo-bg);
+  --badge-entregado-text: var(--badge-activo-text);
+  --badge-entregado-border: var(--badge-activo-border);
+
+  --badge-cancelado-bg: var(--badge-inactivo-bg);
+  --badge-cancelado-text: var(--badge-inactivo-text);
+  --badge-cancelado-border: var(--badge-inactivo-border);
+
+  /* ── Alias de compatibilidad ── */
+  --bg-surface: var(--bg-card);
+  --bg-table-header: var(--bg-table-head);
+  --border-default: var(--border-card);
+  --border-focus: var(--accent);
+  --accent-blue: var(--accent-strong);
+  --btn-primary: var(--accent);
+  --btn-primary-hover: var(--accent-strong);
+  --btn-success: var(--success);
+  --btn-success-hover: var(--success-strong);
+  --danger-text: var(--danger);
+  --danger-bg-hover: var(--danger-soft);
+}

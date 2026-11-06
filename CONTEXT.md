@@ -111,6 +111,11 @@ repartos-ya/
 - Cada app tiene su propio login independiente.
 - Los componentes visuales no se comparten (web usa HTML/CSS; mobile usa componentes nativos con StyleSheet). Solo se replica a mano la identidad visual (colores, logo, tipografía).
 
+### Regla Estricta de Diseño y Tokens Centralizados (Dark / Light):
+- **OBLIGATORIO PARA CUALQUIER AGENTE O DESARROLLADOR:** Desde la primera maqueta de cualquier vista o componente frontend (tanto en Web como en Mobile), **está terminantemente prohibido utilizar colores hexadecimales o RGBA rígidos o hardcodeados en estilos locales o inline.**
+- **En Web (`client-admin`):** Se deben utilizar exclusivamente las variables CSS semánticas de `client-admin/src/styles/theme.css` (`var(--bg-card)`, `var(--text-main)`, `var(--text-muted)`, `var(--border-card)`, `var(--accent)`, `var(--badge-activo-bg)`, etc.). Nunca duplicar bloques `.theme-light` dentro de archivos locales si el componente puede resolverse mediante tokens en `:root` y `.theme-light`.
+- **En Mobile (`client-mobile`):** Se debe consumir siempre el contexto de diseño mediante `const { colors, esOscuro } = useTheme()` proveniente de `client-mobile/src/context/ThemeContext.js`. Todos los fondos, bordes, tipografías y badges deben referenciar las propiedades de `colors` (`colors.bg`, `colors.surface`, `colors.text`, `colors.border`, `colors.badges.activoBg`, etc.), garantizando paridad estética y cumplimiento WCAG AA tanto en Modo Oscuro como en Modo Claro sin necesidad de refactorizaciones posteriores.
+
 ---
 
 ## 2. STACK TECNOLÓGICO

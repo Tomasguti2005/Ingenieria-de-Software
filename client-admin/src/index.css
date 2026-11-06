@@ -1,4 +1,5 @@
 /* === Reset y estilos base de Repartos Ya (client-admin) === */
+@import './styles/theme.css';
 
 *,
 *::before,
@@ -12,33 +13,6 @@ body {
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* ─── Variables de Sistema para Modo Claro (Paleta WCAG Optimizada) ─── */
-.theme-light {
-  --bg-page: #EEF2F7;
-  --bg-surface: #FFFFFF;
-  --bg-table-header: #F4F6FA;
-  --bg-row-hover: #EFF4FB;
-  
-  --border-default: #D5DCE6;
-  --border-input: #7B8BA1;
-  --border-focus: #2563EB;
-  
-  --text-main: #0F172A;
-  --text-muted: #475569;
-  --text-subtle: #64748B;
-  
-  --accent-blue: #1D4ED8;
-  --btn-primary: #2563EB;
-  --btn-primary-hover: #1D4ED8;
-  
-  --btn-success: #15803D;
-  --btn-success-hover: #166534;
-  
-  --danger-text: #DC2626;
-  --danger-bg-hover: #FEE2E2;
-
   background-color: var(--bg-page);
   color: var(--text-main);
 }
