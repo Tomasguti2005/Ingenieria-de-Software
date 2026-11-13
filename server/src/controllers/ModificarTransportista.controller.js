@@ -74,6 +74,19 @@ const modificarTransportista = async (req, res) => {
       return error(res, 'El transportista no existe o no corresponde a un repartidor.', 404);
     }
 
+    const usuarioExistente2 = await prisma.usuario.findFirst({
+      where: {
+        nombre: nombreLimpio,
+        apellido: apellidoLimpio,
+        NOT: {
+          id: transportistaId // <-- ESTO ES CLAVE: ignora al propio transportista que estamos editando
+        }
+      }
+    });
+
+    if (usuarioExistente2) {
+      return error(res, 'Operación no permitida: ya existe esa persona en el sistema', 409);
+    }
     // Escenario 3: Control de correo duplicado si se intenta cambiar a uno perteneciente a otro usuario
     if (emailLimpio !== transportistaActual.email.toLowerCase()) {
       const emailExistente = await prisma.usuario.findUnique({
@@ -85,6 +98,8 @@ const modificarTransportista = async (req, res) => {
       }
     }
 
+    
+  
     // Escenario 1: Actualización exitosa en la base de datos
     const transportistaActualizado = await prisma.usuario.update({
       where: { id: transportistaId },

@@ -98,11 +98,8 @@ export default function EditarTransportistaPage() {
       const json = await res.json();
 
       if (!res.ok) {
-        // Escenario 3: Modificación rechazada por correo duplicado
-       
-        if (res.status === 409 ) {
-          return setError('El correo electrónico ya se encuentra registrado');
-        } 
+        // Si el backend mandó un mensaje de error específico (json.error), lo mostramos.
+        // Si no, mostramos un mensaje genérico de error de formato.
         return setError(json.error || 'Debe completar todos los campos obligatorios con un formato válido');
       }
        if(res.status===200){
