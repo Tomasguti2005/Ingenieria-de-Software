@@ -58,6 +58,23 @@ const crearTransportista = async (req, res) => {
       });
     }
 
+
+    const nombreNormalizado = nombre.trim();
+    const apellidoNormalizado = apellido.trim();
+
+  const usuarioExistente2 = await prisma.usuario.findFirst({
+   where: {
+     nombre: nombreNormalizado,
+     apellido: apellidoNormalizado
+   }
+  });
+
+if (usuarioExistente2) {
+  return res.status(409).json({
+    error: 'Operación no permitida: ya existe esa persona en el sistema'
+  });
+}
+
     // Escenario 1: Alta de cuenta exitosa
     // Encriptar la contraseña (salting rounds = 10)
     const hashedPassword = await bcrypt.hash(password, 10);
