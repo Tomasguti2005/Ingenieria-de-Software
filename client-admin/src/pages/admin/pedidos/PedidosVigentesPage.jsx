@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { obtenerPedidosVigentes, eliminarPedido } from '../../../services/pedidosService';
+import { obtenerPedidosVigentes, modificarPedido, eliminarPedido } from '../../../services/pedidosService';
 import './PedidosVigentesPage.css';
 
 export default function PedidosVigentesPage() {
@@ -28,6 +28,8 @@ export default function PedidosVigentesPage() {
   const [pedidoAEliminar, setPedidoAEliminar] = useState(null);
   const [eliminando, setEliminando] = useState(false);
   const [errorEliminar, setErrorEliminar] = useState('');
+  const [pedidoCancelandoId, setPedidoCancelandoId] = useState(null);
+  const [errorCancelacion, setErrorCancelacion] = useState('');
 
   // Filtros y ordenamiento
   const [busqueda, setBusqueda] = useState('');
@@ -62,6 +64,34 @@ export default function PedidosVigentesPage() {
   // Regla: No puede eliminarse ni modificarse un pedido en estados posteriores al "retiro" (inclusive)
   const estadosBloqueados = ['RETIRADO', 'EN_CAMINO', 'ENTREGADO', 'FALLIDO', 'CANCELADO'];
   const esEstadoBloqueado = (estado) => estadosBloqueados.includes(estado);
+
+  const handleCancelarPedido = async (pedido) => {
+    setMensajeToast('');
+    setErrorCancelacion('');
+
+    if (pedido.estado === 'EN_CAMINO') {
+      setErrorCancelacion('Operación no permitida: el pedido ya se encuentra en camino con el transportista');
+      return;
+    }
+
+    if (!['REGISTRADO', 'ASIGNADO'].includes(pedido.estado)) {
+      setErrorCancelacion('Solo se pueden cancelar pedidos registrados o asignados.');
+      return;
+    }
+
+    try {
+      setPedidoCancelandoId(pedido.id);
+      await modificarPedido(pedido.id, { estado: 'CANCELADO' });
+      setPedidos((prev) =>
+        prev.map((item) => (item.id === pedido.id ? { ...item, estado: 'CANCELADO' } : item))
+      );
+      setMensajeToast('El pedido ha sido cancelado con éxito');
+    } catch (err) {
+      setErrorCancelacion(err.message || 'No se pudo cancelar el pedido.');
+    } finally {
+      setPedidoCancelandoId(null);
+    }
+  };
 
   const handleConfirmarEliminacion = async () => {
     if (!pedidoAEliminar) return;
@@ -176,6 +206,20 @@ export default function PedidosVigentesPage() {
           <button
             type="button"
             onClick={() => setMensajeToast('')}
+            aria-label="Cerrar notificación"
+            className="btn-toast-close"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {errorCancelacion && (
+        <div className="alert-banner-top error" role="alert">
+          <span>{errorCancelacion}</span>
+          <button
+            type="button"
+            onClick={() => setErrorCancelacion('')}
             aria-label="Cerrar notificación"
             className="btn-toast-close"
           >
@@ -411,6 +455,19 @@ export default function PedidosVigentesPage() {
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                           </svg>
                         </Link>
+                      )}
+
+                      {['REGISTRADO', 'ASIGNADO', 'EN_CAMINO'].includes(pedido.estado) && (
+                        <button
+                          type="button"
+                          className="btn-action-table-cancel"
+                          onClick={() => handleCancelarPedido(pedido)}
+                          disabled={pedidoCancelandoId !== null}
+                          title="Cancelar pedido"
+                          aria-label={`Cancelar pedido ${pedido.codigoSeguimiento}`}
+                        >
+                          {pedidoCancelandoId === pedido.id ? 'Cancelando...' : 'Cancelar pedido'}
+                        </button>
                       )}
 
                       {/* Botón Eliminar: solo permitido en estados previos a RETIRO */}

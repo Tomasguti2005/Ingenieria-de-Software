@@ -23,6 +23,7 @@ export default function CrearRutaPage() {
   // Datos del backend / mock
   const [transportistas, setTransportistas] = useState([]);
   const [pedidos, setPedidos] = useState([]);
+  const pedidosDisponibles = pedidos.filter((pedido) => pedido.estado !== 'CANCELADO');
   const [rutasExistentes, setRutasExistentes] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [enviando, setEnviando] = useState(false);
@@ -419,10 +420,10 @@ export default function CrearRutaPage() {
           <div className="pedidos-selection-list">
             {cargando ? (
               <div style={{ padding: '20px', textAlign: 'center', color: '#9ca3af' }}>Cargando pedidos disponibles...</div>
-            ) : pedidos.length === 0 ? (
-              <div style={{ padding: '20px', textAlign: 'center', color: '#9ca3af' }}>No hay pedidos registrados en el sistema.</div>
+            ) : pedidosDisponibles.length === 0 ? (
+              <div style={{ padding: '20px', textAlign: 'center', color: '#9ca3af' }}>No hay pedidos disponibles para asignar a una ruta.</div>
             ) : (
-              pedidos.map((p) => {
+              pedidosDisponibles.map((p) => {
                 const estaAsignadoAOtraRuta = p.rutaId !== null && p.rutaId !== undefined;
                 const estaSeleccionado = pedidosSeleccionados.includes(p.id);
 
