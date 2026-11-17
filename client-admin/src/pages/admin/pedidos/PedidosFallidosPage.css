@@ -1,0 +1,108 @@
+.pedidos-fallidos-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.pedidos-fallidos-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pedidos-fallidos-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.pedidos-fallidos-breadcrumb span:last-child {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.pedidos-fallidos-header h1 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 21px;
+}
+
+.pedidos-fallidos-header p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.pedidos-fallidos-state {
+  padding: 28px 20px;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  text-align: center;
+  box-shadow: var(--shadow-card);
+}
+
+.pedidos-fallidos-state.error {
+  border-color: var(--badge-cancelado-border);
+  background: var(--badge-cancelado-bg);
+  color: var(--badge-cancelado-text);
+}
+
+.pedidos-fallidos-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pedido-fallido-card {
+  padding: 18px;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+}
+
+.pedido-fallido-card h2 {
+  margin: 0 0 16px;
+  color: var(--badge-cancelado-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 15px;
+}
+
+.pedido-fallido-card dl {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+}
+
+.pedido-fallido-card dl div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pedido-fallido-card dt {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.pedido-fallido-card dd {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
