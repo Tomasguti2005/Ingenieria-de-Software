@@ -308,6 +308,14 @@ export async function modificarPedido(id, datos) {
 /**
  * Elimina un pedido del sistema si se encuentra en estado REGISTRADO o ASIGNADO.
  */
+export async function reprogramarPedido(id) {
+  const pedidoId = Number(id);
+  const res = await fetchAPI(`/pedidos/${pedidoId}/reprogramar`, {
+    method: 'POST',
+  });
+  return res.data ?? res;
+}
+
 export async function eliminarPedido(id) {
   const pedidoId = Number(id);
 

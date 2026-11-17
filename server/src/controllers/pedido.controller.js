@@ -18,8 +18,20 @@ const obtenerPedidos = async (req, res) => {
   try {
     const { estado } = req.query;
 
+    const estadoFiltro = estado ? String(estado).toUpperCase() : null;
+
+    let idsYaReprogramados = [];
+    if (estadoFiltro === 'FALLIDO') {
+      const reprogramados = await prisma.pedido.findMany({
+        where: { pedidoOriginalId: { not: null } },
+        select: { pedidoOriginalId: true },
+      });
+      idsYaReprogramados = reprogramados.map((p) => p.pedidoOriginalId);
+    }
+
     const where = {
-      ...(estado && { estado: String(estado).toUpperCase() }),
+      ...(estadoFiltro && { estado: estadoFiltro }),
+      ...(idsYaReprogramados.length > 0 && { id: { notIn: idsYaReprogramados } }),
     };
 
     const pedidos = await prisma.pedido.findMany({
@@ -255,11 +267,41 @@ const modificarPedido = async (req, res) => {
     if (descripcionProductos) datosActualizados.descripcionProductos = String(descripcionProductos).trim();
     if (notas !== undefined) datosActualizados.notas = notas ? String(notas).trim() : null;
     if (fechaEntrega) datosActualizados.fechaEntrega = new Date(fechaEntrega);
-    if (estado) datosActualizados.estado = estado; 
+    // Regla: Desde admin solo se permiten REGISTRADO, ASIGNADO o CANCELADO
+    const estadoNormalizado = estado ? String(estado).toUpperCase() : undefined;
+    if (estadoNormalizado && !['REGISTRADO', 'ASIGNADO', 'CANCELADO'].includes(estadoNormalizado)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Desde administración solo se puede registrar, asignar o cancelar un pedido.',
+      });
+    }
 
     // Regla: Debe estar asignado a una única ruta y transportista (se actualiza mediante sus IDs)
     if (rutaId) datosActualizados.rutaId = Number(rutaId);
-    if (repartidorId) datosActualizados.repartidorId = Number(repartidorId);
+    if (repartidorId !== undefined) {
+      datosActualizados.repartidorId = repartidorId ? Number(repartidorId) : null;
+    }
+
+    const repartidorFinal =
+      repartidorId !== undefined ? datosActualizados.repartidorId : pedidoExistente.repartidorId;
+
+    if (estadoNormalizado === 'CANCELADO') {
+      datosActualizados.estado = 'CANCELADO';
+    } else if (estadoNormalizado === 'REGISTRADO' && repartidorFinal) {
+      return res.status(400).json({
+        success: false,
+        message: 'Un pedido en estado REGISTRADO no puede tener un transportista asignado.',
+      });
+    } else if (estadoNormalizado === 'ASIGNADO' && !repartidorFinal) {
+      return res.status(400).json({
+        success: false,
+        message: 'Un pedido en estado ASIGNADO debe tener un transportista asignado.',
+      });
+    } else if (repartidorId !== undefined) {
+      datosActualizados.estado = repartidorFinal ? 'ASIGNADO' : 'REGISTRADO';
+    } else if (estadoNormalizado) {
+      datosActualizados.estado = estadoNormalizado;
+    }
 
     // --- ESCENARIO 1: Éxito (Se modifican y guardan los campos) ---
     const pedidoActualizado = await prisma.pedido.update({
@@ -291,9 +333,71 @@ const modificarPedido = async (req, res) => {
   }
 };
 
+/**
+ * POST /api/pedidos/:id/reprogramar
+ * Reprograma un pedido FALLIDO creando uno nuevo en estado REGISTRADO para la fecha actual.
+ */
+const reprogramarPedido = async (req, res) => {
+  try {
+    const pedidoId = Number(req.params.id);
+    if (Number.isNaN(pedidoId)) {
+      return error(res, 'ID de pedido inválido.', 400);
+    }
+
+    const pedidoOriginal = await prisma.pedido.findUnique({
+      where: { id: pedidoId },
+    });
+
+    if (!pedidoOriginal) {
+      return error(res, 'Pedido no encontrado.', 404);
+    }
+
+    if (pedidoOriginal.estado !== 'FALLIDO') {
+      return error(res, 'Solo se pueden reprogramar pedidos en estado FALLIDO.', 400);
+    }
+
+    const yaReprogramado = await prisma.pedido.findFirst({
+      where: { pedidoOriginalId: pedidoId },
+    });
+    if (yaReprogramado) {
+      return error(res, 'Este pedido fallido ya fue reprogramado anteriormente.', 400);
+    }
+
+    const nuevoCodigo = `RY-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+
+    const nuevoPedido = await prisma.pedido.create({
+      data: {
+        codigoSeguimiento: nuevoCodigo,
+        direccionOrigen: pedidoOriginal.direccionOrigen,
+        direccionDestino: pedidoOriginal.direccionDestino,
+        destinatarioNombre: pedidoOriginal.destinatarioNombre,
+        destinatarioTelefono: pedidoOriginal.destinatarioTelefono,
+        descripcionProductos: pedidoOriginal.descripcionProductos,
+        notas: pedidoOriginal.notas,
+        fechaEntrega: new Date(),
+        estado: 'REGISTRADO',
+        pedidoOriginalId: pedidoOriginal.id,
+      },
+    });
+
+    return success(
+      res,
+      {
+        mensaje: 'El pedido se ha reprogramado para hoy exitosamente',
+        pedido: nuevoPedido,
+      },
+      201
+    );
+  } catch (err) {
+    console.error('Error al reprogramar pedido:', err);
+    return error(res, 'Error interno del servidor al reprogramar el pedido.', 500);
+  }
+};
+
 module.exports = {
   obtenerPedidos,
   crearPedido,
   eliminarPedido,
   modificarPedido,
+  reprogramarPedido,
 };
