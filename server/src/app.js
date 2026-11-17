@@ -11,6 +11,7 @@ const obtenerTransportistasRoutes = require('./routes/obtenerTransportistas.rout
 const rutaTransportistaRoutes = require('./routes/modificarTransportistaRuta.routes');
 const rutasGenerales = require('./routes/rutas.routes');
 const pedidoRoutes = require('./routes/pedido.routes');
+const editarEstadoOperativoRoutes = require('./routes/editarEstadoOperativo.routes');
 
 const clientOrigin = process.env.ADMIN_ORIGIN || 'http://localhost:5173';
 
@@ -19,7 +20,7 @@ const app = express();
 app.use(cors({
   origin: clientOrigin,
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
 }));
 
 // 2. Middleware crucial: le dice a Express que procese y entienda el formato JSON
@@ -31,7 +32,9 @@ app.use('/api/vehiculos', vehiculoRoutes);
 app.use('/api/transportistasVehiculo', transportistaVehiculoRoutes);
 app.use('/api/admin/transportistas', transportistasRoutes);
 app.use('/api/admin/transportistas', obtenerTransportistasRoutes);
+app.use('/api/admin/transportistas', editarEstadoOperativoRoutes);
 app.use('/api/transportistas', transportistaEdicionRoutes);
+app.use('/api/transportistas', editarEstadoOperativoRoutes);
 app.use('/api/rutaTransportista', rutaTransportistaRoutes);
 app.use('/api/rutas', rutasGenerales);
 app.use('/api/pedidos', pedidoRoutes);
