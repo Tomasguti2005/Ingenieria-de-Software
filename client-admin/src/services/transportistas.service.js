@@ -157,3 +157,45 @@ export async function eliminarTransportista(id) {
   });
   return respuesta;
 }
+
+/**
+ * Modificar el estado operativo de un transportista (Historia: Cambio de estado operativo del transportista)
+ * Regla: Los estados posibles son "Activo" e "Inactivo" (mapeados a ACTIVO e INACTIVO).
+ * Escenario 1: Actualización exitosa -> "Estado operativo actualizado"
+ * Escenario 2: Actualización fallida -> Transportista no existe (HTTP 404)
+ * @param {number|string} id
+ * @param {string} nuevoEstado - "Activo" | "Inactivo" (o "ACTIVO" | "INACTIVO")
+ * @returns {Promise<{success: boolean, mensaje: string, data: object}>}
+ */
+export async function editarEstadoOperativo(id, nuevoEstado) {
+  const idNum = Number(id);
+  const estadoNormalizado = String(nuevoEstado).trim().toUpperCase();
+
+  if (USAR_MOCK) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const transportista = MOCK_TRANSPORTISTAS.find((t) => t.id === idNum);
+        if (!transportista) {
+          const err = new Error('El transportista no existe o no corresponde a un repartidor.');
+          err.status = 404;
+          reject(err);
+          return;
+        }
+        transportista.estado = estadoNormalizado;
+        resolve({
+          success: true,
+          mensaje: 'Estado operativo actualizado',
+          data: {
+            mensaje: 'Estado operativo actualizado',
+            transportista,
+          },
+        });
+      }, 300);
+    });
+  }
+
+  return fetchAPI(`/admin/transportistas/${idNum}/estado`, {
+    method: 'PATCH',
+    body: JSON.stringify({ estado: estadoNormalizado }),
+  });
+}

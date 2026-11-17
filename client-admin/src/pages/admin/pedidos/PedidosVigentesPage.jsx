@@ -30,6 +30,7 @@ export default function PedidosVigentesPage() {
   const [errorEliminar, setErrorEliminar] = useState('');
   const [pedidoCancelandoId, setPedidoCancelandoId] = useState(null);
   const [errorCancelacion, setErrorCancelacion] = useState('');
+  const [errorSeguimiento, setErrorSeguimiento] = useState('');
 
   // Filtros y ordenamiento
   const [busqueda, setBusqueda] = useState('');
@@ -59,6 +60,26 @@ export default function PedidosVigentesPage() {
       return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
     return f;
+  }
+
+  async function handleCopiarEnlaceSeguimiento(pedido) {
+    setMensajeToast('');
+    setErrorSeguimiento('');
+
+    if (!pedido.codigoSeguimiento) {
+      setErrorSeguimiento('Este pedido no tiene un código de seguimiento disponible.');
+      return;
+    }
+
+    const url = `${window.location.origin}/seguimiento/${encodeURIComponent(pedido.codigoSeguimiento)}`;
+
+    try {
+      await navigator.clipboard.writeText(url);
+      setMensajeToast('Enlace copiado al portapapeles');
+    } catch (err) {
+      console.error('Error al copiar el enlace de seguimiento:', err);
+      setErrorSeguimiento('No se pudo copiar el enlace. Compruebe los permisos del portapapeles e intente nuevamente.');
+    }
   }
 
   // Regla: No puede eliminarse ni modificarse un pedido en estados posteriores al "retiro" (inclusive)
@@ -228,6 +249,20 @@ export default function PedidosVigentesPage() {
         </div>
       )}
 
+      {errorSeguimiento && (
+        <div className="alert-banner-top error" role="alert">
+          <span>{errorSeguimiento}</span>
+          <button
+            type="button"
+            onClick={() => setErrorSeguimiento('')}
+            aria-label="Cerrar notificación"
+            className="btn-toast-close"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* ── Encabezado ── */}
       <header className="page-header">
         <div className="header-meta">
@@ -374,7 +409,7 @@ export default function PedidosVigentesPage() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Código</th>
+                <th>Código / enlace de seguimiento</th>
                 <th>Cliente Destinatario</th>
                 <th>Trayecto</th>
                 <th>Fecha Entrega</th>
@@ -387,7 +422,28 @@ export default function PedidosVigentesPage() {
               {pedidosFiltrados.map((pedido) => (
                 <tr key={pedido.id} className="table-row">
                   <td>
-                    <span className="badge-codigo-linear">{pedido.codigoSeguimiento}</span>
+                    <div className="tracking-table-cell">
+                      <span className="badge-codigo-linear">{pedido.codigoSeguimiento}</span>
+                      {pedido.codigoSeguimiento && (
+                        <>
+                          <a
+                            className="tracking-table-link"
+                            href={`${window.location.origin}/seguimiento/${encodeURIComponent(pedido.codigoSeguimiento)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {`${window.location.origin}/seguimiento/${encodeURIComponent(pedido.codigoSeguimiento)}`}
+                          </a>
+                          <button
+                            type="button"
+                            className="btn-copy-tracking"
+                            onClick={() => handleCopiarEnlaceSeguimiento(pedido)}
+                          >
+                            Copiar enlace
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </td>
                   <td>
                     <div className="destinatario-profile">

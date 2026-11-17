@@ -978,3 +978,165 @@
   color: var(--badge-activo-text);
   border: 1px solid var(--badge-activo-border);
 }
+
+/* ========================================================================= */
+/* ── Estilos para Editar Estado Operativo (Historia de Usuario) ─────────── */
+/* ========================================================================= */
+
+.status-pill-interactive {
+  cursor: pointer;
+  background: none;
+  font: inherit;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.status-pill-interactive:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.status-edit-icon {
+  opacity: 0.6;
+  margin-left: 2px;
+  transition: opacity 0.15s ease;
+}
+
+.status-pill-interactive:hover .status-edit-icon {
+  opacity: 1;
+}
+
+/* Botón inline en la ficha del transportista */
+.btn-cambiar-estado-inline {
+  background: transparent;
+  border: 1px dashed var(--border-divider, #3b4252);
+  color: var(--text-subtle, #94a3b8);
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm, 6px);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-cambiar-estado-inline:hover {
+  border-color: var(--accent, #3b82f6);
+  color: var(--accent, #3b82f6);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+/* Botón en acciones de la ficha */
+.btn-action-estado-ficha {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-card, #1a1d24);
+  border: 1px solid var(--border-input, #2e3440);
+  color: var(--text-main, #e2e8f0);
+  border-radius: var(--radius-sm, 6px);
+  padding: 8px 14px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-action-estado-ficha:hover {
+  border-color: var(--accent, #3b82f6);
+  color: var(--accent, #3b82f6);
+  background: rgba(59, 130, 246, 0.06);
+}
+
+/* Modal pequeño para cambio de estado */
+.modal-window-sm {
+  max-width: 440px;
+}
+
+.estado-radios-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn-estado-opcion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-input, #2e3440);
+  background: var(--bg-card, #16181e);
+  color: var(--text-main, #e2e8f0);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.btn-estado-opcion:hover {
+  border-color: var(--accent, #3b82f6);
+  background: rgba(59, 130, 246, 0.04);
+}
+
+.btn-estado-opcion.seleccionado-activo {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.08);
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.3);
+}
+
+.btn-estado-opcion.seleccionado-inactivo {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.3);
+}
+
+.btn-estado-opcion .status-dot.dot-activo {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  flex-shrink: 0;
+}
+
+.btn-estado-opcion .status-dot.dot-inactivo {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+  flex-shrink: 0;
+}
+
+.estado-opcion-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.estado-opcion-titulo {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-main, #ffffff);
+}
+
+.estado-opcion-desc {
+  font-size: 11.5px;
+  color: var(--text-subtle, #94a3b8);
+}
+
+.estado-opcion-check {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent, #3b82f6);
+}
+
+.seleccionado-activo .estado-opcion-check {
+  color: #22c55e;
+}
+
+.seleccionado-inactivo .estado-opcion-check {
+  color: #ef4444;
+}
