@@ -13,6 +13,7 @@ const rutasGenerales = require('./routes/rutas.routes');
 const pedidoRoutes = require('./routes/pedido.routes');
 const seguimientoPedidoRoutes = require('./routes/seguimientoPedido.routes');
 
+
 const clientOrigin = process.env.ADMIN_ORIGIN || 'http://localhost:5173';
 
 // 1. Inicializamos la aplicación de Express
