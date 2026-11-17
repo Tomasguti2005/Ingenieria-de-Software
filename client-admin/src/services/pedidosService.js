@@ -120,7 +120,7 @@ export async function obtenerPedidosVigentes() {
 
 export async function obtenerPedidosFallidos() {
   const pedidos = await obtenerPedidosVigentes();
-  return pedidos.filter((pedido) => pedido.estado === 'FALLIDO');
+  return pedidos.filter((pedido) => ['FALLIDO', 'CANCELADO'].includes(pedido.estado));
 }
 
 /**
