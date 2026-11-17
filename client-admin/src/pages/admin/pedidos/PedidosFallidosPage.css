@@ -72,11 +72,30 @@
   box-shadow: var(--shadow-card);
 }
 
+.pedido-fallido-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
 .pedido-fallido-card h2 {
-  margin: 0 0 16px;
-  color: var(--badge-cancelado-text);
+  margin: 0;
+  color: var(--text-main);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 15px;
+}
+
+.pedido-fallido-status {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border: 1px solid var(--badge-cancelado-border);
+  border-radius: var(--radius-sm);
+  background: var(--badge-cancelado-bg);
+  color: var(--badge-cancelado-text);
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .pedido-fallido-card dl {

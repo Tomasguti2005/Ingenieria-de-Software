@@ -82,9 +82,7 @@ export default function PedidosVigentesPage() {
     try {
       setPedidoCancelandoId(pedido.id);
       await modificarPedido(pedido.id, { estado: 'CANCELADO' });
-      setPedidos((prev) =>
-        prev.map((item) => (item.id === pedido.id ? { ...item, estado: 'CANCELADO' } : item))
-      );
+      setPedidos((prev) => prev.filter((item) => item.id !== pedido.id));
       setMensajeToast('El pedido ha sido cancelado con éxito');
     } catch (err) {
       setErrorCancelacion(err.message || 'No se pudo cancelar el pedido.');
@@ -110,7 +108,9 @@ export default function PedidosVigentesPage() {
 
   // Filtrado reactivo en memoria
   const pedidosFiltrados = useMemo(() => {
-    let resultado = [...pedidos];
+    let resultado = pedidos.filter(
+      (pedido) => !['FALLIDO', 'CANCELADO'].includes(pedido.estado)
+    );
 
     // 1. Buscador inteligente multifunción: Destinatario, Transportista, Código o Fecha
     if (busqueda.trim()) {
