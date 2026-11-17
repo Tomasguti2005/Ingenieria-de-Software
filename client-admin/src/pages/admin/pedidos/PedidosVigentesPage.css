@@ -74,6 +74,33 @@
   border-color: var(--danger);
 }
 
+.btn-action-table-cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 8px;
+  background: var(--bg-card);
+  color: var(--danger);
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-action-table-cancel:hover:not(:disabled) {
+  background: var(--danger-soft);
+  border-color: var(--danger);
+}
+
+.btn-action-table-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* ── Banner emergente de Éxito Superior ── */
 .alert-banner-top {
   display: flex;
@@ -91,6 +118,12 @@
   background: var(--badge-activo-bg);
   border: 1px solid var(--badge-activo-border);
   color: var(--badge-activo-text);
+}
+
+.alert-banner-top.error {
+  background: var(--danger-soft);
+  border: 1px solid var(--danger);
+  color: var(--danger);
 }
 
 .btn-toast-close {

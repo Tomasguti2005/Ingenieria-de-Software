@@ -174,7 +174,9 @@ export default function RutasCreadasPage() {
   }
 
   // Pedidos que están libres en el sistema (sin ruta)
-  const pedidosLibres = pedidos.filter((p) => p.rutaId === null || p.rutaId === undefined);
+  const pedidosLibres = pedidos.filter(
+    (p) => (p.rutaId === null || p.rutaId === undefined) && p.estado !== 'CANCELADO'
+  );
 
   // Transportista actualmente preseleccionado en el modal
   const transportistaModalSeleccionado = transportistas.find(
