@@ -255,11 +255,41 @@ const modificarPedido = async (req, res) => {
     if (descripcionProductos) datosActualizados.descripcionProductos = String(descripcionProductos).trim();
     if (notas !== undefined) datosActualizados.notas = notas ? String(notas).trim() : null;
     if (fechaEntrega) datosActualizados.fechaEntrega = new Date(fechaEntrega);
-    if (estado) datosActualizados.estado = estado; 
+    // Regla: Desde admin solo se permiten REGISTRADO, ASIGNADO o CANCELADO
+    const estadoNormalizado = estado ? String(estado).toUpperCase() : undefined;
+    if (estadoNormalizado && !['REGISTRADO', 'ASIGNADO', 'CANCELADO'].includes(estadoNormalizado)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Desde administración solo se puede registrar, asignar o cancelar un pedido.',
+      });
+    }
 
     // Regla: Debe estar asignado a una única ruta y transportista (se actualiza mediante sus IDs)
     if (rutaId) datosActualizados.rutaId = Number(rutaId);
-    if (repartidorId) datosActualizados.repartidorId = Number(repartidorId);
+    if (repartidorId !== undefined) {
+      datosActualizados.repartidorId = repartidorId ? Number(repartidorId) : null;
+    }
+
+    const repartidorFinal =
+      repartidorId !== undefined ? datosActualizados.repartidorId : pedidoExistente.repartidorId;
+
+    if (estadoNormalizado === 'CANCELADO') {
+      datosActualizados.estado = 'CANCELADO';
+    } else if (estadoNormalizado === 'REGISTRADO' && repartidorFinal) {
+      return res.status(400).json({
+        success: false,
+        message: 'Un pedido en estado REGISTRADO no puede tener un transportista asignado.',
+      });
+    } else if (estadoNormalizado === 'ASIGNADO' && !repartidorFinal) {
+      return res.status(400).json({
+        success: false,
+        message: 'Un pedido en estado ASIGNADO debe tener un transportista asignado.',
+      });
+    } else if (repartidorId !== undefined) {
+      datosActualizados.estado = repartidorFinal ? 'ASIGNADO' : 'REGISTRADO';
+    } else if (estadoNormalizado) {
+      datosActualizados.estado = estadoNormalizado;
+    }
 
     // --- ESCENARIO 1: Éxito (Se modifican y guardan los campos) ---
     const pedidoActualizado = await prisma.pedido.update({

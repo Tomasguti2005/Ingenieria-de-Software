@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { obtenerPedidosVigentes, modificarPedido, eliminarPedido } from '../../../services/pedidosService';
+import { obtenerPedidosVigentes, modificarPedido } from '../../../services/pedidosService';
 import './PedidosVigentesPage.css';
 
 export default function PedidosVigentesPage() {
@@ -24,10 +24,8 @@ export default function PedidosVigentesPage() {
     }
   }, [location, navigate]);
 
-  // Modal para confirmación de eliminación (HU Eliminar Pedido)
-  const [pedidoAEliminar, setPedidoAEliminar] = useState(null);
-  const [eliminando, setEliminando] = useState(false);
-  const [errorEliminar, setErrorEliminar] = useState('');
+  // Modal para confirmación de cancelación
+  const [pedidoACancelar, setPedidoACancelar] = useState(null);
   const [pedidoCancelandoId, setPedidoCancelandoId] = useState(null);
   const [errorCancelacion, setErrorCancelacion] = useState('');
 
@@ -65,7 +63,7 @@ export default function PedidosVigentesPage() {
   const estadosBloqueados = ['RETIRADO', 'EN_CAMINO', 'ENTREGADO', 'FALLIDO', 'CANCELADO'];
   const esEstadoBloqueado = (estado) => estadosBloqueados.includes(estado);
 
-  const handleCancelarPedido = async (pedido) => {
+  const handleSolicitarCancelacion = (pedido) => {
     setMensajeToast('');
     setErrorCancelacion('');
 
@@ -79,30 +77,22 @@ export default function PedidosVigentesPage() {
       return;
     }
 
+    setPedidoACancelar(pedido);
+  };
+
+  const handleConfirmarCancelacion = async () => {
+    if (!pedidoACancelar) return;
     try {
-      setPedidoCancelandoId(pedido.id);
-      await modificarPedido(pedido.id, { estado: 'CANCELADO' });
-      setPedidos((prev) => prev.filter((item) => item.id !== pedido.id));
+      setPedidoCancelandoId(pedidoACancelar.id);
+      setErrorCancelacion('');
+      await modificarPedido(pedidoACancelar.id, { estado: 'CANCELADO' });
+      setPedidos((prev) => prev.filter((item) => item.id !== pedidoACancelar.id));
+      setPedidoACancelar(null);
       setMensajeToast('El pedido ha sido cancelado con éxito');
     } catch (err) {
       setErrorCancelacion(err.message || 'No se pudo cancelar el pedido.');
     } finally {
       setPedidoCancelandoId(null);
-    }
-  };
-
-  const handleConfirmarEliminacion = async () => {
-    if (!pedidoAEliminar) return;
-    try {
-      setEliminando(true);
-      setErrorEliminar('');
-      await eliminarPedido(pedidoAEliminar.id);
-      setPedidos((prev) => prev.filter((p) => p.id !== pedidoAEliminar.id));
-      setPedidoAEliminar(null);
-    } catch (err) {
-      setErrorEliminar(err.message || 'Error al eliminar el pedido.');
-    } finally {
-      setEliminando(false);
     }
   };
 
@@ -460,31 +450,16 @@ export default function PedidosVigentesPage() {
                       {['REGISTRADO', 'ASIGNADO', 'EN_CAMINO'].includes(pedido.estado) && (
                         <button
                           type="button"
-                          className="btn-action-table-cancel"
-                          onClick={() => handleCancelarPedido(pedido)}
+                          className="btn-action-table-delete"
+                          onClick={() => handleSolicitarCancelacion(pedido)}
                           disabled={pedidoCancelandoId !== null}
                           title="Cancelar pedido"
                           aria-label={`Cancelar pedido ${pedido.codigoSeguimiento}`}
                         >
-                          {pedidoCancelandoId === pedido.id ? 'Cancelando...' : 'Cancelar pedido'}
-                        </button>
-                      )}
-
-                      {/* Botón Eliminar: solo permitido en estados previos a RETIRO */}
-                      {!esEstadoBloqueado(pedido.estado) && (
-                        <button
-                          type="button"
-                          className="btn-action-table-delete"
-                          onClick={() => setPedidoAEliminar(pedido)}
-                          title="Eliminar pedido"
-                          aria-label="Eliminar pedido"
-                        >
-                          {/* Icono de Eliminar / Tacho */}
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="3 6 5 6 21 6" />
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                            <line x1="10" y1="11" x2="10" y2="17" />
-                            <line x1="14" y1="11" x2="14" y2="17" />
+                          {/* Icono de Cancelar / Cruz */}
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
                           </svg>
                         </button>
                       )}
@@ -503,44 +478,45 @@ export default function PedidosVigentesPage() {
         </div>
       )}
 
-      {/* Modal de confirmación de eliminación (Criterio HU Eliminar Pedido) */}
-      {pedidoAEliminar && (
+      {/* Modal de confirmación de cancelación */}
+      {pedidoACancelar && (
         <div className="modal-overlay" role="dialog" aria-modal="true">
           <div className="modal-dialog">
             <div className="modal-header">
-              <svg className="modal-icon-danger" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M3 6h18" />
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              <svg className="modal-icon-danger" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="15" y1="9" x2="9" y2="15" />
+                <line x1="9" y1="9" x2="15" y2="15" />
               </svg>
-              <h3 className="modal-title">Eliminar pedido</h3>
+              <h3 className="modal-title">Cancelar pedido</h3>
             </div>
             <div className="modal-body">
-              {errorEliminar && (
-                <div style={{ color: '#f85149', marginBottom: '10px', fontSize: '13px' }}>
-                  {errorEliminar}
+              {errorCancelacion && (
+                <div className="modal-error-text">
+                  {errorCancelacion}
                 </div>
               )}
-              ¿Está seguro de que desea eliminar el pedido <strong>{pedidoAEliminar.codigoSeguimiento}</strong>? Esta acción no se puede deshacer.
+              ¿Está seguro de que desea cancelar el pedido <strong>{pedidoACancelar.codigoSeguimiento}</strong>? Pasará a la pestaña de cancelados/fallidos.
             </div>
             <div className="modal-actions">
               <button
                 type="button"
                 onClick={() => {
-                  setPedidoAEliminar(null);
-                  setErrorEliminar('');
+                  setPedidoACancelar(null);
+                  setErrorCancelacion('');
                 }}
-                disabled={eliminando}
+                disabled={pedidoCancelandoId !== null}
                 className="btn-secondary"
               >
-                Cancelar
+                Volver
               </button>
               <button
                 type="button"
-                onClick={handleConfirmarEliminacion}
-                disabled={eliminando}
+                onClick={handleConfirmarCancelacion}
+                disabled={pedidoCancelandoId !== null}
                 className="btn-modal-danger"
               >
-                {eliminando ? 'Eliminando...' : 'Aceptar'}
+                {pedidoCancelandoId !== null ? 'Cancelando...' : 'Confirmar cancelación'}
               </button>
             </div>
           </div>
