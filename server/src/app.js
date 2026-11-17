@@ -11,6 +11,7 @@ const obtenerTransportistasRoutes = require('./routes/obtenerTransportistas.rout
 const rutaTransportistaRoutes = require('./routes/modificarTransportistaRuta.routes');
 const rutasGenerales = require('./routes/rutas.routes');
 const pedidoRoutes = require('./routes/pedido.routes');
+const seguimientoPedidoRoutes = require('./routes/seguimientoPedido.routes');
 
 
 const clientOrigin = process.env.ADMIN_ORIGIN || 'http://localhost:5173';
@@ -38,6 +39,7 @@ app.use('/api/transportistas', transportistaEdicionRoutes);
 app.use('/api/rutaTransportista', rutaTransportistaRoutes);
 app.use('/api/rutas', rutasGenerales);
 app.use('/api/pedidos', pedidoRoutes);
+app.use('/api/pedidos', seguimientoPedidoRoutes);
 
 // 4. Definimos el puerto (usamos el del archivo .env que configuraste antes, o el 3000 por defecto)
 const PORT = process.env.PORT || 3000;
