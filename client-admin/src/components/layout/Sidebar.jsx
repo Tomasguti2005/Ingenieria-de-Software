@@ -223,6 +223,16 @@ export default function Sidebar({ abierto, onClose }) {
                   <span className="sidebar-sublink-dot" />
                   <span>Pedidos vigentes</span>
                 </NavLink>
+
+                <NavLink
+                  to="/admin/pedidos/fallidos"
+                  className={({ isActive }) => `sidebar-sublink ${isActive ? 'activo' : ''}`}
+                  onClick={onClose}
+                  title="Pedidos fallidos"
+                >
+                  <span className="sidebar-sublink-dot" />
+                  <span>Pedidos fallidos</span>
+                </NavLink>
               </div>
             )}
           </div>

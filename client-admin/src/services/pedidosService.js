@@ -118,6 +118,11 @@ export async function obtenerPedidosVigentes() {
   });
 }
 
+export async function obtenerPedidosFallidos() {
+  const pedidos = await obtenerPedidosVigentes();
+  return pedidos.filter((pedido) => pedido.estado === 'FALLIDO');
+}
+
 /**
  * Crea un nuevo pedido con validación.
  * Campos obligatorios requeridos:
