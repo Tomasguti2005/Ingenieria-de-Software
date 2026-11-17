@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { obtenerPedidosFallidos } from '../../../services/pedidosService';
+import { obtenerPedidosFallidos, reprogramarPedido } from '../../../services/pedidosService';
 import './PedidosFallidosPage.css';
 
 export default function PedidosFallidosPage() {
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
+  const [reprogramandoId, setReprogramandoId] = useState(null);
+  const [mensajeToast, setMensajeToast] = useState('');
 
   useEffect(() => {
     let componenteActivo = true;
@@ -30,6 +32,27 @@ export default function PedidosFallidosPage() {
     };
   }, []);
 
+  const handleReprogramar = async (pedido) => {
+    setError('');
+    setMensajeToast('');
+    try {
+      setReprogramandoId(pedido.id);
+      const res = await reprogramarPedido(pedido.id);
+      const nuevoCodigo = res?.pedido?.codigoSeguimiento;
+      setPedidos((prev) => prev.filter((item) => item.id !== pedido.id));
+      setMensajeToast(
+        nuevoCodigo
+          ? `El pedido se ha reprogramado para hoy exitosamente (Nuevo código: ${nuevoCodigo})`
+          : 'El pedido se ha reprogramado para hoy exitosamente'
+      );
+      setTimeout(() => setMensajeToast(''), 5000);
+    } catch (err) {
+      setError(err.message || 'No se pudo reprogramar el pedido.');
+    } finally {
+      setReprogramandoId(null);
+    }
+  };
+
   return (
     <div className="pedidos-fallidos-container">
       <header className="pedidos-fallidos-header">
@@ -43,6 +66,12 @@ export default function PedidosFallidosPage() {
         <h1>Pedidos fallidos y cancelados</h1>
         <p>Consultá los pedidos fallidos y cancelados. Solo los fallidos podrán reprogramarse.</p>
       </header>
+
+      {mensajeToast && (
+        <div className="pedidos-fallidos-toast" role="status">
+          {mensajeToast}
+        </div>
+      )}
 
       {cargando ? (
         <div className="pedidos-fallidos-state" role="status">
@@ -73,6 +102,27 @@ export default function PedidosFallidosPage() {
                   </span>
                 </div>
                 <dl>
+                  <div>
+                    <dt>Destinatario</dt>
+                    <dd>
+                      {pedido.destinatarioNombre}
+                      {pedido.destinatarioTelefono ? ` (${pedido.destinatarioTelefono})` : ''}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Origen</dt>
+                    <dd>{pedido.direccionOrigen}</dd>
+                  </div>
+                  <div>
+                    <dt>Destino</dt>
+                    <dd>{pedido.direccionDestino}</dd>
+                  </div>
+                  {pedido.descripcionProductos && (
+                    <div>
+                      <dt>Productos</dt>
+                      <dd>{pedido.descripcionProductos}</dd>
+                    </div>
+                  )}
                   {esFallido ? (
                     <>
                       <div>
@@ -93,6 +143,18 @@ export default function PedidosFallidosPage() {
                     </div>
                   )}
                 </dl>
+                {esFallido && (
+                  <div className="pedido-fallido-actions">
+                    <button
+                      type="button"
+                      className="btn-reprogramar"
+                      onClick={() => handleReprogramar(pedido)}
+                      disabled={reprogramandoId !== null}
+                    >
+                      {reprogramandoId === pedido.id ? 'Reprogramando...' : 'Reprogramar'}
+                    </button>
+                  </div>
+                )}
               </li>
             );
           })}

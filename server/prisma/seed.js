@@ -129,6 +129,26 @@ async function main() {
       notas: 'Horario comercial 9 a 18 hs',
       estado: 'REGISTRADO',
     },
+    {
+      codigoSeguimiento: 'RY-FA01',
+      direccionOrigen: 'Av. 7 N° 850, La Plata',
+      direccionDestino: 'Calle 12 N° 950, La Plata',
+      destinatarioNombre: 'Martín Herrera',
+      destinatarioTelefono: '+5492214455667',
+      descripcionProductos: 'Caja de repuestos electrónicos',
+      notas: 'Timbre 2B',
+      estado: 'FALLIDO',
+    },
+    {
+      codigoSeguimiento: 'RY-FA02',
+      direccionOrigen: 'Av. 7 N° 850, La Plata',
+      direccionDestino: 'Diagonal 73 N° 1640, La Plata',
+      destinatarioNombre: 'Sofía Pereyra',
+      destinatarioTelefono: '+5492217788990',
+      descripcionProductos: 'Indumentaria deportiva',
+      notas: 'Dejar en recepción si no atiende',
+      estado: 'FALLIDO',
+    },
   ];
 
   for (const pedido of pedidosIniciales) {

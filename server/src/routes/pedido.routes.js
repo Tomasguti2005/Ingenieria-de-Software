@@ -7,7 +7,8 @@ const {
   obtenerPedidos,
   crearPedido,
   modificarPedido,
-  eliminarPedido
+  eliminarPedido,
+  reprogramarPedido
 } = require('../controllers/pedido.controller');
 
 // Obtener el listado de pedidos (soporta query param ?estado=...)
@@ -18,6 +19,9 @@ router.post('/', crearPedido);
 
 // Modificar un pedido existente (requiere el ID en la URL, ej: /api/pedidos/5)
 router.put('/:id', modificarPedido); 
+
+// Reprogramar un pedido fallido para hoy
+router.post('/:id/reprogramar', reprogramarPedido);
 
 // Eliminar un pedido (requiere el ID en la URL, ej: /api/pedidos/5)
 router.delete('/:id', eliminarPedido);
