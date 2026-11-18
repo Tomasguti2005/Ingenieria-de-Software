@@ -13,6 +13,7 @@ import CrearPedidoPage from './pages/admin/pedidos/CrearPedidoPage.jsx';
 import PedidosVigentesPage from './pages/admin/pedidos/PedidosVigentesPage.jsx';
 import PedidosFallidosPage from './pages/admin/pedidos/PedidosFallidosPage.jsx';
 import EditarPedidoPage from './pages/admin/pedidos/EditarPedidoPage.jsx';
+import RendicionPage from './pages/admin/rendicion/RendicionPage.jsx';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
               <Route path="pedidos/vigentes" element={<PedidosVigentesPage />} />
               <Route path="pedidos/fallidos" element={<PedidosFallidosPage />} />
               <Route path="pedidos/:id/editar" element={<EditarPedidoPage />} />
+              <Route path="rendicion" element={<RendicionPage />} />
             </Route>
 
             {/* Cualquier ruta desconocida → login */}

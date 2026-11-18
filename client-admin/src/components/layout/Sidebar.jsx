@@ -298,8 +298,10 @@ export default function Sidebar({ abierto, onClose }) {
           </div>
 
           {/* 5. Rendición de Cuentas */}
-          <div
-            className="sidebar-link deshabilitado"
+          <NavLink
+            to="/admin/rendicion"
+            className={({ isActive }) => `sidebar-link ${isActive ? 'activo' : ''}`}
+            onClick={onClose}
             title="Rendición de Cuentas"
           >
             <span className="sidebar-icon">
@@ -309,7 +311,8 @@ export default function Sidebar({ abierto, onClose }) {
               </svg>
             </span>
             <span className="sidebar-label">Rendición</span>
-          </div>
+            <span className="sidebar-active-indicator" />
+          </NavLink>
 
           {/* 6. Reportes y Estadísticas */}
           <div
