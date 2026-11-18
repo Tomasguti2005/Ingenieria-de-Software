@@ -23,7 +23,7 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <Routes>
-            {/* Rutas públicas */}
+            {/* Rutas públicas — Sin autenticación (el cliente final entra directo sin usuario) */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/seguimiento/:codigo" element={<TrackingPage />} />
 

@@ -32,6 +32,27 @@
   border-color: var(--accent);
 }
 
+.btn-action-table-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-action-table-copy:hover {
+  background: var(--bg-row-hover);
+  color: var(--accent-strong);
+  border-color: var(--accent);
+}
+
 .btn-action-table-view {
   display: inline-flex;
   align-items: center;

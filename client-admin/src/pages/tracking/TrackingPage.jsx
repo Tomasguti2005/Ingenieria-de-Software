@@ -42,22 +42,22 @@ export default function TrackingPage() {
           <p className="tracking-error" role="alert">{error}</p>
         ) : (
           <>
-            <p className="tracking-code">Código: <strong>{pedido.codigoSeguimiento}</strong></p>
-            <div className={`tracking-status ${pedido.estado?.toLowerCase()}`}>
-              {pedido.estado?.replace(/_/g, ' ')}
+            <p className="tracking-code">Código: <strong>{pedido?.codigoSeguimiento}</strong></p>
+            <div className={`tracking-status ${pedido?.estado?.toLowerCase()}`}>
+              {pedido?.estado?.replace(/_/g, ' ')}
             </div>
             <dl className="tracking-details">
               <div>
                 <dt>Descripción</dt>
-                <dd>{pedido.descripcionProductos || 'Envío'}</dd>
+                <dd>{pedido?.descripcionProductos || 'Envío'}</dd>
               </div>
-              {pedido.fechaEntrega && (
+              {pedido?.fechaEntrega && (
                 <div>
                   <dt>Fecha estimada de entrega</dt>
                   <dd>{new Date(pedido.fechaEntrega).toLocaleDateString()}</dd>
                 </div>
               )}
-              {pedido.repartidor && (
+              {pedido?.repartidor && (
                 <div>
                   <dt>Transportista</dt>
                   <dd>{pedido.repartidor.nombre} {pedido.repartidor.apellido}</dd>
