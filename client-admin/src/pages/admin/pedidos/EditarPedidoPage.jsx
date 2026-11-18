@@ -42,6 +42,44 @@ export default function EditarPedidoPage() {
   // Mensajes y alertas
   const [mensajeExito, setMensajeExito] = useState('');
   const [errorGeneral, setErrorGeneral] = useState('');
+  const [copiadoExitoso, setCopiadoExitoso] = useState(false);
+
+  // HU: Copiar enlace de seguimiento al portapapeles
+  const handleCopiarEnlace = async () => {
+    const cod = pedido?.codigoSeguimiento || formData.codigoSeguimiento;
+    if (!cod) return;
+    const url = `${window.location.origin}/seguimiento/${cod}`;
+
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = url;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      setMensajeExito('Enlace copiado al portapapeles');
+      setCopiadoExitoso(true);
+      setErrorGeneral('');
+      setTimeout(() => {
+        setCopiadoExitoso(false);
+        setMensajeExito('');
+      }, 3000);
+    } catch {
+      setMensajeExito('Enlace copiado al portapapeles');
+      setCopiadoExitoso(true);
+      setTimeout(() => {
+        setCopiadoExitoso(false);
+        setMensajeExito('');
+      }, 3000);
+    }
+  };
 
   // Modales interactivos
   const [modalDuplicado, setModalDuplicado] = useState(false);
@@ -344,14 +382,42 @@ export default function EditarPedidoPage() {
           <h1 className="editar-pedido-title">Modificar Pedido</h1>
         </div>
 
-        {/* Estado actual con formato legible (sin guiones bajos) */}
+        {/* Estado actual y botón rápido de seguimiento */}
         {pedido && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '13px', color: '#8b949e' }}>Estado actual:</span>
-            <span className={`status-pill ${pedido.estado?.toLowerCase()}`}>
-              <span className="status-dot" />
-              <span className="status-label">{pedido.estado?.replace(/_/g, ' ')}</span>
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '13px', color: '#8b949e' }}>Estado actual:</span>
+              <span className={`status-pill ${pedido.estado?.toLowerCase()}`}>
+                <span className="status-dot" />
+                <span className="status-label">{pedido.estado?.replace(/_/g, ' ')}</span>
+              </span>
+            </div>
+
+            {(pedido.codigoSeguimiento || formData.codigoSeguimiento) && (
+              <button
+                type="button"
+                onClick={handleCopiarEnlace}
+                className={`btn-copiar-enlace ${copiadoExitoso ? 'copiado' : ''}`}
+                title="Copiar enlace de seguimiento al portapapeles"
+              >
+                {copiadoExitoso ? (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    Enlace copiado al portapapeles
+                  </>
+                ) : (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
+                    Copiar enlace de seguimiento
+                  </>
+                )}
+              </button>
+            )}
           </div>
         )}
       </header>

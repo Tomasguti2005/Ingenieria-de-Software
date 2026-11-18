@@ -84,6 +84,19 @@ export default function PedidosVigentesPage() {
   const estadosBloqueados = ['RETIRADO', 'EN_CAMINO', 'ENTREGADO', 'FALLIDO', 'CANCELADO'];
   const esEstadoBloqueado = (estado) => estadosBloqueados.includes(estado);
 
+  const handleCopiarEnlacePedido = async (codigoSeguimiento) => {
+    if (!codigoSeguimiento) return;
+    const url = `${window.location.origin}/seguimiento/${codigoSeguimiento}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setMensajeToast('Enlace copiado al portapapeles');
+      setTimeout(() => setMensajeToast(''), 3000);
+    } catch {
+      setMensajeToast(`Enlace: ${url}`);
+      setTimeout(() => setMensajeToast(''), 3000);
+    }
+  };
+
   const handleSolicitarCancelacion = (pedido) => {
     setMensajeToast('');
     setErrorCancelacion('');
@@ -473,6 +486,22 @@ export default function PedidosVigentesPage() {
                   </td>
                   <td style={{ textAlign: 'right' }}>
                     <div style={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
+                      {/* Botón rápido Copiar Enlace de Seguimiento */}
+                      {pedido.codigoSeguimiento && (
+                        <button
+                          type="button"
+                          className="btn-action-table-copy"
+                          onClick={() => handleCopiarEnlacePedido(pedido.codigoSeguimiento)}
+                          title="Copiar enlace de seguimiento"
+                          aria-label={`Copiar enlace de seguimiento del pedido ${pedido.codigoSeguimiento}`}
+                        >
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                          </svg>
+                        </button>
+                      )}
+
                       {/* Botón Modificar / Ver */}
                       {esEstadoBloqueado(pedido.estado) ? (
                         /* Si está bloqueado: botón con texto "Ver" */

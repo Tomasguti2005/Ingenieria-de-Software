@@ -7,6 +7,7 @@ import ListaPedidosScreen from '../screens/ListaPedidosScreen';
 import PedidosRetiradosScreen from '../screens/PedidosRetiradosScreen';
 import DetalleEntregaScreen from '../screens/DetalleEntregaScreen';
 import MobileSidebar from '../components/MobileSidebar';
+import SeguimientoPedidoScreen from '../screens/SeguimientoPedidoScreen';
 import UserMenu from '../components/UserMenu';
 import ThemeToggle from '../components/ThemeToggle';
 import { useAuth } from '../context/AuthContext';
@@ -14,6 +15,20 @@ import { useTheme } from '../context/ThemeContext';
 import { View } from 'react-native';
 
 const Stack = createNativeStackNavigator();
+
+// Configuración de enlaces profundos para que al abrir el link del pedido
+// (ej: repartosya://seguimiento/PED-MOB-001 o /seguimiento/:codigo) abra la pantalla
+const linking = {
+  prefixes: ['repartosya://', 'http://localhost:8081', 'http://localhost:19006'],
+  config: {
+    screens: {
+      Login: 'login',
+      SeguimientoPedido: 'seguimiento/:codigo',
+      ListaPedidos: 'pedidos',
+      DetalleEntrega: 'entrega/:id',
+    },
+  },
+};
 
 export default function AppNavigator() {
   const { estaAutenticado, cargando } = useAuth();
@@ -24,7 +39,7 @@ export default function AppNavigator() {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <Stack.Navigator
         screenOptions={{
           headerBackTitle: 'Volver',
@@ -45,11 +60,18 @@ export default function AppNavigator() {
         }}
       >
         {!estaAutenticado ? (
-          <Stack.Screen
-            name="Login"
-            component={LoginScreen}
-            options={{ headerShown: false }}
-          />
+          <>
+            <Stack.Screen
+              name="Login"
+              component={LoginScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="SeguimientoPedido"
+              component={SeguimientoPedidoScreen}
+              options={{ title: 'Seguimiento de Pedido' }}
+            />
+          </>
         ) : (
           <>
             <Stack.Screen
@@ -74,6 +96,11 @@ export default function AppNavigator() {
               name="DetalleEntrega"
               component={DetalleEntregaScreen}
               options={{ title: 'Detalle de Entrega' }}
+            />
+            <Stack.Screen
+              name="SeguimientoPedido"
+              component={SeguimientoPedidoScreen}
+              options={{ title: 'Seguimiento de Pedido' }}
             />
           </>
         )}

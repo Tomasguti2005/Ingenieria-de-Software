@@ -77,6 +77,12 @@
   transform: scale(0.98);
 }
 
+.btn-copiar-enlace.copiado {
+  background: var(--badge-activo-bg);
+  border-color: var(--badge-activo-border);
+  color: var(--badge-activo-text);
+  font-weight: 600;
+}
 /* ── Banners de Alerta / Bloqueo con Tonalidad Sólida ── */
 .alert-banner {
   display: flex;

@@ -19,7 +19,11 @@ export default function TrackingPage() {
         const resultado = await obtenerSeguimiento(codigo);
         if (activo) setPedido(resultado);
       } catch (err) {
-        if (activo) setError(err.message || 'No se pudo cargar el seguimiento del envío.');
+        if (activo) {
+          setError(
+            err.message || 'El enlace de seguimiento no es válido o el pedido ya no se encuentra disponible'
+          );
+        }
       } finally {
         if (activo) setCargando(false);
       }
@@ -31,36 +35,76 @@ export default function TrackingPage() {
     };
   }, [codigo]);
 
+  function formatearFecha(f) {
+    if (!f) return null;
+    const soloFecha = f.split('T')[0];
+    const partes = soloFecha.split('-');
+    if (partes.length === 3) {
+      return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+    return f;
+  }
+
   return (
     <main className="tracking-page">
       <section className="tracking-card">
-        <p className="tracking-eyebrow">Seguimiento de envío</p>
+        <p className="tracking-eyebrow">Repartos Ya — Seguimiento</p>
         <h1>Estado de tu envío</h1>
+
         {cargando ? (
           <p role="status">Cargando estado del envío...</p>
         ) : error ? (
-          <p className="tracking-error" role="alert">{error}</p>
+          <p className="tracking-error" role="alert">
+            {error}
+          </p>
         ) : (
           <>
-            <p className="tracking-code">Código: <strong>{pedido.codigoSeguimiento}</strong></p>
-            <div className={`tracking-status ${pedido.estado?.toLowerCase()}`}>
-              {pedido.estado?.replace(/_/g, ' ')}
+            <p className="tracking-code">
+              Código de pedido: <strong>{pedido?.codigoSeguimiento || codigo}</strong>
+            </p>
+
+            <div className={`tracking-status ${pedido?.estado?.toLowerCase()}`}>
+              {pedido?.estado?.replace(/_/g, ' ')}
             </div>
+
             <dl className="tracking-details">
-              <div>
-                <dt>Descripción</dt>
-                <dd>{pedido.descripcionProductos || 'Envío'}</dd>
-              </div>
-              {pedido.fechaEntrega && (
+              {pedido?.destinatarioNombre && (
                 <div>
-                  <dt>Fecha estimada de entrega</dt>
-                  <dd>{new Date(pedido.fechaEntrega).toLocaleDateString()}</dd>
+                  <dt>Destinatario</dt>
+                  <dd>
+                    <strong>{pedido.destinatarioNombre}</strong>
+                  </dd>
                 </div>
               )}
-              {pedido.repartidor && (
+
+              {pedido?.direccionDestino && (
                 <div>
-                  <dt>Transportista</dt>
-                  <dd>{pedido.repartidor.nombre} {pedido.repartidor.apellido}</dd>
+                  <dt>Dirección de entrega</dt>
+                  <dd>{pedido.direccionDestino}</dd>
+                </div>
+              )}
+
+              <div>
+                <dt>Contenido del paquete</dt>
+                <dd>{pedido?.descripcionProductos || 'Paquete sellado'}</dd>
+              </div>
+
+              {(pedido?.fechaEntrega || pedido?.diaEntrega) && (
+                <div>
+                  <dt>Fecha estimada de entrega</dt>
+                  <dd>
+                    {formatearFecha(pedido.diaEntrega || pedido.fechaEntrega)}
+                  </dd>
+                </div>
+              )}
+
+              {(pedido?.transportista || pedido?.repartidor) && (
+                <div>
+                  <dt>Transportista asignado</dt>
+                  <dd>
+                    {pedido.transportista?.nombre ||
+                      `${pedido.repartidor?.nombre || ''} ${pedido.repartidor?.apellido || ''}`.trim()}
+                  </dd>
                 </div>
               )}
             </dl>
