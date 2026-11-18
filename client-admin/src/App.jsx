@@ -14,6 +14,7 @@ import PedidosVigentesPage from './pages/admin/pedidos/PedidosVigentesPage.jsx';
 import PedidosFallidosPage from './pages/admin/pedidos/PedidosFallidosPage.jsx';
 import EditarPedidoPage from './pages/admin/pedidos/EditarPedidoPage.jsx';
 import RendicionPage from './pages/admin/rendicion/RendicionPage.jsx';
+import HistorialEntregadosPage from './pages/admin/pedidos/HistorialEntregadosPage.jsx';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
               <Route path="pedidos/crear" element={<CrearPedidoPage />} />
               <Route path="pedidos/vigentes" element={<PedidosVigentesPage />} />
               <Route path="pedidos/fallidos" element={<PedidosFallidosPage />} />
+              <Route path="pedidos/historial" element={<HistorialEntregadosPage />} />
               <Route path="pedidos/:id/editar" element={<EditarPedidoPage />} />
               <Route path="rendicion" element={<RendicionPage />} />
             </Route>
