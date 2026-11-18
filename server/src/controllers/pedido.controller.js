@@ -21,7 +21,7 @@ const obtenerPedidos = async (req, res) => {
     const estadoFiltro = estado ? String(estado).toUpperCase() : null;
 
     let idsYaReprogramados = [];
-    if (estadoFiltro === 'FALLIDO') {
+    if (!estadoFiltro || estadoFiltro === 'FALLIDO') {
       const reprogramados = await prisma.pedido.findMany({
         where: { pedidoOriginalId: { not: null } },
         select: { pedidoOriginalId: true },

@@ -194,7 +194,7 @@ export async function editarEstadoOperativo(id, nuevoEstado) {
     });
   }
 
-  return fetchAPI(`/admin/transportistas/${idNum}/estado`, {
+  return fetchAPI(`/transportistas/${idNum}/estado`, {
     method: 'PATCH',
     body: JSON.stringify({ estado: estadoNormalizado }),
   });

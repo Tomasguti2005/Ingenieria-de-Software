@@ -192,19 +192,6 @@ export default function EditarTransportistaPage() {
             />
           </div>
 
-          <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-            <label className="form-label" htmlFor="estado">Estado actual</label>
-            <select
-              id="estado"
-              className="minimal-select full-width"
-              value={estado}
-              onChange={(e) => setEstado(e.target.value)}
-            >
-              <option value="ACTIVO">ACTIVO</option>
-              <option value="INACTIVO">INACTIVO</option>
-            </select>
-          </div>
-
           {error && <div className="form-alert error" style={{ marginBottom: '1rem' }}>{error}</div>}
           {exito && <div className="form-alert success" style={{ marginBottom: '1rem' }}>{exito}</div>}
 

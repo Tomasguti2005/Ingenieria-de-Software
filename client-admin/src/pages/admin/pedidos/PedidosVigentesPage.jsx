@@ -399,7 +399,7 @@ export default function PedidosVigentesPage() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Código / enlace de seguimiento</th>
+                <th>Código de seguimiento</th>
                 <th>Cliente Destinatario</th>
                 <th>Trayecto</th>
                 <th>Fecha Entrega</th>
@@ -412,26 +412,21 @@ export default function PedidosVigentesPage() {
               {pedidosFiltrados.map((pedido) => (
                 <tr key={pedido.id} className="table-row">
                   <td>
-                    <div className="tracking-table-cell">
+                    <div className="tracking-table-cell" style={{ flexDirection: 'row', alignItems: 'center', gap: '18px' }}>
                       <span className="badge-codigo-linear">{pedido.codigoSeguimiento}</span>
                       {pedido.codigoSeguimiento && (
-                        <>
-                          <a
-                            className="tracking-table-link"
-                            href={`${window.location.origin}/seguimiento/${encodeURIComponent(pedido.codigoSeguimiento)}`}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            {`${window.location.origin}/seguimiento/${encodeURIComponent(pedido.codigoSeguimiento)}`}
-                          </a>
-                          <button
-                            type="button"
-                            className="btn-copy-tracking"
-                            onClick={() => handleCopiarEnlaceSeguimiento(pedido)}
-                          >
-                            Copiar enlace
-                          </button>
-                        </>
+                        <button
+                          type="button"
+                          className="btn-action-table-edit"
+                          onClick={() => handleCopiarEnlaceSeguimiento(pedido)}
+                          title="Copiar enlace de seguimiento"
+                          aria-label={`Copiar enlace de seguimiento ${pedido.codigoSeguimiento}`}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                          </svg>
+                        </button>
                       )}
                     </div>
                   </td>
