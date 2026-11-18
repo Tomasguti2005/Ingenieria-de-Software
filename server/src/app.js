@@ -18,7 +18,6 @@ const confirmarEntregaRoutes = require('./routes/confirmarEntrega.routes');
 const historialEntregadosRoutes = require('./routes/historialEntregados.routes');
 const rendicionRoutes = require('./routes/rendicion.routes');
 const mobileRoutes = require('./routes/mobile');
-const editarEstadoOperativoRoutes = require('./routes/editarEstadoOperativo.routes');
 const trackingRoutes = require('./routes/tracking.routes');
 
 const clientOrigin = process.env.ADMIN_ORIGIN || 'http://localhost:5173';
