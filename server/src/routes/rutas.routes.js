@@ -6,7 +6,8 @@ const {
   crearRuta,
   asignarPedidoARuta,
   desasignarPedidosDeRuta,
-  eliminarRuta
+  eliminarRuta,
+  reordenarPedidosDeRuta
 } = require('../controllers/ruta.controller');
 
 // Controladores de asignación de transportista a ruta
@@ -26,6 +27,9 @@ router.post('/:id/asignar-pedido', asignarPedidoARuta);
 
 // DELETE: Desasignar pedidos de una ruta específica
 router.delete('/:id/desasignar-pedidos', desasignarPedidosDeRuta);
+
+// PUT: Reordenar los pedidos de una ruta específica
+router.put('/:id/reordenar-pedidos', reordenarPedidosDeRuta);
 
 // POST: Asignar o modificar el transportista de una ruta
 router.post('/:id/asignar-transportista', asignarTransportistaARuta);

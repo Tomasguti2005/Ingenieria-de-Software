@@ -1,5 +1,8 @@
 const prisma = require('../config/prisma');
 const { success, error } = require('../utils/response');
+const { esRutaIniciada, obtenerRutaSinTerminarDeTransportista } = require('../utils/estadoRuta');
+
+const MENSAJE_RUTA_INICIADA = 'No puede cambiarse el transportista de una ruta ya iniciada';
 
 /**
  * Escenarios 1, 2, 3, 4, 5 y 6: Asignar o modificar el transportista de una ruta
@@ -32,6 +35,11 @@ const asignarTransportistaARuta = async (req, res) => {
       return error(res, 'Esta ruta ya tiene un transportista asignado', 400);
     }
 
+    // Regla: Si la ruta ya fue iniciada no se puede cambiar el transportista
+    if (ruta.transportistaId !== transportistaId && esRutaIniciada(ruta.pedidos)) {
+      return error(res, MENSAJE_RUTA_INICIADA, 400);
+    }
+
     // Buscamos al transportista
     const transportista = await prisma.usuario.findUnique({
       where: { id: transportistaId }
@@ -49,6 +57,14 @@ const asignarTransportistaARuta = async (req, res) => {
     // ESCENARIO 4: Transportista sin vehículo
     if (!transportista.vehiculo || transportista.vehiculo.trim() === '') {
       return error(res, 'El transportista no tiene un vehículo asignado', 400);
+    }
+
+    // Regla: Un transportista no puede tener dos rutas asignadas al mismo tiempo
+    const rutaSinTerminar = ruta.transportistaId === transportista.id
+      ? null
+      : await obtenerRutaSinTerminarDeTransportista(prisma, transportista.id, rutaId);
+    if (rutaSinTerminar) {
+      return error(res, `El transportista ya tiene asignada la ruta "${rutaSinTerminar.nombre}" sin terminar`, 400);
     }
 
     // ESCENARIO 1 y 6: Asignación / Modificación exitosa
@@ -88,9 +104,17 @@ const removerTransportistaDeRuta = async (req, res) => {
   }
 
   try {
-    const ruta = await prisma.ruta.findUnique({ where: { id: rutaId } });
+    const ruta = await prisma.ruta.findUnique({
+      where: { id: rutaId },
+      include: { pedidos: { select: { estado: true } } },
+    });
 
     if (!ruta) return error(res, 'La ruta especificada no existe.', 404);
+
+    // Regla: Si la ruta ya fue iniciada no se puede quitar el transportista
+    if (esRutaIniciada(ruta.pedidos)) {
+      return error(res, MENSAJE_RUTA_INICIADA, 400);
+    }
 
     await prisma.$transaction(async (tx) => {
       await tx.ruta.update({

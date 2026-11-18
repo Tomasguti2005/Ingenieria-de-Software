@@ -283,6 +283,242 @@
   gap: 10px;
 }
 
+/* ── Barra de búsqueda y filtros (mismo estilo que Pedidos vigentes) ── */
+.rutas-creadas-container .command-bar {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 18px;
+}
+
+.rutas-creadas-container .search-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 240px;
+  max-width: 420px;
+}
+
+.rutas-creadas-container .search-field-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--text-subtle);
+  pointer-events: none;
+}
+
+.rutas-creadas-container .search-field-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--bg-input);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-sm);
+  padding: 7px 30px 7px 32px;
+  color: var(--text-main);
+  font-size: 12.5px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rutas-creadas-container .search-field-input:focus,
+.rutas-creadas-container .minimal-select:focus {
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+
+.rutas-creadas-container .search-field-input::placeholder {
+  color: var(--text-subtle);
+}
+
+.rutas-creadas-container .search-clear-btn {
+  position: absolute;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-subtle);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+}
+
+.rutas-creadas-container .search-clear-btn:hover {
+  color: var(--text-main);
+}
+
+.rutas-creadas-container .filters-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.rutas-creadas-container .segmented-control {
+  display: inline-flex;
+  background: var(--bg-table-head);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.rutas-creadas-container .segmented-btn {
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 9px;
+  color: var(--text-muted);
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rutas-creadas-container .segmented-btn:hover {
+  color: var(--text-main);
+}
+
+.rutas-creadas-container .segmented-btn.activo {
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-weight: 600;
+  box-shadow: var(--shadow-card);
+}
+
+.rutas-creadas-container .toolbar-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--border-divider);
+}
+
+.rutas-creadas-container .select-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.rutas-creadas-container .minimal-select {
+  appearance: none;
+  background: var(--bg-input);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-sm);
+  padding: 6px 26px 6px 10px;
+  color: var(--text-main);
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rutas-creadas-container .minimal-select.filtro-fecha {
+  appearance: auto;
+  padding: 5px 8px;
+  color-scheme: light dark;
+}
+
+.rutas-creadas-container .select-arrow {
+  position: absolute;
+  right: 9px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.rutas-creadas-container .btn-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: all 0.15s ease;
+}
+
+.rutas-creadas-container .btn-reset:hover {
+  background: var(--bg-row-hover);
+  color: var(--text-main);
+  border-color: var(--border-input-hover);
+}
+
+/* Estado de la ruta: iniciada (amarillo) / terminada (verde) */
+.ruta-card.ruta-card-iniciada {
+  border-color: var(--badge-retirado-border);
+  box-shadow: 0 0 0 1px var(--badge-retirado-border), var(--shadow-card);
+}
+
+.ruta-card.ruta-card-terminada {
+  border-color: var(--badge-activo-border);
+  box-shadow: 0 0 0 1px var(--badge-activo-border), var(--shadow-card);
+}
+
+.ruta-card.ruta-card-vencida {
+  border-color: var(--badge-inactivo-border);
+  box-shadow: 0 0 0 1px var(--badge-inactivo-border), var(--shadow-card);
+}
+
+.pill-ruta-vencida {
+  background: var(--badge-inactivo-bg);
+  color: var(--badge-inactivo-text);
+  border: 1px solid var(--badge-inactivo-border);
+}
+
+.pill-ruta-iniciada {
+  background: var(--badge-retirado-bg);
+  color: var(--badge-retirado-text);
+  border: 1px solid var(--badge-retirado-border);
+}
+
+.pill-ruta-terminada {
+  background: var(--badge-activo-bg);
+  color: var(--badge-activo-text);
+  border: 1px solid var(--badge-activo-border);
+}
+
+/* Reordenamiento de pedidos en el modal "Modificar pedidos" */
+.reordenar-ayuda {
+  font-size: 0.8rem;
+  color: var(--text-muted, #94a3b8);
+  margin: 0 0 8px;
+}
+
+.pedido-reordenable {
+  cursor: grab;
+}
+
+.pedido-arrastrando {
+  opacity: 0.5;
+  border-style: dashed;
+}
+
+.btn-orden-flecha {
+  background: transparent;
+  border: 1px solid var(--border-card);
+  color: var(--text-muted, #94a3b8);
+  border-radius: var(--radius-sm);
+  width: 26px;
+  height: 26px;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.btn-orden-flecha:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
 .pedido-orden-badge {
   font-size: 0.75rem;
   font-weight: 700;

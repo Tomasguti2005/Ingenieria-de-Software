@@ -64,6 +64,31 @@ async function asegurarEstructuraDB() {
   estructuraInicializada = true;
 }
 
+// Estados que indican que el pedido ya fue retirado (la ruta ya está iniciada)
+const {
+  ESTADOS_PEDIDO_RETIRADO,
+  obtenerRutaSinTerminarDeTransportista,
+} = require('../utils/estadoRuta');
+
+/**
+ * Reenumera el ordenEntrega (1..N) de los pedidos de una ruta respetando el orden actual.
+ * Se usa luego de quitar pedidos para que no queden huecos en la numeración.
+ */
+async function reenumerarPedidosDeRuta(client, rutaId) {
+  const pedidos = await client.pedido.findMany({
+    where: { rutaId },
+    select: { id: true },
+    orderBy: [{ ordenEntrega: 'asc' }, { id: 'asc' }],
+  });
+
+  for (let i = 0; i < pedidos.length; i++) {
+    await client.pedido.update({
+      where: { id: pedidos[i].id },
+      data: { ordenEntrega: i + 1 },
+    });
+  }
+}
+
 /**
  * Obtiene el listado completo de rutas registradas.
  * Incluye los datos del transportista asignado y la lista de pedidos asociados.
@@ -160,6 +185,12 @@ const crearRuta = async (req, res) => {
     // Regla: El transportista debe tener un vehículo asignado
     if (!transportista.vehiculo || String(transportista.vehiculo).trim() === '') {
       return error(res, 'El transportista no cumple con los requisitos: no tiene un vehículo asignado.', 400);
+    }
+
+    // Regla: Un transportista no puede tener dos rutas asignadas al mismo tiempo
+    const rutaSinTerminar = await obtenerRutaSinTerminarDeTransportista(prisma, transportistaIdNum);
+    if (rutaSinTerminar) {
+      return error(res, `El transportista ya tiene asignada la ruta "${rutaSinTerminar.nombre}" sin terminar`, 400);
     }
 
     // Normalizar IDs de pedidos asegurando números válidos
@@ -373,27 +404,27 @@ const desasignarPedidosDeRuta = async (req, res) => {
       return error(res, 'Uno o más pedidos no pertenecen a esta ruta.', 404);
     }
 
-    const estadosNoDesasignables = ['RETIRADO', 'EN_CAMINO', 'ENTREGADO'];
     const pedidoBloqueado = pedidosDeLaRuta.find((p) =>
-      estadosNoDesasignables.includes(p.estado)
+      ESTADOS_PEDIDO_RETIRADO.includes(p.estado)
     );
     if (pedidoBloqueado) {
-      return error(
-        res,
-        `No se puede quitar de la ruta el pedido ${pedidoBloqueado.codigoSeguimiento} porque ya fue retirado.`,
-        400
-      );
+      return error(res, 'No pueden eliminarse pedidos retirados', 400);
     }
 
-    // Escenario 4: Los pedidos quedan libres de la ruta y del repartidor
-    await prisma.pedido.updateMany({
-      where: { id: { in: idsValidos }, rutaId },
-      data: {
-        rutaId: null,
-        repartidorId: null,
-        ordenEntrega: null,
-        estado: 'REGISTRADO',
-      },
+    // Escenario 4: Los pedidos quedan libres de la ruta y del repartidor,
+    // y se reenumera el orden de entrega de los que quedan en la ruta
+    await prisma.$transaction(async (tx) => {
+      await tx.pedido.updateMany({
+        where: { id: { in: idsValidos }, rutaId },
+        data: {
+          rutaId: null,
+          repartidorId: null,
+          ordenEntrega: null,
+          estado: 'REGISTRADO',
+        },
+      });
+
+      await reenumerarPedidosDeRuta(tx, rutaId);
     });
 
     return success(
@@ -436,17 +467,13 @@ const eliminarRuta = async (req, res) => {
     const pedidoRetiradoEnRuta = await prisma.pedido.findFirst({
       where: {
         rutaId,
-        estado: { in: ['RETIRADO', 'EN_CAMINO', 'ENTREGADO'] },
+        estado: { in: ESTADOS_PEDIDO_RETIRADO },
       },
       select: { codigoSeguimiento: true },
     });
 
     if (pedidoRetiradoEnRuta) {
-      return error(
-        res,
-        'No se puede eliminar una ruta que ya tiene pedidos retirados o en reparto.',
-        400
-      );
+      return error(res, 'No pueden eliminarse rutas ya iniciadas', 400);
     }
 
     // 2. Transacción atómica: desvincula pedidos y elimina la ruta
@@ -482,10 +509,75 @@ const eliminarRuta = async (req, res) => {
   }
 };
 
+/**
+ * Reordena los pedidos de una ruta según el orden recibido.
+ * Body: { pedidosIds: [idEnPosicion1, idEnPosicion2, ...] } (todos los pedidos de la ruta).
+ * Regla: los pedidos ya retirados no pueden cambiar de posición.
+ */
+const reordenarPedidosDeRuta = async (req, res) => {
+  try {
+    await asegurarEstructuraDB();
+    const rutaId = Number(req.params?.id);
+    const { pedidosIds } = req.body || {};
+
+    if (!Number.isInteger(rutaId) || rutaId <= 0) {
+      return error(res, 'Debe especificar una ruta válida.', 400);
+    }
+
+    if (!Array.isArray(pedidosIds) || pedidosIds.length === 0) {
+      return error(res, 'Debe enviar el nuevo orden de los pedidos.', 400);
+    }
+
+    const idsOrdenados = pedidosIds.map((id) => Number(id));
+    if (idsOrdenados.some((id) => !Number.isInteger(id) || id <= 0)) {
+      return error(res, 'Los identificadores de pedidos no son válidos.', 400);
+    }
+
+    const pedidosDeLaRuta = await prisma.pedido.findMany({
+      where: { rutaId },
+      select: { id: true, estado: true },
+      orderBy: [{ ordenEntrega: 'asc' }, { id: 'asc' }],
+    });
+
+    const idsRuta = new Set(pedidosDeLaRuta.map((p) => p.id));
+    if (
+      new Set(idsOrdenados).size !== idsOrdenados.length ||
+      idsOrdenados.length !== pedidosDeLaRuta.length ||
+      idsOrdenados.some((id) => !idsRuta.has(id))
+    ) {
+      return error(res, 'El nuevo orden debe incluir exactamente los pedidos de la ruta.', 400);
+    }
+
+    // Los pedidos retirados deben conservar su posición
+    const retiradoMovido = pedidosDeLaRuta.some(
+      (p, idx) => ESTADOS_PEDIDO_RETIRADO.includes(p.estado) && idsOrdenados[idx] !== p.id
+    );
+    if (retiradoMovido) {
+      return error(res, 'No pueden reordenarse pedidos retirados', 400);
+    }
+
+    await prisma.$transaction(async (tx) => {
+      for (let i = 0; i < idsOrdenados.length; i++) {
+        await tx.pedido.update({
+          where: { id: idsOrdenados[i] },
+          data: { ordenEntrega: i + 1 },
+        });
+      }
+    });
+
+    return success(res, { mensaje: 'Orden de pedidos actualizado' }, 200);
+  } catch (err) {
+    console.error('Error al reordenar pedidos de la ruta:', err);
+    return error(res, 'Error interno del servidor al reordenar los pedidos.', 500);
+  }
+};
+
 module.exports = {
   obtenerRutas,
   crearRuta,
   asignarPedidoARuta,
   desasignarPedidosDeRuta,
   eliminarRuta,
+  reordenarPedidosDeRuta,
+  reenumerarPedidosDeRuta,
 };

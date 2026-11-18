@@ -8,6 +8,7 @@
 
 const prisma = require('../config/prisma');
 const { success, error } = require('../utils/response');
+const { obtenerRutaEnCursoDeTransportista } = require('../utils/estadoRuta');
 
 // Expresión regular para validar formato nombre@gmail.com
 const REGEX_EMAIL_GMAIL = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -72,6 +73,15 @@ const modificarTransportista = async (req, res) => {
 
     if (!transportistaActual || transportistaActual.rol !== 'REPARTIDOR') {
       return error(res, 'El transportista no existe o no corresponde a un repartidor.', 404);
+    }
+
+    // Regla: No se puede inactivar a un transportista que ya comenzó su ruta
+    if (
+      estadoLimpio === 'INACTIVO' &&
+      transportistaActual.estado !== 'INACTIVO' &&
+      (await obtenerRutaEnCursoDeTransportista(prisma, transportistaId))
+    ) {
+      return error(res, 'No puede ponerse inactivo un transportista con una ruta iniciada', 400);
     }
 
     const usuarioExistente2 = await prisma.usuario.findFirst({

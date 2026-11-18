@@ -9,6 +9,7 @@
 const crypto = require('crypto');
 const prisma = require('../config/prisma');
 const { success, error } = require('../utils/response');
+const { reenumerarPedidosDeRuta } = require('./ruta.controller');
 
 function obtenerRangoDelDia() {
   const desde = new Date();
@@ -357,6 +358,11 @@ const modificarPedido = async (req, res) => {
         }
       }
     });
+
+    // Si el pedido salió de su ruta anterior, se reenumera el orden de los que quedan
+    if (pedidoExistente.rutaId && pedidoActualizado.rutaId !== pedidoExistente.rutaId) {
+      await reenumerarPedidosDeRuta(prisma, pedidoExistente.rutaId);
+    }
 
     return success(
       res,

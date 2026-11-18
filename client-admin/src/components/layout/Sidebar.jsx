@@ -288,10 +288,10 @@ export default function Sidebar({ abierto, onClose }) {
                   to="/admin/asignar-ruta"
                   className={({ isActive }) => `sidebar-sublink ${isActive ? 'activo' : ''}`}
                   onClick={onClose}
-                  title="Asignar ruta"
+                  title="Crear rutas"
                 >
                   <span className="sidebar-sublink-dot" />
-                  <span>Asignar ruta</span>
+                  <span>Crear rutas</span>
                 </NavLink>
 
                 <NavLink

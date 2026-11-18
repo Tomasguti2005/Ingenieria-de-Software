@@ -8,6 +8,7 @@ import {
   obtenerPedidosParaRuta,
   obtenerRutasCreadas,
   crearRuta,
+  transportistaTieneRutaSinTerminar,
 } from '../../../services/rutas.service.js';
 import './CrearRutaPage.css';
 
@@ -78,7 +79,7 @@ export default function CrearRutaPage() {
     const tieneVehiculo = Boolean(
       transportistaSeleccionado.vehiculo && String(transportistaSeleccionado.vehiculo).trim() !== ''
     );
-    const yaTieneRuta = rutasExistentes.some((r) => r.transportistaId === transportistaSeleccionado.id);
+    const yaTieneRuta = transportistaTieneRutaSinTerminar(rutasExistentes, transportistaSeleccionado.id);
     return estaActivo && tieneVehiculo && !yaTieneRuta;
   }, [transportistaSeleccionado, rutasExistentes]);
 
@@ -86,7 +87,7 @@ export default function CrearRutaPage() {
   function handleSeleccionarTransportista(t) {
     const estaActivo = t.estado === 'ACTIVO';
     const tieneVehiculo = Boolean(t.vehiculo && String(t.vehiculo).trim() !== '');
-    const yaTieneRuta = rutasExistentes.some((r) => r.transportistaId === t.id);
+    const yaTieneRuta = transportistaTieneRutaSinTerminar(rutasExistentes, t.id);
     const esApto = estaActivo && tieneVehiculo && !yaTieneRuta;
 
     // Regla: "Un transportista no puede ser asignado a una ruta si no cumple con los requisitos establecidos"
@@ -329,7 +330,7 @@ export default function CrearRutaPage() {
                     transportistas.map((t) => {
                       const tieneVehiculo = Boolean(t.vehiculo && String(t.vehiculo).trim() !== '');
                       const estaActivo = t.estado === 'ACTIVO';
-                      const yaTieneRuta = rutasExistentes.some((r) => r.transportistaId === t.id);
+                      const yaTieneRuta = transportistaTieneRutaSinTerminar(rutasExistentes, t.id);
                       const esApto = estaActivo && tieneVehiculo && !yaTieneRuta;
                       const estaSeleccionado = Number(transportistaId) === t.id;
 
