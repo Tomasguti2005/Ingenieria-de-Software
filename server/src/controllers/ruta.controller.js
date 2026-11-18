@@ -366,11 +366,23 @@ const desasignarPedidosDeRuta = async (req, res) => {
 
     const pedidosDeLaRuta = await prisma.pedido.findMany({
       where: { id: { in: idsValidos }, rutaId },
-      select: { id: true },
+      select: { id: true, estado: true, codigoSeguimiento: true },
     });
 
     if (pedidosDeLaRuta.length !== idsValidos.length) {
       return error(res, 'Uno o más pedidos no pertenecen a esta ruta.', 404);
+    }
+
+    const estadosNoDesasignables = ['RETIRADO', 'EN_CAMINO', 'ENTREGADO'];
+    const pedidoBloqueado = pedidosDeLaRuta.find((p) =>
+      estadosNoDesasignables.includes(p.estado)
+    );
+    if (pedidoBloqueado) {
+      return error(
+        res,
+        `No se puede quitar de la ruta el pedido ${pedidoBloqueado.codigoSeguimiento} porque ya fue retirado.`,
+        400
+      );
     }
 
     // Escenario 4: Los pedidos quedan libres de la ruta y del repartidor
@@ -419,6 +431,22 @@ const eliminarRuta = async (req, res) => {
 
     if (!rutaExistente) {
       return error(res, 'La ruta no existe en el sistema.', 404);
+    }
+
+    const pedidoRetiradoEnRuta = await prisma.pedido.findFirst({
+      where: {
+        rutaId,
+        estado: { in: ['RETIRADO', 'EN_CAMINO', 'ENTREGADO'] },
+      },
+      select: { codigoSeguimiento: true },
+    });
+
+    if (pedidoRetiradoEnRuta) {
+      return error(
+        res,
+        'No se puede eliminar una ruta que ya tiene pedidos retirados o en reparto.',
+        400
+      );
     }
 
     // 2. Transacción atómica: desvincula pedidos y elimina la ruta

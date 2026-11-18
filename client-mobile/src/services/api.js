@@ -17,11 +17,13 @@ export async function fetchAPI(endpoint, opciones = {}) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
+  const esFormData = typeof FormData !== 'undefined' && opciones.body instanceof FormData;
+
   const config = {
     ...opciones,
     signal: controller.signal,
     headers: {
-      'Content-Type': 'application/json',
+      ...(!esFormData && { 'Content-Type': 'application/json' }),
       ...(token && { Authorization: `Bearer ${token}` }),
       ...opciones.headers,
     },

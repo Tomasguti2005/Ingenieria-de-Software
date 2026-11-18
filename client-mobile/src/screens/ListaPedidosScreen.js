@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   Alert,
   ActivityIndicator,
@@ -10,7 +11,7 @@ import {
 } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import {
-  actualizarRetiroPedido,
+  iniciarViaje,
   obtenerPedidosAsignados,
 } from '../services/pedidos.service';
 
@@ -18,12 +19,13 @@ const MENSAJE_RUTA_INICIADA =
   'No es posible modificar el estado de retiro: la ruta de reparto ya se encuentra iniciada';
 const MENSAJE_PEDIDO_RETIRADO = 'Un pedido retirado no puede desmarcarse.';
 
-export default function ListaPedidosScreen() {
+export default function ListaPedidosScreen({ navigation }) {
   const { colors } = useTheme();
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
-  const [actualizandoPedidoId, setActualizandoPedidoId] = useState(null);
+  const [seleccionadosIds, setSeleccionadosIds] = useState([]);
+  const [iniciandoViaje, setIniciandoViaje] = useState(false);
 
   const cargarPedidos = useCallback(async () => {
     setCargando(true);
@@ -39,11 +41,15 @@ export default function ListaPedidosScreen() {
     }
   }, []);
 
-  useEffect(() => {
-    cargarPedidos();
-  }, [cargarPedidos]);
+  useFocusEffect(
+    useCallback(() => {
+      cargarPedidos();
+    }, [cargarPedidos])
+  );
 
-  const seccionesRutas = Object.values(pedidos.reduce((grupos, pedido) => {
+  const pedidosAsignados = pedidos.filter((pedido) => pedido.estado === 'ASIGNADO');
+
+  const seccionesRutas = Object.values(pedidosAsignados.reduce((grupos, pedido) => {
     const clave = String(pedido.rutaId);
     if (!grupos[clave]) {
       grupos[clave] = {
@@ -57,29 +63,39 @@ export default function ListaPedidosScreen() {
     return grupos;
   }, {}));
 
-  const alternarRetiro = async (pedido) => {
-    const retirado = pedido.estado !== 'RETIRADO';
-    setActualizandoPedidoId(pedido.id);
+  const alternarSeleccion = (pedidoId) => {
+    setSeleccionadosIds((prev) =>
+      prev.includes(pedidoId)
+        ? prev.filter((id) => id !== pedidoId)
+        : [...prev, pedidoId]
+    );
+  };
 
+  const confirmarInicioViaje = async () => {
+    if (seleccionadosIds.length === 0) return;
+    setIniciandoViaje(true);
     try {
-      const actualizado = await actualizarRetiroPedido(pedido.id, retirado);
-      const pedidosActualizados = pedidos.map((item) =>
-        item.id === pedido.id ? actualizado : item
-      );
-      setPedidos(pedidosActualizados);
-
-      const cargaCompleta = pedidosActualizados
-        .filter((item) => item.rutaId === pedido.rutaId)
-        .every((item) => item.estado === 'RETIRADO' || item.estado === 'EN_CAMINO');
-
-      if (retirado && cargaCompleta) {
-        Alert.alert('Carga total completada con éxito');
-      }
+      const listaActualizada = await iniciarViaje(seleccionadosIds);
+      setPedidos(listaActualizada);
+      setSeleccionadosIds([]);
+      navigation.navigate('PedidosRetirados');
     } catch (err) {
-      Alert.alert('No se pudo actualizar el pedido', err.message);
+      Alert.alert('No se pudo iniciar el viaje', err.message || 'Ocurrió un error al confirmar los retiros.');
     } finally {
-      setActualizandoPedidoId(null);
+      setIniciandoViaje(false);
     }
+  };
+
+  const handleEmpezarViaje = () => {
+    if (seleccionadosIds.length === 0 || iniciandoViaje) return;
+    Alert.alert(
+      'Empezar viaje',
+      `¿Confirmás que retiraste ${seleccionadosIds.length} pedido(s)? Una vez confirmados no podrán desmarcarse.`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Confirmar', onPress: confirmarInicioViaje },
+      ]
+    );
   };
 
   const renderEncabezadoRuta = ({ section }) => {
@@ -103,6 +119,8 @@ export default function ListaPedidosScreen() {
 
   const renderPedido = ({ item, index }) => {
     const pedidoRetirado = item.estado === 'RETIRADO' || item.estado === 'EN_CAMINO';
+    const seleccionadoLocal = seleccionadosIds.includes(item.id);
+    const marcado = pedidoRetirado || seleccionadoLocal;
     const rutaIniciada = pedidos.some(
       (pedido) => pedido.rutaId === item.rutaId && pedido.estado === 'EN_CAMINO'
     );
@@ -131,8 +149,8 @@ export default function ListaPedidosScreen() {
             style={[
               styles.checkbox,
               {
-                borderColor: pedidoRetirado ? colors.successStrong : colors.textMuted,
-                backgroundColor: pedidoRetirado ? colors.successStrong : 'transparent',
+                borderColor: marcado ? colors.successStrong : colors.textMuted,
+                backgroundColor: marcado ? colors.successStrong : 'transparent',
               },
             ]}
             onPress={() => {
@@ -143,17 +161,17 @@ export default function ListaPedidosScreen() {
                 );
                 return;
               }
-              alternarRetiro(item);
+              alternarSeleccion(item.id);
             }}
-            disabled={actualizandoPedidoId !== null}
+            disabled={iniciandoViaje}
             accessibilityRole="checkbox"
             accessibilityLabel={`${item.codigoSeguimiento}, ${estadoLabel}`}
             accessibilityState={{
-              checked: pedidoRetirado,
-              disabled: actualizandoPedidoId !== null,
+              checked: marcado,
+              disabled: iniciandoViaje,
             }}
           >
-            {pedidoRetirado && <Text style={styles.checkmark}>✓</Text>}
+            {marcado && <Text style={styles.checkmark}>✓</Text>}
           </TouchableOpacity>
           <View style={styles.orderHeadingText}>
             <Text style={[styles.codigo, { color: colors.text }]}>{item.codigoSeguimiento}</Text>
@@ -208,8 +226,23 @@ export default function ListaPedidosScreen() {
       ) : pedidos.length === 0 ? (
         <View style={styles.stateContainer}>
           <Text style={[styles.emptyText, { color: colors.textMuted }]}>
-            No posees pedidos asignados para la jornada actual
+            Aún no se te asignaron pedidos para la jornada actual.
           </Text>
+        </View>
+      ) : pedidosAsignados.length === 0 ? (
+        <View style={styles.stateContainer}>
+          <Text style={[styles.emptyText, { color: colors.text }]}>
+            Todos los pedidos del día ya fueron retirados.
+          </Text>
+          <TouchableOpacity
+            style={[styles.retryButton, { backgroundColor: colors.accentStrong }]}
+            onPress={() => navigation.navigate('PedidosRetirados')}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.retryText, { color: '#FFFFFF' }]}>
+              Ver pedidos retirados
+            </Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <SectionList
@@ -221,6 +254,21 @@ export default function ListaPedidosScreen() {
           showsVerticalScrollIndicator={false}
           stickySectionHeadersEnabled={false}
         />
+      )}
+
+      {seleccionadosIds.length > 0 && (
+        <TouchableOpacity
+          style={[styles.fabEmpezarViaje, { backgroundColor: colors.accentStrong }]}
+          onPress={handleEmpezarViaje}
+          disabled={iniciandoViaje}
+          activeOpacity={0.85}
+        >
+          {iniciandoViaje ? (
+            <ActivityIndicator size="small" color="#FFFFFF" />
+          ) : (
+            <Text style={styles.fabEmpezarViajeText}>Empezar viaje →</Text>
+          )}
+        </TouchableOpacity>
       )}
     </View>
   );
@@ -254,6 +302,24 @@ const styles = StyleSheet.create({
   routeText: {
     fontSize: 12,
     marginTop: 4,
+  },
+  fabEmpezarViaje: {
+    position: 'absolute',
+    right: 20,
+    bottom: 24,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 999,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
+  fabEmpezarViajeText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
   },
   listContent: {
     paddingBottom: 16,

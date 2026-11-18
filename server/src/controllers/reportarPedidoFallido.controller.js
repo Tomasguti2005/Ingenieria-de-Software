@@ -21,7 +21,7 @@ const reportarPedidoFallido = async (req, res) => {
 
     const pedidoExistente = await prisma.pedido.findUnique({
       where: { id: pedidoId },
-      select: { id: true },
+      select: { id: true, rutaId: true },
     });
 
     if (!pedidoExistente) {
@@ -35,6 +35,37 @@ const reportarPedidoFallido = async (req, res) => {
         motivoFallo: rawMotivo.trim(),
       },
     });
+
+    if (pedidoExistente.rutaId) {
+      const yaEnCamino = await prisma.pedido.findFirst({
+        where: {
+          rutaId: pedidoExistente.rutaId,
+          estado: 'EN_CAMINO',
+        },
+        select: { id: true },
+      });
+
+      if (!yaEnCamino) {
+        const siguienteRetirado = await prisma.pedido.findFirst({
+          where: {
+            rutaId: pedidoExistente.rutaId,
+            estado: 'RETIRADO',
+          },
+          orderBy: [
+            { ordenEntrega: 'asc' },
+            { id: 'asc' },
+          ],
+          select: { id: true },
+        });
+
+        if (siguienteRetirado) {
+          await prisma.pedido.update({
+            where: { id: siguienteRetirado.id },
+            data: { estado: 'EN_CAMINO' },
+          });
+        }
+      }
+    }
 
     return success(res, pedidoActualizado, 200);
   } catch (err) {

@@ -31,7 +31,7 @@ app.use(cors({
 }));
 
 // 2. Middleware crucial: le dice a Express que procese y entienda el formato JSON
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 // 3. Conectamos las rutas
 app.use('/api/auth', authRoutes);
