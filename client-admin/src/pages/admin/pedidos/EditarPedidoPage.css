@@ -50,6 +50,33 @@
   margin: 4px 0 0 0;
 }
 
+/* ── Botón Copiar Enlace de Seguimiento (HU Admin) ── */
+.btn-copiar-enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-copiar-enlace:hover {
+  background: var(--bg-row-hover);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
+.btn-copiar-enlace:active {
+  transform: scale(0.98);
+}
+
 /* ── Banners de Alerta / Bloqueo con Tonalidad Sólida ── */
 .alert-banner {
   display: flex;

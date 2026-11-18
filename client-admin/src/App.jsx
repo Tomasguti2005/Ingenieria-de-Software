@@ -10,11 +10,11 @@ import AsignarVehiculo from './pages/admin/asignar-vehiculo/AsignarVehiculo.jsx'
 import CrearRutaPage from './pages/admin/rutas/CrearRutaPage.jsx';
 import RutasCreadasPage from './pages/admin/rutas/RutasCreadasPage.jsx';
 import CrearPedidoPage from './pages/admin/pedidos/CrearPedidoPage.jsx';
-import PedidosVigentesPage from './pages/admin/pedidos/PedidosVigentesPage.jsx';
 import PedidosFallidosPage from './pages/admin/pedidos/PedidosFallidosPage.jsx';
+import PedidosVigentesPage from './pages/admin/pedidos/PedidosVigentesPage.jsx';
 import EditarPedidoPage from './pages/admin/pedidos/EditarPedidoPage.jsx';
-import TrackingPage from './pages/tracking/TrackingPage.jsx';
 import HistorialEntregadosPage from './pages/admin/pedidos/HistorialEntregadosPage.jsx';
+import TrackingPage from './pages/tracking/TrackingPage.jsx';
 
 function App() {
   return (
