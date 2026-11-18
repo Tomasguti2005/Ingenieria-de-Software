@@ -13,6 +13,7 @@ import CrearPedidoPage from './pages/admin/pedidos/CrearPedidoPage.jsx';
 import PedidosVigentesPage from './pages/admin/pedidos/PedidosVigentesPage.jsx';
 import PedidosFallidosPage from './pages/admin/pedidos/PedidosFallidosPage.jsx';
 import EditarPedidoPage from './pages/admin/pedidos/EditarPedidoPage.jsx';
+import TrackingPage from './pages/tracking/TrackingPage.jsx';
 
 function App() {
   return (
@@ -20,8 +21,9 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <Routes>
-            {/* Rutas públicas */}
+            {/* Rutas públicas — Sin autenticación (el cliente final entra directo sin usuario) */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/seguimiento/:codigo" element={<TrackingPage />} />
 
             {/* Rutas protegidas del admin — Layout con Sidebar */}
             <Route path="/admin" element={<AdminLayout />}>
