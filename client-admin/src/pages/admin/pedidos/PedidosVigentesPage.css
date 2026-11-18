@@ -484,6 +484,36 @@
   border-bottom: none;
 }
 
+.tracking-table-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 180px;
+}
+
+.tracking-table-link {
+  max-width: 240px;
+  color: var(--accent-strong);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.btn-copy-tracking {
+  padding: 4px 8px;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.btn-copy-tracking:hover {
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
 .pedidos-container .table-row {
   transition: background-color 0.12s ease;
 }

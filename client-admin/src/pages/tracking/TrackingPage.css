@@ -1,0 +1,101 @@
+.tracking-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--bg-page);
+  color: var(--text-main);
+}
+
+.tracking-card {
+  width: min(100%, 620px);
+  padding: 32px;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+}
+
+.tracking-eyebrow {
+  margin: 0 0 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tracking-card h1 {
+  margin: 0 0 24px;
+  font-size: 26px;
+}
+
+.tracking-code {
+  color: var(--text-muted);
+}
+
+.tracking-status {
+  width: fit-content;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: var(--badge-registrado-bg);
+  color: var(--badge-registrado-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tracking-status.asignado {
+  background: var(--badge-asignado-bg);
+  color: var(--badge-asignado-text);
+}
+
+.tracking-status.retirado {
+  background: var(--badge-retirado-bg);
+  color: var(--badge-retirado-text);
+}
+
+.tracking-status.en_camino {
+  background: var(--badge-encamino-bg);
+  color: var(--badge-encamino-text);
+}
+
+.tracking-status.entregado {
+  background: var(--badge-entregado-bg);
+  color: var(--badge-entregado-text);
+}
+
+.tracking-status.fallido,
+.tracking-status.cancelado {
+  background: var(--badge-inactivo-bg);
+  color: var(--badge-inactivo-text);
+}
+
+.tracking-details {
+  display: grid;
+  gap: 16px;
+  margin: 24px 0 0;
+}
+
+.tracking-details div {
+  display: grid;
+  gap: 4px;
+}
+
+.tracking-details dt {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.tracking-details dd {
+  margin: 0;
+}
+
+.tracking-error {
+  color: var(--badge-inactivo-text);
+}
+
+@media (max-width: 480px) {
+  .tracking-card {
+    padding: 24px;
+  }
+}

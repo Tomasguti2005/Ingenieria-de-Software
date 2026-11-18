@@ -7,6 +7,7 @@ import {
   obtenerTransportistas,
   crearTransportista,
   eliminarTransportista,
+  editarEstadoOperativo,
 } from '../../../services/transportistas.service.js';
 import './TransportistasPage.css';
 import {  useNavigate } from 'react-router-dom';
@@ -35,6 +36,11 @@ export default function TransportistasPage() {
   // Ficha Personal del Empleado
   const [fichaTransportista, setFichaTransportista] = useState(null); // transportista seleccionado
   const [modoFicha, setModoFicha] = useState('ver');   // 'ver' | 'editar' | 'confirmarEliminar'
+
+  // Modal: Editar Estado Operativo (Activo / Inactivo)
+  const [transportistaEditarEstado, setTransportistaEditarEstado] = useState(null);
+  const [nuevoEstadoSeleccionado, setNuevoEstadoSeleccionado] = useState('ACTIVO');
+  const [guardandoEstado, setGuardandoEstado] = useState(false);
  
   // Auto-cierre de alerta a los 5 segundos
   useEffect(() => {
@@ -177,6 +183,54 @@ export default function TransportistasPage() {
       } catch (_) { }
       console.error('[SISTEMA / LOGS / ERRORES]:', logError);
       setAlerta({ tipo: 'error', mensaje: 'Ocurrió un error al intentar eliminar el transportista. El error fue registrado en el sistema para su verificación.' });
+    }
+  }
+
+  // ── HISTORIA: EDITAR ESTADO OPERATIVO DEL TRANSPORTISTA ───────────
+  function handleAbrirModalEstado(transportista) {
+    setTransportistaEditarEstado(transportista);
+    setNuevoEstadoSeleccionado(transportista.estado || 'ACTIVO');
+  }
+
+  function handleCerrarModalEstado() {
+    setTransportistaEditarEstado(null);
+    setGuardandoEstado(false);
+  }
+
+  async function handleConfirmarCambioEstado(e) {
+    if (e) e.preventDefault();
+    if (!transportistaEditarEstado) return;
+
+    setGuardandoEstado(true);
+    try {
+      const res = await editarEstadoOperativo(transportistaEditarEstado.id, nuevoEstadoSeleccionado);
+
+      // ESCENARIO 1: Actualización exitosa -> "Estado operativo actualizado"
+      const mensajeExito = res?.mensaje || res?.data?.mensaje || 'Estado operativo actualizado';
+      setAlerta({ tipo: 'success', mensaje: mensajeExito });
+
+      // Actualizar lista en pantalla en tiempo real
+      setTransportistas((prev) =>
+        prev.map((t) =>
+          t.id === transportistaEditarEstado.id ? { ...t, estado: nuevoEstadoSeleccionado } : t
+        )
+      );
+
+      // Si la ficha está abierta con este transportista, actualizarla
+      if (fichaTransportista && fichaTransportista.id === transportistaEditarEstado.id) {
+        setFichaTransportista((prev) => ({ ...prev, estado: nuevoEstadoSeleccionado }));
+      }
+
+      handleCerrarModalEstado();
+    } catch (err) {
+      // ESCENARIO 2: Actualización fallida (ej: transportista no existe 404)
+      console.error('Error al actualizar estado operativo:', err);
+      setAlerta({
+        tipo: 'error',
+        mensaje: err.message || 'Error al actualizar el estado operativo del transportista.',
+      });
+    } finally {
+      setGuardandoEstado(false);
     }
   }
 
@@ -334,9 +388,19 @@ export default function TransportistasPage() {
                   <td className="col-phone"><span className="cell-phone">{item.telefono || '—'}</span></td>
                   <td className="col-vehicle"><span className="cell-vehicle">{item.vehiculo || '—'}</span></td>
                   <td className="col-status">
-                    <span className={`status-pill ${item.estado === 'ACTIVO' ? 'activo' : 'inactivo'}`}>
-                      <span className="status-dot" /><span className="status-label">{item.estado}</span>
-                    </span>
+                    <button
+                      type="button"
+                      className={`status-pill status-pill-interactive ${item.estado === 'ACTIVO' ? 'activo' : 'inactivo'}`}
+                      onClick={() => handleAbrirModalEstado(item)}
+                      title="Hacé clic para cambiar el estado operativo"
+                    >
+                      <span className="status-dot" />
+                      <span className="status-label">{item.estado}</span>
+                      <svg className="status-edit-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                      </svg>
+                    </button>
                   </td>
                   <td className="col-date"><span className="cell-date font-mono">{formatearFecha(item.createdAt)}</span></td>
                 </tr>
@@ -415,9 +479,19 @@ export default function TransportistasPage() {
                   </div>
                   <div className="ficha-identidad">
                     <h3 className="ficha-nombre">{fichaTransportista.nombre} {fichaTransportista.apellido}</h3>
-                    <span className={`status-pill ${fichaTransportista.estado === 'ACTIVO' ? 'activo' : 'inactivo'}`}>
-                      <span className="status-dot" /><span className="status-label">{fichaTransportista.estado}</span>
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      <span className={`status-pill ${fichaTransportista.estado === 'ACTIVO' ? 'activo' : 'inactivo'}`}>
+                        <span className="status-dot" /><span className="status-label">{fichaTransportista.estado}</span>
+                      </span>
+                      <button
+                        type="button"
+                        className="btn-cambiar-estado-inline"
+                        onClick={() => handleAbrirModalEstado(fichaTransportista)}
+                        title="Cambiar estado operativo"
+                      >
+                        Cambiar estado
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -451,6 +525,10 @@ export default function TransportistasPage() {
                   <button type="button" className="btn-modal-danger" onClick={() => setModoFicha('confirmarEliminar')}>
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
                     Eliminar transportista
+                  </button>
+                  <button type="button" className="btn-action-estado-ficha" onClick={() => handleAbrirModalEstado(fichaTransportista)}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                    Cambiar estado
                   </button>
                   <button type="button" className="btn-modal-submit" onClick={() => navigate(`/admin/transportistas/${fichaTransportista.id}/editar`)}>
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
@@ -487,6 +565,85 @@ export default function TransportistasPage() {
               </>
             )}
 
+          </div>
+        </div>
+      )}
+
+      {/* ================================================================= */}
+      {/* MODAL: EDITAR ESTADO OPERATIVO (HISTORIA: EDITAR ESTADO OPERATIVO) */}
+      {/* ================================================================= */}
+      {transportistaEditarEstado && (
+        <div className="modal-backdrop" role="dialog" aria-modal="true">
+          <div className="modal-window modal-window-sm">
+            <div className="modal-header">
+              <h2 className="modal-title">Editar Estado Operativo</h2>
+              <button type="button" className="modal-close-btn" onClick={handleCerrarModalEstado} disabled={guardandoEstado}>&times;</button>
+            </div>
+
+            <div className="modal-body" style={{ padding: '20px 24px' }}>
+              <p style={{ margin: '0 0 16px 0', color: 'var(--text-secondary, #94a3b8)', fontSize: '0.9rem', lineHeight: '1.45' }}>
+                Modificá el estado operativo del chofer <strong>{transportistaEditarEstado.nombre} {transportistaEditarEstado.apellido}</strong> para mantener actualizada la nómina de personal.
+              </p>
+
+              <div className="estado-selector-group">
+                <label className="form-label" style={{ marginBottom: '10px', display: 'block', fontWeight: 600, fontSize: '0.85rem' }}>
+                  Estado operativo a asignar:
+                </label>
+
+                <div className="estado-radios-container">
+                  <button
+                    type="button"
+                    className={`btn-estado-opcion ${nuevoEstadoSeleccionado === 'ACTIVO' ? 'seleccionado-activo' : ''}`}
+                    onClick={() => setNuevoEstadoSeleccionado('ACTIVO')}
+                    disabled={guardandoEstado}
+                  >
+                    <span className="status-dot dot-activo" />
+                    <div className="estado-opcion-textos">
+                      <span className="estado-opcion-titulo">Activo</span>
+                      <span className="estado-opcion-desc">Habilitado para trabajar y ser asignado a rutas</span>
+                    </div>
+                    {nuevoEstadoSeleccionado === 'ACTIVO' && (
+                      <span className="estado-opcion-check">✓</span>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`btn-estado-opcion ${nuevoEstadoSeleccionado === 'INACTIVO' ? 'seleccionado-inactivo' : ''}`}
+                    onClick={() => setNuevoEstadoSeleccionado('INACTIVO')}
+                    disabled={guardandoEstado}
+                  >
+                    <span className="status-dot dot-inactivo" />
+                    <div className="estado-opcion-textos">
+                      <span className="estado-opcion-titulo">Inactivo</span>
+                      <span className="estado-opcion-desc">Pausado en la nómina, no disponible para rutas</span>
+                    </div>
+                    {nuevoEstadoSeleccionado === 'INACTIVO' && (
+                      <span className="estado-opcion-check">✓</span>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-actions" style={{ padding: '16px 24px' }}>
+              <button
+                type="button"
+                className="btn-modal-cancel"
+                onClick={handleCerrarModalEstado}
+                disabled={guardandoEstado}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="btn-modal-submit"
+                onClick={handleConfirmarCambioEstado}
+                disabled={guardandoEstado}
+              >
+                {guardandoEstado ? 'Actualizando...' : 'Confirmar'}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -13,7 +13,6 @@ import CrearPedidoPage from './pages/admin/pedidos/CrearPedidoPage.jsx';
 import PedidosVigentesPage from './pages/admin/pedidos/PedidosVigentesPage.jsx';
 import PedidosFallidosPage from './pages/admin/pedidos/PedidosFallidosPage.jsx';
 import EditarPedidoPage from './pages/admin/pedidos/EditarPedidoPage.jsx';
-import HistorialEntregadosPage from './pages/admin/pedidos/HistorialEntregadosPage.jsx';
 
 function App() {
   return (
@@ -23,6 +22,7 @@ function App() {
           <Routes>
             {/* Rutas públicas */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/seguimiento/:codigo" element={<TrackingPage />} />
 
             {/* Rutas protegidas del admin — Layout con Sidebar */}
             <Route path="/admin" element={<AdminLayout />}>

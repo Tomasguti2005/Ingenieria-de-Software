@@ -2,14 +2,17 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
   ActivityIndicator,
-  FlatList,
+  SectionList,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
-import { obtenerPedidosAsignados } from '../services/pedidos.service';
+import {
+  actualizarRetiroPedido,
+  obtenerPedidosAsignados,
+} from '../services/pedidos.service';
 
 const MENSAJE_RUTA_INICIADA =
   'No es posible modificar el estado de retiro: la ruta de reparto ya se encuentra iniciada';
@@ -19,7 +22,7 @@ export default function ListaPedidosScreen() {
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
-  const [estadoRuta, setEstadoRuta] = useState('ASIGNADO');
+  const [actualizandoPedidoId, setActualizandoPedidoId] = useState(null);
 
   const cargarPedidos = useCallback(async () => {
     setCargando(true);
@@ -27,10 +30,7 @@ export default function ListaPedidosScreen() {
 
     try {
       const listaPedidos = await obtenerPedidosAsignados();
-      setPedidos(listaPedidos.map((pedido) => ({
-        ...pedido,
-        estado: pedido.estado || 'ASIGNADO',
-      })));
+      setPedidos(listaPedidos);
     } catch (err) {
       setError(err.message || 'No se pudieron cargar tus pedidos.');
     } finally {
@@ -42,110 +42,149 @@ export default function ListaPedidosScreen() {
     cargarPedidos();
   }, [cargarPedidos]);
 
-  const pedidosRetirados = pedidos.filter((pedido) => pedido.estado === 'RETIRADO').length;
-  const rutaIniciada = estadoRuta === 'EN_CAMINO';
-
-  const alternarRetiro = (pedidoId) => {
-    const pedido = pedidos.find((item) => item.id === pedidoId);
-    if (!pedido) {
-      return;
+  const seccionesRutas = Object.values(pedidos.reduce((grupos, pedido) => {
+    const clave = String(pedido.rutaId);
+    if (!grupos[clave]) {
+      grupos[clave] = {
+        key: clave,
+        rutaId: pedido.rutaId,
+        title: pedido.rutaNombre,
+        data: [],
+      };
     }
+    grupos[clave].data.push(pedido);
+    return grupos;
+  }, {}));
 
-    if (rutaIniciada && pedido.estado === 'RETIRADO') {
-      Alert.alert('Acción no permitida', MENSAJE_RUTA_INICIADA);
-      return;
-    }
+  const alternarRetiro = async (pedido) => {
+    const retirado = pedido.estado !== 'RETIRADO';
+    setActualizandoPedidoId(pedido.id);
 
-    const seCompletaCarga =
-      pedido.estado === 'ASIGNADO' &&
-      pedidos.every((item) => item.id === pedidoId || item.estado === 'RETIRADO');
+    try {
+      const actualizado = await actualizarRetiroPedido(pedido.id, retirado);
+      const pedidosActualizados = pedidos.map((item) =>
+        item.id === pedido.id ? actualizado : item
+      );
+      setPedidos(pedidosActualizados);
 
-    setPedidos((actuales) =>
-      actuales.map((item) => (
-        item.id === pedidoId
-          ? { ...item, estado: item.estado === 'RETIRADO' ? 'ASIGNADO' : 'RETIRADO' }
-          : item
-      ))
-    );
+      const cargaCompleta = pedidosActualizados
+        .filter((item) => item.rutaId === pedido.rutaId)
+        .every((item) => item.estado === 'RETIRADO' || item.estado === 'EN_CAMINO');
 
-    if (seCompletaCarga) {
-      Alert.alert('Carga total completada con éxito');
+      if (retirado && cargaCompleta) {
+        Alert.alert('Carga total completada con éxito');
+      }
+    } catch (err) {
+      Alert.alert('No se pudo actualizar el pedido', err.message);
+    } finally {
+      setActualizandoPedidoId(null);
     }
   };
 
-  const reiniciarDemo = () => {
-    setPedidos((actuales) => actuales.map((pedido) => ({ ...pedido, estado: 'ASIGNADO' })));
-    setEstadoRuta('ASIGNADO');
-  };
+  const renderEncabezadoRuta = ({ section }) => {
+    const rutaIniciada = section.data.some((pedido) => pedido.estado === 'EN_CAMINO');
+    const retirados = section.data.filter(
+      (pedido) => pedido.estado === 'RETIRADO' || pedido.estado === 'EN_CAMINO'
+    ).length;
 
-  const renderPedido = ({ item, index }) => (
-    <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-      <View style={styles.cardHeader}>
-        <Text style={[styles.parada, { color: colors.accentStrong }]}>
-          Parada {index + 1}
+    return (
+      <View style={[styles.loadSummary, { borderColor: colors.border }]}>
+        <Text style={[styles.routeTitle, { color: colors.text }]}>{section.title}</Text>
+        <Text style={[styles.summaryText, { color: colors.text }]}>
+          {retirados} de {section.data.length} pedidos retirados
         </Text>
-        {index === 0 && (
-          <View style={[styles.nextBadge, { backgroundColor: colors.accentSoft }]}>
-            <Text style={[styles.nextBadgeText, { color: colors.accentStrong }]}>
-              Próxima parada
+        <Text style={[styles.routeText, { color: colors.textMuted }]}>
+          Estado de la ruta: {rutaIniciada ? 'En camino' : 'Asignado'}
+        </Text>
+      </View>
+    );
+  };
+
+  const renderPedido = ({ item, index }) => {
+    const pedidoRetirado = item.estado === 'RETIRADO' || item.estado === 'EN_CAMINO';
+    const rutaIniciada = pedidos.some(
+      (pedido) => pedido.rutaId === item.rutaId && pedido.estado === 'EN_CAMINO'
+    );
+    const bloqueado =
+      item.estado === 'EN_CAMINO' || (rutaIniciada && item.estado === 'RETIRADO');
+    const estadoLabel = item.estado === 'EN_CAMINO'
+      ? 'En camino'
+      : item.estado === 'RETIRADO' ? 'Retirado' : 'Asignado';
+
+    return (
+      <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <View style={styles.cardHeader}>
+          <Text style={[styles.parada, { color: colors.accentStrong }]}>
+            Parada {index + 1}
+          </Text>
+          {index === 0 && (
+            <View style={[styles.nextBadge, { backgroundColor: colors.accentSoft }]}>
+              <Text style={[styles.nextBadgeText, { color: colors.accentStrong }]}>
+                Próxima parada
+              </Text>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.orderHeading}>
+          <TouchableOpacity
+            style={[
+              styles.checkbox,
+              {
+                borderColor: pedidoRetirado ? colors.successStrong : colors.textMuted,
+                backgroundColor: pedidoRetirado ? colors.successStrong : 'transparent',
+              },
+            ]}
+            onPress={() => {
+              if (bloqueado) {
+                Alert.alert('Acción no permitida', MENSAJE_RUTA_INICIADA);
+                return;
+              }
+              alternarRetiro(item);
+            }}
+            disabled={actualizandoPedidoId !== null}
+            accessibilityRole="checkbox"
+            accessibilityLabel={`${item.codigoSeguimiento}, ${estadoLabel}`}
+            accessibilityState={{
+              checked: pedidoRetirado,
+              disabled: actualizandoPedidoId !== null,
+            }}
+          >
+            {pedidoRetirado && <Text style={styles.checkmark}>✓</Text>}
+          </TouchableOpacity>
+          <View style={styles.orderHeadingText}>
+            <Text style={[styles.codigo, { color: colors.text }]}>{item.codigoSeguimiento}</Text>
+            <Text style={[styles.orderStatus, { color: pedidoRetirado ? colors.successStrong : colors.textMuted }]}>
+              {estadoLabel}
             </Text>
           </View>
-        )}
-      </View>
-
-      <View style={styles.orderHeading}>
-        <TouchableOpacity
-          style={[
-            styles.checkbox,
-            {
-              borderColor: item.estado === 'RETIRADO' ? colors.successStrong : colors.textMuted,
-              backgroundColor: item.estado === 'RETIRADO' ? colors.successStrong : 'transparent',
-            },
-          ]}
-          onPress={() => alternarRetiro(item.id)}
-          accessibilityRole="checkbox"
-          accessibilityLabel={`${item.codigoSeguimiento}, ${item.estado === 'RETIRADO' ? 'Retirado' : 'Asignado'}`}
-          accessibilityState={{ checked: item.estado === 'RETIRADO' }}
-        >
-          {item.estado === 'RETIRADO' && <Text style={styles.checkmark}>✓</Text>}
-        </TouchableOpacity>
-        <View style={styles.orderHeadingText}>
-          <Text style={[styles.codigo, { color: colors.text }]}>{item.codigoSeguimiento}</Text>
-          <Text style={[styles.orderStatus, { color: item.estado === 'RETIRADO' ? colors.successStrong : colors.textMuted }]}>
-            {item.estado === 'RETIRADO' ? 'Retirado' : 'Asignado'}
-          </Text>
         </View>
-      </View>
 
-      <Text style={[styles.label, { color: colors.textMuted }]}>Dirección de origen</Text>
-      <Text style={[styles.value, { color: colors.text }]}>{item.direccionOrigen}</Text>
-      <Text style={[styles.label, { color: colors.textMuted }]}>Dirección de entrega</Text>
-      <Text style={[styles.value, { color: colors.text }]}>{item.direccionDestino}</Text>
+        <Text style={[styles.label, { color: colors.textMuted }]}>Dirección de origen</Text>
+        <Text style={[styles.value, { color: colors.text }]}>{item.direccionOrigen}</Text>
+        <Text style={[styles.label, { color: colors.textMuted }]}>Dirección de entrega</Text>
+        <Text style={[styles.value, { color: colors.text }]}>{item.direccionDestino}</Text>
 
-      <View style={styles.detailsRow}>
-        <View style={styles.detail}>
-          <Text style={[styles.label, { color: colors.textMuted }]}>Receptor</Text>
-          <Text style={[styles.value, { color: colors.text }]}>{item.destinatarioNombre}</Text>
+        <View style={styles.detailsRow}>
+          <View style={styles.detail}>
+            <Text style={[styles.label, { color: colors.textMuted }]}>Receptor</Text>
+            <Text style={[styles.value, { color: colors.text }]}>{item.destinatarioNombre}</Text>
+          </View>
+          <View style={styles.detail}>
+            <Text style={[styles.label, { color: colors.textMuted }]}>Teléfono</Text>
+            <Text style={[styles.value, { color: colors.text }]}>{item.destinatarioTelefono}</Text>
+          </View>
         </View>
-        <View style={styles.detail}>
-          <Text style={[styles.label, { color: colors.textMuted }]}>Teléfono</Text>
-          <Text style={[styles.value, { color: colors.text }]}>{item.destinatarioTelefono}</Text>
-        </View>
-      </View>
 
-      <Text style={[styles.label, { color: colors.textMuted }]}>Contenido</Text>
-      <Text style={[styles.value, { color: colors.text }]}>{item.descripcionProductos}</Text>
-    </View>
-  );
+        <Text style={[styles.label, { color: colors.textMuted }]}>Contenido</Text>
+        <Text style={[styles.value, { color: colors.text }]}>{item.descripcionProductos}</Text>
+      </View>
+    );
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
       <Text style={[styles.title, { color: colors.text }]}>Pedidos del Día</Text>
-      <View style={[styles.demoNotice, { backgroundColor: colors.accentSoft, borderColor: colors.border }]}>
-        <Text style={[styles.demoNoticeText, { color: colors.text }]}>
-          Modo demostración: los cambios de retiro son locales y no se guardan en la base de datos.
-        </Text>
-      </View>
 
       {cargando ? (
         <View style={styles.stateContainer}>
@@ -170,47 +209,15 @@ export default function ListaPedidosScreen() {
           </Text>
         </View>
       ) : (
-        <>
-          <View style={[styles.loadSummary, { borderColor: colors.border }]}>
-            <Text style={[styles.summaryText, { color: colors.text }]}>
-              {pedidosRetirados} de {pedidos.length} pedidos retirados
-            </Text>
-            <Text style={[styles.routeText, { color: colors.textMuted }]}>
-              Estado de la ruta: {rutaIniciada ? 'En camino' : 'Asignado'}
-            </Text>
-            <View style={styles.demoActions}>
-              {!rutaIniciada && (
-                <TouchableOpacity
-                  style={[styles.demoButton, { borderColor: colors.border }]}
-                  onPress={() => setEstadoRuta('EN_CAMINO')}
-                  accessibilityRole="button"
-                  accessibilityLabel="Simular inicio del recorrido"
-                >
-                  <Text style={[styles.demoButtonText, { color: colors.text }]}>
-                    Simular inicio del recorrido
-                  </Text>
-                </TouchableOpacity>
-              )}
-              <TouchableOpacity
-                style={styles.resetButton}
-                onPress={reiniciarDemo}
-                accessibilityRole="button"
-                accessibilityLabel="Reiniciar demostración"
-              >
-                <Text style={[styles.resetButtonText, { color: colors.accentStrong }]}>
-                  Reiniciar demo
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          <FlatList
-            data={pedidos}
-            keyExtractor={(item) => String(item.id)}
-            renderItem={renderPedido}
-            contentContainerStyle={styles.listContent}
-            showsVerticalScrollIndicator={false}
-          />
-        </>
+        <SectionList
+          sections={seccionesRutas}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={renderPedido}
+          renderSectionHeader={renderEncabezadoRuta}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          stickySectionHeadersEnabled={false}
+        />
       )}
     </View>
   );
@@ -226,20 +233,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 16,
   },
-  demoNotice: {
-    borderWidth: 1,
-    borderRadius: 8,
-    marginBottom: 12,
-    padding: 10,
-  },
-  demoNoticeText: {
-    fontSize: 12,
-    lineHeight: 18,
-  },
   loadSummary: {
+    backgroundColor: 'transparent',
     borderBottomWidth: 1,
     marginBottom: 12,
     paddingBottom: 10,
+  },
+  routeTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    marginBottom: 6,
   },
   summaryText: {
     fontSize: 14,
@@ -248,29 +251,6 @@ const styles = StyleSheet.create({
   routeText: {
     fontSize: 12,
     marginTop: 4,
-  },
-  demoActions: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 8,
-  },
-  demoButton: {
-    borderWidth: 1,
-    borderRadius: 7,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-  },
-  demoButtonText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  resetButton: {
-    padding: 7,
-  },
-  resetButtonText: {
-    fontSize: 12,
-    fontWeight: '600',
   },
   listContent: {
     paddingBottom: 16,
