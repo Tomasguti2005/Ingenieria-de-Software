@@ -16,6 +16,7 @@ const reportarPedidoFallidoRoutes = require('./routes/reportarPedidoFallido.rout
 const cargarPagoRoutes = require('./routes/cargarPago.routes');
 const confirmarEntregaRoutes = require('./routes/confirmarEntrega.routes');
 const historialEntregadosRoutes = require('./routes/historialEntregados.routes');
+const rendicionRoutes = require('./routes/rendicion.routes');
 const mobileRoutes = require('./routes/mobile');
 
 
@@ -38,6 +39,7 @@ app.use('/api/vehiculos', vehiculoRoutes);
 app.use('/api/transportistasVehiculo', transportistaVehiculoRoutes);
 app.use('/api/admin/transportistas', transportistasRoutes);
 app.use('/api/admin/transportistas', obtenerTransportistasRoutes);
+app.use('/api/admin/rendicion', rendicionRoutes);
 
 app.use('/api/transportistas', transportistaEdicionRoutes);
 
