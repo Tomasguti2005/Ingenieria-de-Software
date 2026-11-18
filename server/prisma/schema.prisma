@@ -30,7 +30,6 @@ enum EstadoPedido {
 enum MetodoPago {
   EFECTIVO
   TRANSFERENCIA
-  MERCADO_PAGO
   OTRO
 }
 
