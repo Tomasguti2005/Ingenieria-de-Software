@@ -8,13 +8,12 @@ import { obtenerHistorialEntregados } from '../../../services/pedidosService';
 import './PedidosVigentesPage.css';
 import './HistorialEntregadosPage.css';
 
-const METODOS_PAGO = ['TODOS', 'EFECTIVO', 'TRANSFERENCIA', 'MERCADO_PAGO', 'OTRO'];
+const METODOS_PAGO = ['TODOS', 'EFECTIVO', 'TRANSFERENCIA', 'OTRO'];
 
 const ETIQUETAS_METODO_PAGO = {
   TODOS: 'Todos',
   EFECTIVO: 'Efectivo',
   TRANSFERENCIA: 'Transferencia',
-  MERCADO_PAGO: 'Mercado Pago',
   OTRO: 'Otro',
 };
 

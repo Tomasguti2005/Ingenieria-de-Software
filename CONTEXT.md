@@ -302,7 +302,7 @@ generator client {
 enum RolUsuario       { ADMIN REPARTIDOR }
 enum EstadoRepartidor { ACTIVO INACTIVO }
 enum EstadoPedido     { REGISTRADO ASIGNADO RETIRADO EN_CAMINO ENTREGADO FALLIDO CANCELADO }
-enum MetodoPago       { EFECTIVO TRANSFERENCIA MERCADO_PAGO OTRO }
+enum MetodoPago       { EFECTIVO TRANSFERENCIA OTRO }
 
 model Usuario {
   id        Int              @id @default(autoincrement())

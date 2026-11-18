@@ -1,7 +1,7 @@
 const prisma = require('../config/prisma');
 const { success, error } = require('../utils/response');
 
-const METODOS_PAGO_VALIDOS = ['EFECTIVO', 'TRANSFERENCIA', 'MERCADO_PAGO', 'OTRO'];
+const METODOS_PAGO_VALIDOS = ['EFECTIVO', 'TRANSFERENCIA', 'OTRO'];
 
 /**
  * Permite al repartidor cargar el comprobante de pago y seleccionar el método de pago
