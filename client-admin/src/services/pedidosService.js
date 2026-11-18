@@ -341,3 +341,33 @@ export async function eliminarPedido(id) {
 
   return res;
 }
+
+/**
+ * Historia: Acceder al historial de pedidos entregados.
+ * Obtiene los pedidos en estado ENTREGADO, ordenados por el backend
+ * del más reciente al más antiguo (GET /api/pedidos/historial-entregados).
+ */
+export async function obtenerHistorialEntregados() {
+  if (USE_MOCK) {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return mockPedidos.filter((p) => p.estado === 'ENTREGADO');
+  }
+
+  const res = await fetchAPI('/pedidos/historial-entregados');
+  const lista = Array.isArray(res) ? res : res.data || [];
+
+  // Misma normalización que obtenerPedidosVigentes para reutilizar la interfaz
+  return lista.map((p) => {
+    const nombreTransportista =
+      p.nombreTransportista ||
+      (p.repartidor
+        ? `${p.repartidor.nombre || ''} ${p.repartidor.apellido || ''}`.trim()
+        : null);
+
+    return {
+      ...p,
+      nombreTransportista,
+      diaEntrega: p.diaEntrega || (p.fechaEntrega ? p.fechaEntrega.split('T')[0] : ''),
+    };
+  });
+}
