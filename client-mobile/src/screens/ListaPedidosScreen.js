@@ -16,6 +16,7 @@ import {
 
 const MENSAJE_RUTA_INICIADA =
   'No es posible modificar el estado de retiro: la ruta de reparto ya se encuentra iniciada';
+const MENSAJE_PEDIDO_RETIRADO = 'Un pedido retirado no puede desmarcarse.';
 
 export default function ListaPedidosScreen() {
   const { colors } = useTheme();
@@ -105,8 +106,7 @@ export default function ListaPedidosScreen() {
     const rutaIniciada = pedidos.some(
       (pedido) => pedido.rutaId === item.rutaId && pedido.estado === 'EN_CAMINO'
     );
-    const bloqueado =
-      item.estado === 'EN_CAMINO' || (rutaIniciada && item.estado === 'RETIRADO');
+    const bloqueado = pedidoRetirado;
     const estadoLabel = item.estado === 'EN_CAMINO'
       ? 'En camino'
       : item.estado === 'RETIRADO' ? 'Retirado' : 'Asignado';
@@ -137,7 +137,10 @@ export default function ListaPedidosScreen() {
             ]}
             onPress={() => {
               if (bloqueado) {
-                Alert.alert('Acción no permitida', MENSAJE_RUTA_INICIADA);
+                Alert.alert(
+                  'Acción no permitida',
+                  rutaIniciada ? MENSAJE_RUTA_INICIADA : MENSAJE_PEDIDO_RETIRADO
+                );
                 return;
               }
               alternarRetiro(item);
