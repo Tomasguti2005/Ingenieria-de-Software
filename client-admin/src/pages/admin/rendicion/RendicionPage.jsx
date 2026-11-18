@@ -1,26 +1,9 @@
 // RendicionPage.jsx — Rendición de cuentas y cierres (admin).
 // Ruta: /admin/rendicion
-// Maqueta frontend con datos mockeados para definir requerimientos de backend.
 
 import { useState, useMemo, useRef, useEffect } from 'react';
+import { obtenerRendicion, USAR_MOCK } from '../../../services/rendicion.service.js';
 import './RendicionPage.css';
-
-// Datos mockeados de ejemplo para la maqueta (diario vs mensual)
-const MOCK_RENDICION_DIARIA = [
-  { id: 1, nombre: 'Carlos', apellido: 'Gómez', entregas: 14, monto: 84500 },
-  { id: 2, nombre: 'Lucía', apellido: 'Fernández', entregas: 11, monto: 67200 },
-  { id: 3, nombre: 'Martín', apellido: 'Rodríguez', entregas: 16, monto: 98400 },
-  { id: 4, nombre: 'Sofía', apellido: 'Pérez', entregas: 9, monto: 51300 },
-  { id: 5, nombre: 'Diego', apellido: 'López', entregas: 12, monto: 73800 },
-];
-
-const MOCK_RENDICION_MENSUAL = [
-  { id: 1, nombre: 'Carlos', apellido: 'Gómez', entregas: 284, monto: 1742000 },
-  { id: 2, nombre: 'Lucía', apellido: 'Fernández', entregas: 245, monto: 1510500 },
-  { id: 3, nombre: 'Martín', apellido: 'Rodríguez', entregas: 312, monto: 1965800 },
-  { id: 4, nombre: 'Sofía', apellido: 'Pérez', entregas: 198, monto: 1184000 },
-  { id: 5, nombre: 'Diego', apellido: 'López', entregas: 260, monto: 1620400 },
-];
 
 const MESES_NOMBRES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -61,6 +44,42 @@ export default function RendicionPage() {
   const [fechaDiaria, setFechaDiaria] = useState('2026-11-18');
   const [mesMensual, setMesMensual] = useState('2026-11');
   const [busqueda, setBusqueda] = useState('');
+  const [datosBase, setDatosBase] = useState([]);
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let cancelado = false;
+
+    async function cargarRendicion() {
+      setCargando(true);
+      setError(null);
+      try {
+        const data = await obtenerRendicion({
+          modo,
+          fecha: fechaDiaria,
+          mes: mesMensual,
+        });
+        if (!cancelado) {
+          setDatosBase(Array.isArray(data?.items) ? data.items : []);
+        }
+      } catch (err) {
+        if (!cancelado) {
+          setDatosBase([]);
+          setError(err.message || 'No se pudo cargar la rendición de cuentas.');
+        }
+      } finally {
+        if (!cancelado) {
+          setCargando(false);
+        }
+      }
+    }
+
+    cargarRendicion();
+    return () => {
+      cancelado = true;
+    };
+  }, [modo, fechaDiaria, mesMensual]);
 
   // Estado del selector desplegable de fecha/mes
   const [pickerAbierto, setPickerAbierto] = useState(false);
@@ -146,8 +165,6 @@ export default function RendicionPage() {
     modo === 'diaria'
       ? `${fechaSel.dia} de ${MESES_NOMBRES[fechaSel.mes]} de ${fechaSel.anio}`
       : `${MESES_NOMBRES[mesSel.mes]} ${mesSel.anio}`;
-
-  const datosBase = modo === 'diaria' ? MOCK_RENDICION_DIARIA : MOCK_RENDICION_MENSUAL;
 
   const datosFiltrados = useMemo(() => {
     const termino = busqueda.trim().toLowerCase();
@@ -477,12 +494,18 @@ export default function RendicionPage() {
           <h2>
             Detalle por Transportista — {modo === 'diaria' ? 'Vista Diaria' : 'Vista Mensual'}
           </h2>
-          <span className="rendicion-badge-mock">Maqueta (datos de ejemplo)</span>
+          {USAR_MOCK && (
+            <span className="rendicion-badge-mock">Maqueta (datos de ejemplo)</span>
+          )}
         </div>
 
-        {datosFiltrados.length === 0 ? (
+        {cargando ? (
+          <div className="rendicion-empty">Cargando rendición de cuentas...</div>
+        ) : error ? (
+          <div className="rendicion-empty">{error}</div>
+        ) : datosFiltrados.length === 0 ? (
           <div className="rendicion-empty">
-            No se encontraron transportistas para el filtro aplicado.
+            No se encontraron transportistas para el período o filtro aplicado.
           </div>
         ) : (
           <div className="rendicion-table-wrapper">
