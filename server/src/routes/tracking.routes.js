@@ -73,6 +73,14 @@ router.get('/:codigo', async (req, res) => {
             vehiculo: pedido.repartidor.vehiculo || 'Vehículo autorizado de flota Repartos Ya',
           }
         : null,
+      repartidor: pedido.repartidor
+        ? {
+            id: pedido.repartidor.id,
+            nombre: pedido.repartidor.nombre,
+            apellido: pedido.repartidor.apellido,
+            telefono: pedido.repartidor.telefono || null,
+          }
+        : null,
     };
 
     return res.status(200).json({
