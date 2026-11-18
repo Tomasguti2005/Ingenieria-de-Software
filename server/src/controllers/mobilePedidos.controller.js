@@ -110,6 +110,10 @@ const actualizarRetiroPedido = async (req, res) => {
       if (rutaIniciada) {
         return error(res, MENSAJE_RUTA_INICIADA, 409);
       }
+
+      if (pedido.estado === 'RETIRADO') {
+        return error(res, 'Un pedido retirado no puede desmarcarse.', 409);
+      }
     }
 
     const estadoEsperado = retirado ? 'ASIGNADO' : 'RETIRADO';
