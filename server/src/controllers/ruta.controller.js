@@ -140,36 +140,16 @@ const crearRuta = async (req, res) => {
       return error(res, 'Debe seleccionar un transportista válido para la ruta.', 400);
     }
 
-    // Verificación o auto-aseguramiento de existencia del transportista
-    let transportista = await prisma.usuario.findUnique({
+    const transportista = await prisma.usuario.findUnique({
       where: { id: transportistaIdNum },
     });
 
     if (!transportista) {
-      transportista = await prisma.usuario.create({
-        data: {
-          id: transportistaIdNum,
-          nombre: 'Lucas',
-          apellido: 'Gómez',
-          email: `repartidor_${transportistaIdNum}@repartosya.com`,
-          password: 'password123',
-          telefono: '+54221456789',
-          rol: 'REPARTIDOR',
-          estado: 'ACTIVO',
-          vehiculo: 'Moto Honda Wave',
-        },
-      });
-    } else {
-      // Si existe pero no tiene vehículo o no es repartidor, lo ajustamos
-      if (transportista.rol !== 'REPARTIDOR' || !transportista.vehiculo) {
-        transportista = await prisma.usuario.update({
-          where: { id: transportistaIdNum },
-          data: {
-            rol: 'REPARTIDOR',
-            vehiculo: transportista.vehiculo || 'Moto Honda Wave',
-          },
-        });
-      }
+      return error(res, 'No se encontró el transportista seleccionado.', 404);
+    }
+
+    if (transportista.rol !== 'REPARTIDOR') {
+      return error(res, 'El usuario seleccionado no es un transportista.', 400);
     }
 
     // Regla: El transportista debe estar activo
@@ -183,35 +163,24 @@ const crearRuta = async (req, res) => {
     }
 
     // Normalizar IDs de pedidos asegurando números válidos
-    const idsValidos = pedidosIds.map((id) => Number(id)).filter((id) => !Number.isNaN(id));
-    if (idsValidos.length !== pedidosIds.length) {
+    const idsValidos = pedidosIds.map((id) => Number(id));
+    if (idsValidos.some((id) => !Number.isInteger(id) || id < 1)) {
       return error(res, 'La lista de pedidos contiene identificadores inválidos.', 400);
     }
 
+    if (new Set(idsValidos).size !== idsValidos.length) {
+      return error(res, 'La lista de pedidos no puede contener identificadores duplicados.', 400);
+    }
+
     // Buscar los pedidos en la base de datos
-    let pedidosExistentes = await prisma.pedido.findMany({
+    const pedidosExistentes = await prisma.pedido.findMany({
       where: { id: { in: idsValidos } },
     });
 
-    // Si los pedidos seleccionados aún no existen en la BD SQLite local, los creamos automáticamente
     if (pedidosExistentes.length < idsValidos.length) {
-      for (const id of idsValidos) {
-        if (!pedidosExistentes.some((p) => p.id === id)) {
-          const nuevoP = await prisma.pedido.create({
-            data: {
-              id,
-              codigoSeguimiento: `RY-P${id}`,
-              direccionOrigen: 'Centro de Distribución La Plata',
-              direccionDestino: `Calle 12 N° ${id}, La Plata`,
-              destinatarioNombre: `Cliente Pedido ${id}`,
-              destinatarioTelefono: '+54221456789',
-              descripcionProductos: 'Paquete para entrega',
-              estado: 'REGISTRADO',
-            },
-          });
-          pedidosExistentes.push(nuevoP);
-        }
-      }
+      const idsEncontrados = new Set(pedidosExistentes.map((pedido) => pedido.id));
+      const idsFaltantes = idsValidos.filter((id) => !idsEncontrados.has(id));
+      return error(res, `No se encontraron los pedidos: ${idsFaltantes.join(', ')}.`, 404);
     }
 
     // Regla: Un pedido no puede estar asignado a más de una ruta

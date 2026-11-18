@@ -16,6 +16,7 @@ const reportarPedidoFallidoRoutes = require('./routes/reportarPedidoFallido.rout
 const cargarPagoRoutes = require('./routes/cargarPago.routes');
 const confirmarEntregaRoutes = require('./routes/confirmarEntrega.routes');
 const historialEntregadosRoutes = require('./routes/historialEntregados.routes');
+const mobileRoutes = require('./routes/mobile');
 
 
 const clientOrigin = process.env.ADMIN_ORIGIN || 'http://localhost:5173';
@@ -48,6 +49,7 @@ app.use('/api/pedidos', seguimientoPedidoRoutes);
 app.use('/api/pedidos', reportarPedidoFallidoRoutes);
 app.use('/api/pedidos', cargarPagoRoutes);
 app.use('/api/pedidos', confirmarEntregaRoutes);
+app.use('/api/mobile', mobileRoutes);
 
 // 4. Definimos el puerto (usamos el del archivo .env que configuraste antes, o el 3000 por defecto)
 const PORT = process.env.PORT || 3000;
