@@ -133,7 +133,7 @@ export default function PedidosVigentesPage() {
   // Filtrado reactivo en memoria
   const pedidosFiltrados = useMemo(() => {
     let resultado = pedidos.filter(
-      (pedido) => !['FALLIDO', 'CANCELADO'].includes(pedido.estado)
+      (pedido) => !['FALLIDO', 'CANCELADO', 'ENTREGADO'].includes(pedido.estado)
     );
 
     // 1. Buscador inteligente multifunción: Destinatario, Transportista, Código o Fecha
@@ -527,7 +527,7 @@ export default function PedidosVigentesPage() {
                         </Link>
                       )}
 
-                      {['REGISTRADO', 'ASIGNADO', 'EN_CAMINO'].includes(pedido.estado) && (
+                      {['REGISTRADO', 'ASIGNADO'].includes(pedido.estado) && (
                         <button
                           type="button"
                           className="btn-action-table-delete"

@@ -373,21 +373,27 @@ export default function RutasCreadasPage() {
                 {rutaEditarPedidos.pedidos?.length === 0 ? (
                   <div className="ruta-empty-box-compact">No hay pedidos en la ruta.</div>
                 ) : (
-                  rutaEditarPedidos.pedidos?.map((p) => (
-                    <div key={p.id} className="pedido-mini-item">
-                      <div className="pedido-mini-info">
-                        <span className="pedido-mini-code">{p.codigoSeguimiento}</span>
-                        <span className="pedido-mini-dest">{p.direccionDestino}</span>
+                  rutaEditarPedidos.pedidos?.map((p) => {
+                    const yaRetirado = ['RETIRADO', 'EN_CAMINO', 'ENTREGADO'].includes(p.estado);
+                    return (
+                      <div key={p.id} className="pedido-mini-item">
+                        <div className="pedido-mini-info">
+                          <span className="pedido-mini-code">{p.codigoSeguimiento}</span>
+                          <span className="pedido-mini-dest">{p.direccionDestino}</span>
+                        </div>
+                        <button
+                          type="button"
+                          className="btn-ruta-action btn-danger-action"
+                          onClick={() => handleQuitarPedidoDeRuta(p.id)}
+                          disabled={yaRetirado}
+                          title={yaRetirado ? 'No se puede quitar un pedido ya retirado' : 'Quitar pedido de la ruta'}
+                          style={yaRetirado ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}
+                        >
+                          {yaRetirado ? 'Ya retirado' : 'Quitar de ruta'}
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        className="btn-ruta-action btn-danger-action"
-                        onClick={() => handleQuitarPedidoDeRuta(p.id)}
-                      >
-                        Quitar de ruta
-                      </button>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
             </div>

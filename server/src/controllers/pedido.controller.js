@@ -10,6 +10,16 @@ const crypto = require('crypto');
 const prisma = require('../config/prisma');
 const { success, error } = require('../utils/response');
 
+function obtenerRangoDelDia() {
+  const desde = new Date();
+  desde.setHours(0, 0, 0, 0);
+
+  const hasta = new Date(desde);
+  hasta.setDate(hasta.getDate() + 1);
+
+  return { gte: desde, lt: hasta };
+}
+
 /**
  * Obtiene el listado completo de pedidos registrados.
  * Permite filtrar por estado a través de query params (ej: /pedidos?estado=REGISTRADO).
@@ -279,7 +289,37 @@ const modificarPedido = async (req, res) => {
     // Regla: Debe estar asignado a una única ruta y transportista (se actualiza mediante sus IDs)
     if (rutaId) datosActualizados.rutaId = Number(rutaId);
     if (repartidorId !== undefined) {
-      datosActualizados.repartidorId = repartidorId ? Number(repartidorId) : null;
+      const repartidorIdNum = repartidorId ? Number(repartidorId) : null;
+      datosActualizados.repartidorId = repartidorIdNum;
+
+      if (repartidorIdNum) {
+        const rutaDelDia = await prisma.ruta.findFirst({
+          where: {
+            transportistaId: repartidorIdNum,
+            createdAt: obtenerRangoDelDia(),
+          },
+          orderBy: { createdAt: 'desc' },
+          select: { id: true },
+        });
+
+        if (!rutaDelDia) {
+          return res.status(400).json({
+            success: false,
+            message: 'El transportista seleccionado no tiene una ruta creada para hoy. Creá una ruta primero.',
+          });
+        }
+
+        if (pedidoExistente.rutaId !== rutaDelDia.id) {
+          const cantidadEnRuta = await prisma.pedido.count({
+            where: { rutaId: rutaDelDia.id },
+          });
+          datosActualizados.rutaId = rutaDelDia.id;
+          datosActualizados.ordenEntrega = cantidadEnRuta + 1;
+        }
+      } else {
+        datosActualizados.rutaId = null;
+        datosActualizados.ordenEntrega = null;
+      }
     }
 
     const repartidorFinal =

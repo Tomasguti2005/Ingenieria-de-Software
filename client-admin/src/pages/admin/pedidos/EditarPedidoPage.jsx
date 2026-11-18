@@ -6,6 +6,7 @@ import {
   eliminarPedido,
   obtenerTransportistasDisponibles,
 } from '../../../services/pedidosService';
+import { obtenerRutasCreadas } from '../../../services/rutas.service';
 import './EditarPedidoPage.css';
 
 export default function EditarPedidoPage() {
@@ -152,15 +153,37 @@ export default function EditarPedidoPage() {
     async function cargarDatos() {
       try {
         setCargando(true);
-        const [pedidoRes, transRes] = await Promise.all([
+        const [pedidoRes, transRes, rutasRes] = await Promise.all([
           obtenerPedidoPorId(id),
           obtenerTransportistasDisponibles().catch(() => []),
+          obtenerRutasCreadas().catch(() => []),
         ]);
 
         if (!activo) return;
 
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        const manana = new Date(hoy);
+        manana.setDate(manana.getDate() + 1);
+
+        const rutasDeHoyPorTransportista = new Map();
+        (Array.isArray(rutasRes) ? rutasRes : []).forEach((r) => {
+          if (!r?.transportistaId || !r?.createdAt) return;
+          const fechaRuta = new Date(r.createdAt);
+          if (fechaRuta >= hoy && fechaRuta < manana) {
+            rutasDeHoyPorTransportista.set(Number(r.transportistaId), r.nombre);
+          }
+        });
+
+        const transportistasConRuta = (Array.isArray(transRes) ? transRes : [])
+          .filter((t) => rutasDeHoyPorTransportista.has(Number(t.id)))
+          .map((t) => ({
+            ...t,
+            rutaNombre: rutasDeHoyPorTransportista.get(Number(t.id)),
+          }));
+
         setPedido(pedidoRes);
-        setTransportistas(transRes);
+        setTransportistas(transportistasConRuta);
 
         // Prellenar campos
         const fechaRaw = pedidoRes.fechaEntrega || pedidoRes.diaEntrega || '';
@@ -525,10 +548,15 @@ export default function EditarPedidoPage() {
               <option value="">-- Sin transportista asignado --</option>
               {transportistas.map((t) => (
                 <option key={t.id} value={t.id}>
-                  {t.nombreCompleto || `${t.nombre || ''} ${t.apellido || ''}`.trim() || `Transportista #${t.id}`}
+                  {(t.nombreCompleto || `${t.nombre || ''} ${t.apellido || ''}`.trim() || `Transportista #${t.id}`)} — {t.rutaNombre}
                 </option>
               ))}
             </select>
+            {transportistas.length === 0 && (
+              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
+                No hay transportistas con una ruta creada para hoy.
+              </span>
+            )}
           </div>
         </div>
 

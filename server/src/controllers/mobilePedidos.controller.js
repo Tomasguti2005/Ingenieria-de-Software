@@ -1,7 +1,7 @@
 const prisma = require('../config/prisma');
 const { success, error } = require('../utils/response');
 
-const estadosActivos = ['ASIGNADO', 'RETIRADO', 'EN_CAMINO'];
+const estadosActivos = ['ASIGNADO', 'RETIRADO', 'EN_CAMINO', 'ENTREGADO', 'FALLIDO'];
 const MENSAJE_RUTA_INICIADA =
   'No es posible modificar el estado de retiro: la ruta de reparto ya se encuentra iniciada';
 
@@ -23,8 +23,12 @@ const pedidoMovilSelect = {
   destinatarioNombre: true,
   destinatarioTelefono: true,
   descripcionProductos: true,
+  notas: true,
   estado: true,
   ordenEntrega: true,
+  metodoPagoCobrado: true,
+  montoCobrado: true,
+  urlComprobante: true,
   ruta: {
     select: {
       id: true,
@@ -153,7 +157,105 @@ const actualizarRetiroPedido = async (req, res) => {
   }
 };
 
+const iniciarViaje = async (req, res) => {
+  const { pedidosIds } = req.body || {};
+  if (!Array.isArray(pedidosIds) || pedidosIds.length === 0) {
+    return error(res, 'Debe seleccionar al menos un pedido para iniciar el viaje.', 400);
+  }
+
+  const idsValidos = pedidosIds.map((id) => Number(id));
+  if (idsValidos.some((id) => !Number.isInteger(id) || id < 1)) {
+    return error(res, 'Los identificadores de pedidos no son válidos.', 400);
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.pedido.updateMany({
+        where: {
+          id: { in: idsValidos },
+          repartidorId: req.usuario.id,
+          estado: 'ASIGNADO',
+          ruta: {
+            is: {
+              transportistaId: req.usuario.id,
+              createdAt: obtenerRangoDelDia(),
+            },
+          },
+        },
+        data: { estado: 'RETIRADO' },
+      });
+
+      const yaEnCamino = await tx.pedido.findFirst({
+        where: {
+          repartidorId: req.usuario.id,
+          estado: 'EN_CAMINO',
+          ruta: {
+            is: {
+              transportistaId: req.usuario.id,
+              createdAt: obtenerRangoDelDia(),
+            },
+          },
+        },
+        select: { id: true },
+      });
+
+      if (!yaEnCamino) {
+        const primerRetirado = await tx.pedido.findFirst({
+          where: {
+            repartidorId: req.usuario.id,
+            estado: 'RETIRADO',
+            ruta: {
+              is: {
+                transportistaId: req.usuario.id,
+                createdAt: obtenerRangoDelDia(),
+              },
+            },
+          },
+          orderBy: [
+            { rutaId: 'asc' },
+            { ordenEntrega: 'asc' },
+            { id: 'asc' },
+          ],
+          select: { id: true },
+        });
+
+        if (primerRetirado) {
+          await tx.pedido.update({
+            where: { id: primerRetirado.id },
+            data: { estado: 'EN_CAMINO' },
+          });
+        }
+      }
+    });
+
+    const pedidosActualizados = await prisma.pedido.findMany({
+      where: {
+        repartidorId: req.usuario.id,
+        estado: { in: estadosActivos },
+        ruta: {
+          is: {
+            transportistaId: req.usuario.id,
+            createdAt: obtenerRangoDelDia(),
+          },
+        },
+      },
+      select: pedidoMovilSelect,
+      orderBy: [
+        { rutaId: 'asc' },
+        { ordenEntrega: 'asc' },
+        { id: 'asc' },
+      ],
+    });
+
+    return success(res, pedidosActualizados.map(adaptarPedidoMovil), 200);
+  } catch (err) {
+    console.error('Error al iniciar viaje:', err);
+    return error(res, 'Error interno al iniciar el viaje.', 500);
+  }
+};
+
 module.exports = {
   obtenerPedidosAsignados,
   actualizarRetiroPedido,
+  iniciarViaje,
 };

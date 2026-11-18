@@ -666,9 +666,9 @@
 .pedidos-container .status-pill.en_camino,
 .pedidos-container .status-pill.en-camino,
 .pedidos-container .status-pill.en\ camino {
-  background: var(--badge-encamino-bg);
-  color: var(--badge-encamino-text);
-  border: 1px solid var(--badge-encamino-border);
+  background: rgba(168, 85, 247, 0.14);
+  color: #a855f7;
+  border: 1px solid rgba(168, 85, 247, 0.35);
 }
 .pedidos-container .status-pill.en_camino .status-dot,
 .pedidos-container .status-pill.en-camino .status-dot,

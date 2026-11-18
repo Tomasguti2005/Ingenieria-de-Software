@@ -27,6 +27,7 @@ export default function HistorialEntregadosPage() {
   const [filtroMetodoPago, setFiltroMetodoPago] = useState('TODOS');
   const [criterioOrden, setCriterioOrden] = useState('fecha');
   const [direccionOrden, setDireccionOrden] = useState('desc');
+  const [pedidoComprobante, setPedidoComprobante] = useState(null);
 
   useEffect(() => {
     async function cargarDatos() {
@@ -313,14 +314,17 @@ export default function HistorialEntregadosPage() {
                 <th>Transportista</th>
                 <th>Método de Pago</th>
                 <th style={{ textAlign: 'right' }}>Monto</th>
+                <th>Comprobante</th>
                 <th>Estado</th>
               </tr>
             </thead>
             <tbody>
               {pedidosFiltrados.map((pedido) => (
                 <tr key={pedido.id} className="table-row">
-                  <td>
-                    <span className="badge-codigo-linear">{pedido.codigoSeguimiento}</span>
+                  <td style={{ whiteSpace: 'nowrap' }}>
+                    <span className="badge-codigo-linear" style={{ whiteSpace: 'nowrap' }}>
+                      {pedido.codigoSeguimiento}
+                    </span>
                   </td>
                   <td>
                     <div className="destinatario-profile">
@@ -368,6 +372,20 @@ export default function HistorialEntregadosPage() {
                     <span className="historial-monto font-mono">{formatearMonto(pedido.montoCobrado)}</span>
                   </td>
                   <td>
+                    {pedido.urlComprobante ? (
+                      <button
+                        type="button"
+                        className="btn-action-table-view"
+                        onClick={() => setPedidoComprobante(pedido)}
+                        title="Ver comprobante de pago"
+                      >
+                        Ver
+                      </button>
+                    ) : (
+                      <span className="historial-metodo-pago sin-dato">—</span>
+                    )}
+                  </td>
+                  <td>
                     <span className={`status-pill ${pedido.estado.toLowerCase()}`}>
                       <span className="status-dot" />
                       <span className="status-label">{pedido.estado.replace(/_/g, ' ')}</span>
@@ -383,6 +401,81 @@ export default function HistorialEntregadosPage() {
             </span>
             <span className="footer-legend">Historial de Entregas</span>
           </footer>
+        </div>
+      )}
+
+      {pedidoComprobante && (
+        <div
+          className="modal-overlay"
+          onClick={() => setPedidoComprobante(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="modal-content"
+            style={{ maxWidth: '480px' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header">
+              <h2 className="modal-title">
+                Comprobante — {pedidoComprobante.codigoSeguimiento}
+              </h2>
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={() => setPedidoComprobante(null)}
+              >
+                &times;
+              </button>
+            </div>
+            <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem' }}>
+                <span>
+                  <strong>Método:</strong>{' '}
+                  {ETIQUETAS_METODO_PAGO[pedidoComprobante.metodoPagoCobrado] ||
+                    pedidoComprobante.metodoPagoCobrado ||
+                    '—'}
+                </span>
+                <span>
+                  <strong>Monto:</strong> {formatearMonto(pedidoComprobante.montoCobrado)}
+                </span>
+              </div>
+              {pedidoComprobante.urlComprobante.startsWith('data:image/') ||
+              pedidoComprobante.urlComprobante.startsWith('http') ||
+              pedidoComprobante.urlComprobante.startsWith('/uploads/') ? (
+                <div
+                  style={{
+                    borderRadius: '10px',
+                    overflow: 'hidden',
+                    border: '1px solid var(--border-card)',
+                    background: '#0f172a',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    maxHeight: '420px',
+                  }}
+                >
+                  <img
+                    src={pedidoComprobante.urlComprobante}
+                    alt={`Comprobante ${pedidoComprobante.codigoSeguimiento}`}
+                    style={{ maxWidth: '100%', maxHeight: '420px', objectFit: 'contain' }}
+                  />
+                </div>
+              ) : (
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                  Este comprobante fue guardado con una ruta local del dispositivo antes de activar la vista web ({pedidoComprobante.urlComprobante}). Los nuevos comprobantes cargados desde la app se verán aquí como imagen.
+                </p>
+              )}
+            </div>
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="btn-modal-cancel"
+                onClick={() => setPedidoComprobante(null)}
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

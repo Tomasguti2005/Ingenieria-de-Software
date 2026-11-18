@@ -19,6 +19,8 @@ const confirmarEntrega = async (req, res) => {
         id: true,
         estado: true,
         urlComprobante: true,
+        rutaId: true,
+        repartidorId: true,
       },
     });
 
@@ -37,6 +39,37 @@ const confirmarEntrega = async (req, res) => {
         fechaEntrega: new Date(),
       },
     });
+
+    if (pedidoExistente.rutaId) {
+      const yaEnCamino = await prisma.pedido.findFirst({
+        where: {
+          rutaId: pedidoExistente.rutaId,
+          estado: 'EN_CAMINO',
+        },
+        select: { id: true },
+      });
+
+      if (!yaEnCamino) {
+        const siguienteRetirado = await prisma.pedido.findFirst({
+          where: {
+            rutaId: pedidoExistente.rutaId,
+            estado: 'RETIRADO',
+          },
+          orderBy: [
+            { ordenEntrega: 'asc' },
+            { id: 'asc' },
+          ],
+          select: { id: true },
+        });
+
+        if (siguienteRetirado) {
+          await prisma.pedido.update({
+            where: { id: siguienteRetirado.id },
+            data: { estado: 'EN_CAMINO' },
+          });
+        }
+      }
+    }
 
     return success(
       res,
