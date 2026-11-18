@@ -233,6 +233,16 @@ export default function Sidebar({ abierto, onClose }) {
                   <span className="sidebar-sublink-dot" />
                   <span>Fallidos y cancelados</span>
                 </NavLink>
+
+                <NavLink
+                  to="/admin/pedidos/historial"
+                  className={({ isActive }) => `sidebar-sublink ${isActive ? 'activo' : ''}`}
+                  onClick={onClose}
+                  title="Historial de Pedidos"
+                >
+                  <span className="sidebar-sublink-dot" />
+                  <span>Historial de Pedidos</span>
+                </NavLink>
               </div>
             )}
           </div>

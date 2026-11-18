@@ -1,0 +1,33 @@
+/* HistorialEntregadosPage.css — Estilos propios del historial de pedidos entregados.
+   La base visual (header, command-bar, tabla, estados vacíos) se reutiliza de PedidosVigentesPage.css.
+   Solo tokens de theme.css, sin colores hardcodeados. */
+
+.historial-entregados .historial-transportista {
+  color: var(--text-main);
+  font-size: 12.5px;
+}
+
+.historial-entregados .historial-metodo-pago {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-card);
+  background: var(--accent-soft);
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.historial-entregados .historial-monto {
+  color: var(--text-main);
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.historial-entregados .sin-dato,
+.historial-entregados .historial-metodo-pago.sin-dato {
+  color: var(--text-muted);
+  background: transparent;
+}
