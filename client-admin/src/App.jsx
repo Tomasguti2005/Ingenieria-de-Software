@@ -13,6 +13,7 @@ import CrearPedidoPage from './pages/admin/pedidos/CrearPedidoPage.jsx';
 import PedidosFallidosPage from './pages/admin/pedidos/PedidosFallidosPage.jsx';
 import PedidosVigentesPage from './pages/admin/pedidos/PedidosVigentesPage.jsx';
 import EditarPedidoPage from './pages/admin/pedidos/EditarPedidoPage.jsx';
+import RendicionPage from './pages/admin/rendicion/RendicionPage.jsx';
 import HistorialEntregadosPage from './pages/admin/pedidos/HistorialEntregadosPage.jsx';
 import TrackingPage from './pages/tracking/TrackingPage.jsx';
 
@@ -40,6 +41,7 @@ function App() {
               <Route path="pedidos/fallidos" element={<PedidosFallidosPage />} />
               <Route path="pedidos/historial" element={<HistorialEntregadosPage />} />
               <Route path="pedidos/:id/editar" element={<EditarPedidoPage />} />
+              <Route path="rendicion" element={<RendicionPage />} />
             </Route>
 
             {/* Cualquier ruta desconocida → login */}
