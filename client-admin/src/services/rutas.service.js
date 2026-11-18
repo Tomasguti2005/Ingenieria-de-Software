@@ -99,6 +99,25 @@ export let MOCK_RUTAS = [
 ];
 
 /**
+ * Indica si el transportista tiene una ruta de HOY que todavía no terminó
+ * (misma regla que el backend en server/src/utils/estadoRuta.js).
+ * Terminada = algún pedido retirado y todos ENTREGADO / FALLIDO / CANCELADO.
+ */
+export function transportistaTieneRutaSinTerminar(rutas, transportistaId) {
+  const inicioHoy = new Date();
+  inicioHoy.setHours(0, 0, 0, 0);
+
+  return rutas.some((r) => {
+    if (r.transportistaId !== transportistaId) return false;
+    if (new Date(r.createdAt) < inicioHoy) return false;
+    const pedidos = r.pedidos || [];
+    const iniciada = pedidos.some((p) => ['RETIRADO', 'EN_CAMINO', 'ENTREGADO', 'FALLIDO'].includes(p.estado));
+    const terminada = iniciada && pedidos.every((p) => ['ENTREGADO', 'FALLIDO', 'CANCELADO'].includes(p.estado));
+    return !terminada;
+  });
+}
+
+/**
  * Obtiene la lista de transportistas registrados.
  */
 export async function obtenerTransportistasParaRuta() {
@@ -259,6 +278,30 @@ export async function desasignarPedidosDeRuta(rutaId, pedidosIds) {
 
   return fetchAPI(`/rutas/${rutaId}/desasignar-pedidos`, {
     method: 'DELETE',
+    body: JSON.stringify({ pedidosIds }),
+  });
+}
+
+/**
+ * Reordena los pedidos de una ruta (Modificar Pedidos).
+ * pedidosIds: todos los ids de la ruta en el nuevo orden de entrega.
+ */
+export async function reordenarPedidosDeRuta(rutaId, pedidosIds) {
+  if (USAR_MOCK) {
+    const ruta = MOCK_RUTAS.find((r) => r.id === Number(rutaId));
+    if (ruta) {
+      ruta.pedidos = pedidosIds
+        .map((id, idx) => {
+          const p = ruta.pedidos.find((x) => x.id === id);
+          return p ? { ...p, ordenEntrega: idx + 1 } : null;
+        })
+        .filter(Boolean);
+    }
+    return { success: true, data: { mensaje: 'Orden de pedidos actualizado' } };
+  }
+
+  return fetchAPI(`/rutas/${rutaId}/reordenar-pedidos`, {
+    method: 'PUT',
     body: JSON.stringify({ pedidosIds }),
   });
 }

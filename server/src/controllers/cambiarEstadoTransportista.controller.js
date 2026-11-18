@@ -1,4 +1,5 @@
 const prisma = require('../config/prisma');
+const { obtenerRutaEnCursoDeTransportista } = require('../utils/estadoRuta');
 
 const ESTADOS_VALIDOS = ['ACTIVO', 'INACTIVO'];
 
@@ -21,6 +22,11 @@ async function cambiarEstadoTransportista(req, res) {
 
     if (!existente) {
       return res.status(404).json({ error: 'El transportista no existe o no corresponde a un repartidor.' });
+    }
+
+    // Regla: No se puede inactivar a un transportista que ya comenzó su ruta
+    if (estado === 'INACTIVO' && (await obtenerRutaEnCursoDeTransportista(prisma, id))) {
+      return res.status(400).json({ error: 'No puede ponerse inactivo un transportista con una ruta iniciada' });
     }
 
     const transportista = await prisma.usuario.update({
