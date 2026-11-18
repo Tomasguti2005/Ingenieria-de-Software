@@ -13,6 +13,10 @@ const rutasGenerales = require('./routes/rutas.routes');
 const pedidoRoutes = require('./routes/pedido.routes');
 const seguimientoPedidoRoutes = require('./routes/seguimientoPedido.routes');
 const reportarPedidoFallidoRoutes = require('./routes/reportarPedidoFallido.routes');
+const cargarPagoRoutes = require('./routes/cargarPago.routes');
+const confirmarEntregaRoutes = require('./routes/confirmarEntrega.routes');
+const historialEntregadosRoutes = require('./routes/historialEntregados.routes');
+const mobileRoutes = require('./routes/mobile');
 
 
 const clientOrigin = process.env.ADMIN_ORIGIN || 'http://localhost:5173';
@@ -39,9 +43,13 @@ app.use('/api/transportistas', transportistaEdicionRoutes);
 
 app.use('/api/rutaTransportista', rutaTransportistaRoutes);
 app.use('/api/rutas', rutasGenerales);
+app.use('/api/pedidos/historial-entregados', historialEntregadosRoutes);
 app.use('/api/pedidos', pedidoRoutes);
 app.use('/api/pedidos', seguimientoPedidoRoutes);
 app.use('/api/pedidos', reportarPedidoFallidoRoutes);
+app.use('/api/pedidos', cargarPagoRoutes);
+app.use('/api/pedidos', confirmarEntregaRoutes);
+app.use('/api/mobile', mobileRoutes);
 
 // 4. Definimos el puerto (usamos el del archivo .env que configuraste antes, o el 3000 por defecto)
 const PORT = process.env.PORT || 3000;
