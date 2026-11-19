@@ -148,8 +148,7 @@ export async function crearPedido(datos) {
     !direccionOrigen?.trim() ||
     !direccionDestino?.trim() ||
     !diaEntrega?.trim() ||
-    !destinatarioNombre?.trim() ||
-    !nombreTransportista?.trim()
+    !destinatarioNombre?.trim()
   ) {
     throw new Error('Falta completar campos obligatorios, intente nuevamente');
   }
@@ -167,8 +166,8 @@ export async function crearPedido(datos) {
       descripcionProductos: datos.descripcionProductos || 'Paquete general',
       diaEntrega: diaEntrega.trim(),
       fechaEntrega: new Date(diaEntrega).toISOString(),
-      nombreTransportista: nombreTransportista.trim(),
-      repartidorId: datos.repartidorId || null,
+      nombreTransportista: (nombreTransportista || '').trim() || null,
+      repartidorId: null,
       estado: 'REGISTRADO',
       notas: (notas || '').trim(),
       urlComprobante: null,
@@ -186,7 +185,7 @@ export async function crearPedido(datos) {
       ...datos,
       fechaEntrega: datos.diaEntrega ? new Date(datos.diaEntrega + 'T12:00:00Z').toISOString() : undefined,
       descripcionProductos: datos.descripcionProductos || 'Paquete general',
-      estado: datos.repartidorId ? 'ASIGNADO' : 'REGISTRADO',
+      estado: 'REGISTRADO',
     }),
   });
 
@@ -275,7 +274,7 @@ export async function modificarPedido(id, datos) {
       const fechaVal = datos.diaEntrega || datos.fechaEntrega.split('T')[0];
       const hoyStr = new Date().toISOString().split('T')[0];
       if (fechaVal < hoyStr) {
-        const err = new Error('La fecha de entrega ingresada es anterior a la actual. Debe cambiarla o eliminar el pedido.');
+        const err = new Error('La fecha de entrega ingresada es anterior a la actual');
         err.status = 400;
         throw err;
       }

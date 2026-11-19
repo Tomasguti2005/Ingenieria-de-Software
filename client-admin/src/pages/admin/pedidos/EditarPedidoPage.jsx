@@ -4,9 +4,7 @@ import {
   obtenerPedidoPorId,
   modificarPedido,
   eliminarPedido,
-  obtenerTransportistasDisponibles,
 } from '../../../services/pedidosService';
-import { obtenerRutasCreadas } from '../../../services/rutas.service';
 import './EditarPedidoPage.css';
 
 export default function EditarPedidoPage() {
@@ -15,19 +13,16 @@ export default function EditarPedidoPage() {
 
   // Estados de datos
   const [pedido, setPedido] = useState(null);
-  const [transportistas, setTransportistas] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [guardando, setGuardando] = useState(false);
 
   // Formulario editable
   const [formData, setFormData] = useState({
-    codigoSeguimiento: '',
     direccionOrigen: '',
     direccionDestino: '',
     destinatarioNombre: '',
     destinatarioTelefono: '',
     descripcionProductos: '',
-    repartidorId: '',
     notas: '',
   });
 
@@ -46,7 +41,7 @@ export default function EditarPedidoPage() {
 
   // HU: Copiar enlace de seguimiento al portapapeles
   const handleCopiarEnlace = async () => {
-    const cod = pedido?.codigoSeguimiento || formData.codigoSeguimiento;
+    const cod = pedido?.codigoSeguimiento;
     if (!cod) return;
     const url = `${window.location.origin}/seguimiento/${cod}`;
 
@@ -82,8 +77,6 @@ export default function EditarPedidoPage() {
   };
 
   // Modales interactivos
-  const [modalDuplicado, setModalDuplicado] = useState(false);
-  const [modalFechaPasada, setModalFechaPasada] = useState(false);
   const [modalConfirmarEliminar, setModalConfirmarEliminar] = useState(false);
   const [modalConfirmarSalida, setModalConfirmarSalida] = useState(false);
 
@@ -113,6 +106,10 @@ export default function EditarPedidoPage() {
       return { esValida: false, error: 'Fecha incompleta. Complete día, mes y año (DD/MM/AAAA).' };
     }
 
+    if (!/^\d{2}\/\d{2}\/\d{4}$/.test(fechaStr.trim())) {
+      return { esValida: false, error: 'Formato inválido. Use DD/MM/AAAA (ej: 25/11/2026).' };
+    }
+
     const diaStr = partes[0];
     const mesStr = partes[1];
     const anioStr = partes[2];
@@ -136,11 +133,12 @@ export default function EditarPedidoPage() {
 
     // Normalizar a fecha local YYYY-MM-DD
     const isoStr = `${anio}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-    const hoyStr = new Date().toISOString().split('T')[0];
+    const ahora = new Date();
+    const hoyStr = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
 
     // Si la fecha ingresada es estrictamente menor al día de hoy, salta la falla
     if (isoStr < hoyStr) {
-      return { esValida: false, esPasada: true, error: 'La fecha de entrega ingresada es anterior a la actual.' };
+      return { esValida: false, error: 'La fecha de entrega ingresada es anterior a la actual' };
     }
 
     return { esValida: true, iso: isoStr };
@@ -153,37 +151,11 @@ export default function EditarPedidoPage() {
     async function cargarDatos() {
       try {
         setCargando(true);
-        const [pedidoRes, transRes, rutasRes] = await Promise.all([
-          obtenerPedidoPorId(id),
-          obtenerTransportistasDisponibles().catch(() => []),
-          obtenerRutasCreadas().catch(() => []),
-        ]);
+        const pedidoRes = await obtenerPedidoPorId(id);
 
         if (!activo) return;
 
-        const hoy = new Date();
-        hoy.setHours(0, 0, 0, 0);
-        const manana = new Date(hoy);
-        manana.setDate(manana.getDate() + 1);
-
-        const rutasDeHoyPorTransportista = new Map();
-        (Array.isArray(rutasRes) ? rutasRes : []).forEach((r) => {
-          if (!r?.transportistaId || !r?.createdAt) return;
-          const fechaRuta = new Date(r.createdAt);
-          if (fechaRuta >= hoy && fechaRuta < manana) {
-            rutasDeHoyPorTransportista.set(Number(r.transportistaId), r.nombre);
-          }
-        });
-
-        const transportistasConRuta = (Array.isArray(transRes) ? transRes : [])
-          .filter((t) => rutasDeHoyPorTransportista.has(Number(t.id)))
-          .map((t) => ({
-            ...t,
-            rutaNombre: rutasDeHoyPorTransportista.get(Number(t.id)),
-          }));
-
         setPedido(pedidoRes);
-        setTransportistas(transportistasConRuta);
 
         // Prellenar campos
         const fechaRaw = pedidoRes.fechaEntrega || pedidoRes.diaEntrega || '';
@@ -192,13 +164,11 @@ export default function EditarPedidoPage() {
         setFechaInicial(fechaFormateada);
 
         const initialValues = {
-          codigoSeguimiento: pedidoRes.codigoSeguimiento || '',
           direccionOrigen: pedidoRes.direccionOrigen || '',
           direccionDestino: pedidoRes.direccionDestino || '',
           destinatarioNombre: pedidoRes.destinatarioNombre || '',
           destinatarioTelefono: pedidoRes.destinatarioTelefono || '',
           descripcionProductos: pedidoRes.descripcionProductos || '',
-          repartidorId: pedidoRes.repartidorId || pedidoRes.repartidor?.id || '',
           notas: pedidoRes.notas || '',
         };
 
@@ -262,34 +232,43 @@ export default function EditarPedidoPage() {
     setMensajeExito('');
   };
 
-  // Guardar Cambios (Escenarios 1, 2, 3 y 4)
+  // Guardar Cambios
   const handleGuardar = async (e) => {
     if (e) e.preventDefault();
     if (estaBloqueado) return;
 
-    // Validación general de campos obligatorios
+    setErrorGeneral('');
+    setMensajeExito('');
+
+    // Validación general de campos obligatorios y formato
     const nuevosErrores = {};
-    if (!formData.codigoSeguimiento.trim()) {
-      nuevosErrores.codigoSeguimiento = 'El código identificador es obligatorio.';
-    }
     if (!formData.direccionOrigen.trim()) {
       nuevosErrores.direccionOrigen = 'La dirección de origen es obligatoria.';
     }
     if (!formData.direccionDestino.trim()) {
       nuevosErrores.direccionDestino = 'La dirección de destino es obligatoria.';
     }
-    if (!formData.destinatarioNombre.trim()) {
+    const nombreTrim = formData.destinatarioNombre.trim();
+    if (!nombreTrim) {
       nuevosErrores.destinatarioNombre = 'El nombre del destinatario es obligatorio.';
+    } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(nombreTrim)) {
+      nuevosErrores.destinatarioNombre = 'Formato incorrecto: el nombre solo debe contener letras.';
+    } else if (nombreTrim.length < 3) {
+      nuevosErrores.destinatarioNombre = 'El nombre debe tener al menos 3 caracteres.';
     }
 
-    // Validación de fecha
+    const telTrim = (formData.destinatarioTelefono || '').trim();
+    if (telTrim && !/^\+?[0-9\s-]{6,20}$/.test(telTrim)) {
+      nuevosErrores.destinatarioTelefono = 'Ingrese un teléfono válido (números, mínimo 6 dígitos).';
+    }
+
+    // Validación de fecha (obligatoria + formato DD/MM/AAAA + no pasada)
     const validacionFecha = validarFecha(fechaInput);
     if (!validacionFecha.esValida) {
-      if (validacionFecha.esPasada) {
-        setModalFechaPasada(true);
-        return;
-      }
       nuevosErrores.fechaEntrega = validacionFecha.error;
+      if (validacionFecha.error === 'La fecha de entrega ingresada es anterior a la actual') {
+        setErrorGeneral('La fecha de entrega ingresada es anterior a la actual');
+      }
     }
 
     if (Object.keys(nuevosErrores).length > 0) {
@@ -303,15 +282,13 @@ export default function EditarPedidoPage() {
       setMensajeExito('');
 
       await modificarPedido(id, {
-        codigoSeguimiento: formData.codigoSeguimiento.trim(),
         direccionOrigen: formData.direccionOrigen.trim(),
         direccionDestino: formData.direccionDestino.trim(),
-        destinatarioNombre: formData.destinatarioNombre.trim(),
-        destinatarioTelefono: formData.destinatarioTelefono.trim(),
+        destinatarioNombre: nombreTrim,
+        destinatarioTelefono: telTrim,
         descripcionProductos: formData.descripcionProductos.trim(),
         fechaEntrega: new Date(validacionFecha.iso + 'T12:00:00Z').toISOString(),
         diaEntrega: validacionFecha.iso,
-        repartidorId: formData.repartidorId ? Number(formData.repartidorId) : null,
         notas: formData.notas.trim(),
       });
 
@@ -322,13 +299,12 @@ export default function EditarPedidoPage() {
       });
     } catch (err) {
       const mensaje = err.message || '';
-      // Escenario 2: Falla por ID repetido (409)
-      if (err.status === 409 || mensaje.includes('identificador del pedido ya existe') || mensaje.includes('código de seguimiento ya se encuentra registrado')) {
-        setModalDuplicado(true);
-      }
-      // Escenario 3: Falla por fecha pasada (400)
-      else if (err.status === 400 && mensaje.toLowerCase().includes('fecha')) {
-        setModalFechaPasada(true);
+      if (err.status === 400 && mensaje.toLowerCase().includes('fecha')) {
+        setErroresCampos((prev) => ({
+          ...prev,
+          fechaEntrega: 'La fecha de entrega ingresada es anterior a la actual',
+        }));
+        setErrorGeneral('La fecha de entrega ingresada es anterior a la actual');
       } else {
         setErrorGeneral(mensaje || 'Ocurrió un error al intentar modificar el pedido.');
       }
@@ -343,8 +319,6 @@ export default function EditarPedidoPage() {
       setGuardando(true);
       await eliminarPedido(id);
       setModalConfirmarEliminar(false);
-      setModalDuplicado(false);
-      setModalFechaPasada(false);
       navigate('/admin/pedidos/vigentes', { replace: true });
     } catch (err) {
       setErrorGeneral(err.message || 'No se pudo eliminar el pedido.');
@@ -377,7 +351,7 @@ export default function EditarPedidoPage() {
       <header className="editar-pedido-header">
         <div>
           <span style={{ fontSize: '12px', color: '#8b949e', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Edición de Pedido #{pedido?.id}
+            Edición de Pedido #{pedido?.id}{pedido?.codigoSeguimiento ? ` · ${pedido.codigoSeguimiento}` : ''}
           </span>
           <h1 className="editar-pedido-title">Modificar Pedido</h1>
         </div>
@@ -393,7 +367,7 @@ export default function EditarPedidoPage() {
               </span>
             </div>
 
-            {(pedido.codigoSeguimiento || formData.codigoSeguimiento) && (
+            {pedido.codigoSeguimiento && (
               <button
                 type="button"
                 onClick={handleCopiarEnlace}
@@ -456,106 +430,55 @@ export default function EditarPedidoPage() {
 
       {/* Formulario Reorganizado por Secciones */}
       <form onSubmit={handleGuardar} className="form-card" noValidate>
-        {/* Sección 1: Identificación y Planificación */}
+        {/* Sección 1: Planificación */}
         <div className="form-section">
           <div className="form-section-header">
-            <span className="form-section-title">1. Identificación y Planificación</span>
+            <span className="form-section-title">1. Planificación</span>
           </div>
-          
-          <div className="form-grid-2">
-            {/* Identificador de Pedido Único */}
-            <div className="form-group">
-              <label className="form-label" htmlFor="codigoSeguimiento">
-                Código / ID Único *
-              </label>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="fechaEntrega">
+              Fecha de Entrega * (DD/MM/AAAA)
+            </label>
+            <div style={{ position: 'relative' }}>
               <input
-                id="codigoSeguimiento"
-                name="codigoSeguimiento"
+                id="fechaEntrega"
+                name="fechaEntrega"
                 type="text"
+                placeholder="DD/MM/AAAA"
+                maxLength={10}
                 required
                 disabled={estaBloqueado}
-                className={`form-input ${erroresCampos.codigoSeguimiento ? 'input-error' : ''}`}
-                value={formData.codigoSeguimiento}
-                onChange={handleChange}
+                className={`form-input ${erroresCampos.fechaEntrega ? 'input-error' : ''}`}
+                value={fechaInput}
+                onChange={handleFechaChange}
               />
-              {erroresCampos.codigoSeguimiento && (
-                <span style={{ color: '#f85149', fontSize: '11.5px' }}>{erroresCampos.codigoSeguimiento}</span>
-              )}
-              <span className="form-help">Código identificador único del pedido.</span>
-            </div>
-
-            {/* Fecha de Entrega */}
-            <div className="form-group">
-              <label className="form-label" htmlFor="fechaEntrega">
-                Fecha de Entrega * (DD/MM/AAAA)
-              </label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  id="fechaEntrega"
-                  name="fechaEntrega"
-                  type="text"
-                  placeholder="DD/MM/AAAA"
-                  maxLength={10}
-                  required
-                  disabled={estaBloqueado}
-                  className={`form-input ${erroresCampos.fechaEntrega ? 'input-error' : ''}`}
-                  value={fechaInput}
-                  onChange={handleFechaChange}
-                />
-                {!estaBloqueado && fechaInput && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFechaInput('');
-                      setErroresCampos((prev) => ({ ...prev, fechaEntrega: '' }));
-                    }}
-                    title="Borrar fecha"
-                    style={{
-                      position: 'absolute',
-                      right: '10px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'transparent',
-                      border: 'none',
-                      color: '#8b949e',
-                      cursor: 'pointer',
-                      fontSize: '14px',
-                    }}
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-              {erroresCampos.fechaEntrega && (
-                <span style={{ color: '#f85149', fontSize: '11.5px' }}>{erroresCampos.fechaEntrega}</span>
+              {!estaBloqueado && fechaInput && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFechaInput('');
+                    setErroresCampos((prev) => ({ ...prev, fechaEntrega: '' }));
+                  }}
+                  title="Borrar fecha"
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#8b949e',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                  }}
+                >
+                  ✕
+                </button>
               )}
             </div>
-          </div>
-
-          {/* Transportista Asignado */}
-          <div className="form-group">
-            <label className="form-label" htmlFor="repartidorId">
-              Transportista Asignado
-            </label>
-            <select
-              id="repartidorId"
-              name="repartidorId"
-              disabled={estaBloqueado}
-              className="form-select"
-              value={formData.repartidorId}
-              onChange={handleChange}
-            >
-              <option value="">-- Sin transportista asignado --</option>
-              {transportistas.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {(t.nombreCompleto || `${t.nombre || ''} ${t.apellido || ''}`.trim() || `Transportista #${t.id}`)} — {t.rutaNombre}
-                </option>
-              ))}
-            </select>
-            {transportistas.length === 0 && (
-              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
-                No hay transportistas con una ruta creada para hoy.
-              </span>
+            {erroresCampos.fechaEntrega && (
+              <span style={{ color: '#f85149', fontSize: '11.5px' }}>{erroresCampos.fechaEntrega}</span>
             )}
           </div>
         </div>
@@ -642,10 +565,13 @@ export default function EditarPedidoPage() {
                 name="destinatarioTelefono"
                 type="text"
                 disabled={estaBloqueado}
-                className="form-input"
+                className={`form-input ${erroresCampos.destinatarioTelefono ? 'input-error' : ''}`}
                 value={formData.destinatarioTelefono}
                 onChange={handleChange}
               />
+              {erroresCampos.destinatarioTelefono && (
+                <span style={{ color: '#f85149', fontSize: '11.5px' }}>{erroresCampos.destinatarioTelefono}</span>
+              )}
             </div>
           </div>
         </div>
@@ -745,76 +671,6 @@ export default function EditarPedidoPage() {
                 className="btn-modal-danger"
               >
                 Descartar cambios
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Modal Escenario 2: Falla por ID repetido ── */}
-      {modalDuplicado && (
-        <div className="modal-overlay" role="dialog" aria-modal="true">
-          <div className="modal-dialog">
-            <div className="modal-header">
-              <svg className="modal-icon-danger" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              <h3 className="modal-title">Identificador de pedido duplicado</h3>
-            </div>
-            <div className="modal-body">
-              El identificador del pedido ya existe. ¿Desea eliminar el pedido actual?
-            </div>
-            <div className="modal-actions">
-              <button
-                type="button"
-                onClick={() => setModalDuplicado(false)}
-                className="btn-secondary"
-              >
-                Cambiar código
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmarEliminacion}
-                className="btn-modal-danger"
-              >
-                Eliminar pedido
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Modal Escenario 3: Falla por fecha pasada ── */}
-      {modalFechaPasada && (
-        <div className="modal-overlay" role="dialog" aria-modal="true">
-          <div className="modal-dialog">
-            <div className="modal-header">
-              <svg className="modal-icon-danger" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              <h3 className="modal-title">Fecha de entrega no válida</h3>
-            </div>
-            <div className="modal-body">
-              La fecha de entrega ingresada es anterior a la actual. Debe cambiarla o eliminar el pedido.
-            </div>
-            <div className="modal-actions">
-              <button
-                type="button"
-                onClick={() => setModalFechaPasada(false)}
-                className="btn-secondary"
-              >
-                Cambiar fecha
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmarEliminacion}
-                className="btn-modal-danger"
-              >
-                Eliminar pedido
               </button>
             </div>
           </div>

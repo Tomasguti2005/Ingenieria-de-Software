@@ -8,9 +8,9 @@
 //   * Direcciones y transportista: advertencias de obligatoriedad.
 // - Adaptable al tema visual Claro y Oscuro.
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { crearPedido, obtenerTransportistasDisponibles } from '../../../services/pedidosService';
+import { crearPedido } from '../../../services/pedidosService';
 import './CrearPedidoPage.css';
 
 export default function CrearPedidoPage() {
@@ -23,8 +23,6 @@ export default function CrearPedidoPage() {
     destinatarioNombre: '',
     destinatarioTelefono: '',
     descripcionProductos: '',
-    nombreTransportista: '',
-    repartidorId: '',
     notas: '',
   });
 
@@ -35,22 +33,9 @@ export default function CrearPedidoPage() {
   // Errores específicos por campo
   const [erroresCampos, setErroresCampos] = useState({});
 
-  const [transportistas, setTransportistas] = useState([]);
   const [cargando, setCargando] = useState(false);
   const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
   const [intentadoEnviar, setIntentadoEnviar] = useState(false);
-
-  useEffect(() => {
-    async function cargarTransportistas() {
-      try {
-        const lista = await obtenerTransportistasDisponibles();
-        setTransportistas(lista);
-      } catch (err) {
-        console.error('Error cargando transportistas:', err);
-      }
-    }
-    cargarTransportistas();
-  }, []);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -60,18 +45,6 @@ export default function CrearPedidoPage() {
       ...prev,
       [name]: '',
     }));
-
-    if (name === 'nombreTransportista') {
-      const seleccionado = transportistas.find(
-        (t) => (t.nombreCompleto || `${t.nombre} ${t.apellido}`) === value
-      );
-      setFormData((prev) => ({
-        ...prev,
-        nombreTransportista: value,
-        repartidorId: seleccionado ? seleccionado.id : '',
-      }));
-      return;
-    }
 
     setFormData((prev) => ({
       ...prev,
@@ -189,12 +162,7 @@ export default function CrearPedidoPage() {
       nuevosErrores.destinatarioTelefono = 'Ingrese un teléfono válido (números, mínimo 6 dígitos).';
     }
 
-    // 4. Nombre del transportista
-    if (!formData.nombreTransportista.trim()) {
-      nuevosErrores.nombreTransportista = 'Debe seleccionar un transportista asignado.';
-    }
-
-    // 5. Fecha de entrega detallada
+    // 4. Fecha de entrega detallada
     const resFecha = validarFechaDetallada(fechaInput);
     if (!resFecha.esValida) {
       nuevosErrores.diaEntrega = resFecha.error;
@@ -231,8 +199,6 @@ export default function CrearPedidoPage() {
         destinatarioNombre: '',
         destinatarioTelefono: '',
         descripcionProductos: '',
-        nombreTransportista: '',
-        repartidorId: '',
         notas: '',
       });
       setFechaInput('');
@@ -319,33 +285,6 @@ export default function CrearPedidoPage() {
                   />
                   {intentadoEnviar && erroresCampos.diaEntrega && (
                     <span className="campo-error-texto">{erroresCampos.diaEntrega}</span>
-                  )}
-                </div>
-
-                {/* Nombre del Transportista */}
-                <div className="campo-grupo">
-                  <label htmlFor="nombreTransportista">
-                    Nombre del transportista <span className="campo-requerido">*</span>
-                  </label>
-                  <select
-                    id="nombreTransportista"
-                    name="nombreTransportista"
-                    value={formData.nombreTransportista}
-                    onChange={handleChange}
-                    className={intentadoEnviar && erroresCampos.nombreTransportista ? 'error' : ''}
-                  >
-                    <option value="">-- Seleccionar transportista asignado --</option>
-                    {transportistas.map((t) => {
-                      const nombre = t.nombreCompleto || `${t.nombre} ${t.apellido}`;
-                      return (
-                        <option key={t.id} value={nombre}>
-                          {nombre}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  {intentadoEnviar && erroresCampos.nombreTransportista && (
-                    <span className="campo-error-texto">{erroresCampos.nombreTransportista}</span>
                   )}
                 </div>
               </div>

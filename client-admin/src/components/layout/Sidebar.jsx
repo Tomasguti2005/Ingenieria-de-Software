@@ -323,20 +323,6 @@ export default function Sidebar({ abierto, onClose }) {
             <span className="sidebar-label">Rendición</span>
             <span className="sidebar-active-indicator" />
           </NavLink>
-
-          {/* 6. Reportes y Estadísticas */}
-          <div
-            className="sidebar-link deshabilitado"
-            title="Reportes y Estadísticas"
-          >
-            <span className="sidebar-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 3v18h18" />
-                <path d="m19 9-5 5-4-4-3 3" />
-              </svg>
-            </span>
-            <span className="sidebar-label">Reportes</span>
-          </div>
         </nav>
 
         <div className="sidebar-footer">

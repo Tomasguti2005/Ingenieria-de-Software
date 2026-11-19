@@ -202,14 +202,15 @@ const modificarPedido = async (req, res) => {
     }
 
     const {
-      codigoSeguimiento, // En tu HU se menciona como "ID de pedido único"
       rutaId,            // ruta asignada
       repartidorId,      // transportista asignado
       direccionOrigen,
       direccionDestino,
       destinatarioNombre,
+      destinatarioTelefono,
       descripcionProductos,
       fechaEntrega,
+      diaEntrega,
       notas,
       estado
     } = req.body || {};
@@ -235,49 +236,45 @@ const modificarPedido = async (req, res) => {
       );
     }
 
-    // --- ESCENARIO 2: Falla por ID repetido ---
-    // Verificamos si están intentando cambiar el código por uno que ya tiene otro pedido
-    if (codigoSeguimiento && String(codigoSeguimiento).trim() !== pedidoExistente.codigoSeguimiento) {
-      const idRepetido = await prisma.pedido.findUnique({
-        where: { codigoSeguimiento: String(codigoSeguimiento).trim() },
-      });
-
-      if (idRepetido) {
-        // Retornamos un 409 Conflict. El frontend deberá capturar esto y mostrar el alert de "¿desea eliminar?"
-        return error(
-          res,
-          'El identificador del pedido ya existe. ¿Desea eliminar el pedido actual?',
-          409 
-        );
-      }
-    }
-
     // --- ESCENARIO 3: Falla por fecha pasada ---
-    if (fechaEntrega) {
-      // Normalizamos ambas fechas a formato YYYY-MM-DD para evitar problemas de horas y zonas horarias
-      const fechaIngresadaStr = new Date(fechaEntrega).toISOString().split('T')[0];
-      const hoyStr = new Date().toISOString().split('T')[0];
+    const fechaRaw = diaEntrega || fechaEntrega;
+    let fechaEntregaFinal = null;
+    if (fechaRaw) {
+      const fechaObj = diaEntrega
+        ? new Date(`${String(diaEntrega).trim()}T12:00:00Z`)
+        : new Date(fechaRaw);
+      if (Number.isNaN(fechaObj.getTime())) {
+        return error(res, 'La fecha de entrega ingresada no es válida.', 400);
+      }
+
+      const fechaIngresadaStr = diaEntrega
+        ? String(diaEntrega).trim().slice(0, 10)
+        : fechaObj.toISOString().split('T')[0];
+      const ahora = new Date();
+      const hoyStr = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
 
       if (fechaIngresadaStr < hoyStr) {
-        // Retornamos 400. El frontend capturará este error y mostrará el mensaje emergente.
         return error(
           res,
-          'La fecha de entrega ingresada es anterior a la actual. Debe cambiarla o eliminar el pedido.',
+          'La fecha de entrega ingresada es anterior a la actual',
           400
         );
       }
+      fechaEntregaFinal = fechaObj;
     }
 
     // Preparamos el objeto con los datos a actualizar (solo agregamos los que vengan en el req.body)
     const datosActualizados = {};
     
-    if (codigoSeguimiento) datosActualizados.codigoSeguimiento = String(codigoSeguimiento).trim();
     if (direccionOrigen) datosActualizados.direccionOrigen = String(direccionOrigen).trim();
     if (direccionDestino) datosActualizados.direccionDestino = String(direccionDestino).trim();
     if (destinatarioNombre) datosActualizados.destinatarioNombre = String(destinatarioNombre).trim();
+    if (destinatarioTelefono !== undefined) {
+      datosActualizados.destinatarioTelefono = String(destinatarioTelefono).trim();
+    }
     if (descripcionProductos) datosActualizados.descripcionProductos = String(descripcionProductos).trim();
     if (notas !== undefined) datosActualizados.notas = notas ? String(notas).trim() : null;
-    if (fechaEntrega) datosActualizados.fechaEntrega = new Date(fechaEntrega);
+    if (fechaEntregaFinal) datosActualizados.fechaEntrega = fechaEntregaFinal;
     // Regla: Desde admin solo se permiten REGISTRADO, ASIGNADO o CANCELADO
     const estadoNormalizado = estado ? String(estado).toUpperCase() : undefined;
     if (estadoNormalizado && !['REGISTRADO', 'ASIGNADO', 'CANCELADO'].includes(estadoNormalizado)) {
