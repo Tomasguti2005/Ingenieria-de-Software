@@ -51,7 +51,7 @@ export default function SeguimientoPedidoScreen({ route }) {
           // ESCENARIO 2: Mensaje exacto requerido
           setErrorMensaje(
             err.message ||
-              'El enlace de seguimiento no es válido o el pedido ya no se encuentra disponible'
+              'El enlace de seguimiento no es válido'
           );
         }
       } finally {
@@ -143,7 +143,7 @@ export default function SeguimientoPedidoScreen({ route }) {
           </Text>
           <Text style={[styles.mensajeError, { color: colors.textMuted }]}>
             {errorMensaje ||
-              'El enlace de seguimiento no es válido o el pedido ya no se encuentra disponible'}
+              'El enlace de seguimiento no es válido'}
           </Text>
         </View>
       </SafeAreaView>

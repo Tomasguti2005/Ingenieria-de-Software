@@ -12,7 +12,7 @@ router.get('/:codigo', async (req, res) => {
 
     if (!codigo || typeof codigo !== 'string' || !codigo.trim()) {
       return res.status(400).json({
-        error: 'El enlace de seguimiento no es válido o el pedido ya no se encuentra disponible',
+        error: 'El enlace de seguimiento no es válido',
       });
     }
 
@@ -48,7 +48,7 @@ router.get('/:codigo', async (req, res) => {
     if (!pedido) {
       console.log(`⚠️ [BACKEND TRACKING] Código "${codigoLimpio}" no existe en la base de datos (404).`);
       return res.status(404).json({
-        error: 'El enlace de seguimiento no es válido o el pedido ya no se encuentra disponible',
+        error: 'El enlace de seguimiento no es válido',
       });
     }
 

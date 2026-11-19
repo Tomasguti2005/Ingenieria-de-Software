@@ -20,9 +20,7 @@ export default function TrackingPage() {
         if (activo) setPedido(resultado);
       } catch (err) {
         if (activo) {
-          setError(
-            err.message || 'El enlace de seguimiento no es válido o el pedido ya no se encuentra disponible'
-          );
+          setError('El enlace de seguimiento no es válido');
         }
       } finally {
         if (activo) setCargando(false);

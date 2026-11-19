@@ -136,7 +136,7 @@ export async function obtenerSeguimientoPedido(codigo) {
   const codigoLimpio = String(codigo || '').trim().toUpperCase();
 
   if (!codigoLimpio) {
-    throw new Error('El enlace de seguimiento no es válido o el pedido ya no se encuentra disponible');
+    throw new Error('El enlace de seguimiento no es válido');
   }
 
   if (USAR_MOCK_PEDIDOS) {
@@ -146,7 +146,7 @@ export async function obtenerSeguimientoPedido(codigo) {
     );
 
     if (!pedido) {
-      throw new Error('El enlace de seguimiento no es válido o el pedido ya no se encuentra disponible');
+      throw new Error('El enlace de seguimiento no es válido');
     }
 
     return pedido;
@@ -155,10 +155,10 @@ export async function obtenerSeguimientoPedido(codigo) {
   try {
     const respuesta = await fetchAPI(`/tracking/${encodeURIComponent(codigoLimpio)}`);
     if (!respuesta || !respuesta.data) {
-      throw new Error('El enlace de seguimiento no es válido o el pedido ya no se encuentra disponible');
+      throw new Error('El enlace de seguimiento no es válido');
     }
     return respuesta.data;
   } catch (_) {
-    throw new Error('El enlace de seguimiento no es válido o el pedido ya no se encuentra disponible');
+    throw new Error('El enlace de seguimiento no es válido');
   }
 }

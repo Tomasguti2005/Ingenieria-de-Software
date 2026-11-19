@@ -333,7 +333,7 @@ export default function EditarPedidoPage() {
   if (cargando) {
     return (
       <div className="editar-pedido-container">
-        <p style={{ color: '#8b949e', padding: '40px 0', textAlign: 'center' }}>
+        <p style={{ color: 'var(--text-muted)', padding: '40px 0', textAlign: 'center' }}>
           Cargando datos del pedido...
         </p>
       </div>
@@ -350,7 +350,7 @@ export default function EditarPedidoPage() {
       {/* Encabezado */}
       <header className="editar-pedido-header">
         <div>
-          <span style={{ fontSize: '12px', color: '#8b949e', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <span style={{ fontSize: '12px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Edición de Pedido #{pedido?.id}{pedido?.codigoSeguimiento ? ` · ${pedido.codigoSeguimiento}` : ''}
           </span>
           <h1 className="editar-pedido-title">Modificar Pedido</h1>
@@ -360,7 +360,7 @@ export default function EditarPedidoPage() {
         {pedido && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '13px', color: '#8b949e' }}>Estado actual:</span>
+              <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Estado actual:</span>
               <span className={`status-pill ${pedido.estado?.toLowerCase()}`}>
                 <span className="status-dot" />
                 <span className="status-label">{pedido.estado?.replace(/_/g, ' ')}</span>

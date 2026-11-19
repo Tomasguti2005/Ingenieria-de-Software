@@ -348,12 +348,12 @@ export default function RutasCreadasPage() {
 
       {/* ── Listado de Rutas ── */}
       {cargando ? (
-        <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>
+        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
           Cargando rutas registradas...
         </div>
       ) : rutas.length === 0 ? (
-        <div style={{ padding: '60px', textAlign: 'center', background: '#121316', borderRadius: '12px', border: '1px solid #22242a' }}>
-          <p style={{ color: '#94a3b8', fontSize: '1.05rem', margin: 0 }}>
+        <div style={{ padding: '60px', textAlign: 'center', background: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border-card)', boxShadow: 'var(--shadow-card)' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem', margin: 0 }}>
             No hay rutas creadas en el sistema todavía. Podés crear la primera desde la sección <strong>Crear rutas</strong>.
           </p>
         </div>

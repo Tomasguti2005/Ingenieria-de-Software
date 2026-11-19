@@ -11,7 +11,7 @@ import { obtenerPedidosVigentes } from './pedidosService';
  */
 export async function obtenerSeguimientoPedido(codigo) {
   if (!codigo || typeof codigo !== 'string' || !codigo.trim()) {
-    throw new Error('El enlace de seguimiento no es válido o el pedido ya no se encuentra disponible');
+    throw new Error('El enlace de seguimiento no es válido');
   }
 
   const codigoNormalizado = codigo.trim();
@@ -28,7 +28,7 @@ export async function obtenerSeguimientoPedido(codigo) {
   } catch (err) {
     // Si el backend responde 404 explícito (pedido no encontrado), lanzamos el error
     if (err && err.status === 404) {
-      throw new Error('El enlace de seguimiento no es válido o el pedido ya no se encuentra disponible');
+      throw new Error('El enlace de seguimiento no es válido');
     }
     // Si es error de conexión (backend apagado), intentamos buscar en los pedidos del front
   }

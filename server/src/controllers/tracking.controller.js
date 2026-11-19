@@ -20,7 +20,7 @@ const obtenerSeguimiento = async (req, res) => {
     });
 
     if (!pedido) {
-      return error(res, 'No se encontró un pedido con ese código de seguimiento.', 404);
+      return error(res, 'El enlace de seguimiento no es válido', 404);
     }
 
     return success(res, pedido);
