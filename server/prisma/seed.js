@@ -1,4 +1,4 @@
-// seed.js — Crea o actualiza la cuenta del administrador, repartidores y pedidos iniciales.
+// seed.js — Crea o actualiza la cuenta del administrador, repartidor, vehículo, ruta y pedidos iniciales.
 // Se ejecuta con: npx prisma db seed o node prisma/seed.js
 // Lee las credenciales de las variables de entorno (.env)
 
@@ -16,7 +16,6 @@ async function main() {
     ADMIN_TELEFONO,
   } = process.env;
 
-  // Validar que todas las variables estén definidas
   if (!ADMIN_EMAIL || !ADMIN_PASSWORD || !ADMIN_NOMBRE || !ADMIN_APELLIDO || !ADMIN_TELEFONO) {
     throw new Error(
       'Faltan variables de entorno para el seed del admin. ' +
@@ -48,6 +47,17 @@ async function main() {
 
   console.log(`✅ Admin creado/actualizado: ${admin.email} (id: ${admin.id})`);
 
+  // Vehículo con formato de patente estándar (AB123CD)
+  const patenteSeed = 'AB123CD';
+  await prisma.vehiculo.upsert({
+    where: { patente: patenteSeed },
+    update: { modelo: 'Renault Kangoo' },
+    create: {
+      patente: patenteSeed,
+      modelo: 'Renault Kangoo',
+    },
+  });
+
   // Repartidor inicial para pruebas en client-mobile
   const repartidorEmail = 'repartidor@repartosya.com';
   const repartidorPasswordHash = await bcrypt.hash('repartidor123', 10);
@@ -61,7 +71,7 @@ async function main() {
       password: repartidorPasswordHash,
       rol: 'REPARTIDOR',
       estado: 'ACTIVO',
-      vehiculo: 'Moto Honda Wave',
+      vehiculo: patenteSeed,
     },
     create: {
       email: repartidorEmail,
@@ -71,13 +81,38 @@ async function main() {
       telefono: '+5492211234567',
       rol: 'REPARTIDOR',
       estado: 'ACTIVO',
-      vehiculo: 'Moto Honda Wave',
+      vehiculo: patenteSeed,
     },
   });
 
-  console.log(`✅ Repartidor creado/actualizado: ${repartidor.email} (id: ${repartidor.id})`);
+  console.log(`✅ Repartidor creado/actualizado: ${repartidor.email} (id: ${repartidor.id}, vehículo: ${patenteSeed})`);
 
-  // Pedidos iniciales para pruebas del sistema y asignación de rutas
+  // Ruta del día asignada al repartidor del seed (para probar bloqueo de estado con pedidos retirados)
+  const hoyInicio = new Date();
+  hoyInicio.setHours(0, 0, 0, 0);
+  const hoyFin = new Date(hoyInicio);
+  hoyFin.setDate(hoyFin.getDate() + 1);
+
+  let rutaSeed = await prisma.ruta.findFirst({
+    where: {
+      nombre: 'Ruta Centro - La Plata',
+      transportistaId: repartidor.id,
+      createdAt: { gte: hoyInicio, lt: hoyFin },
+    },
+  });
+
+  if (!rutaSeed) {
+    rutaSeed = await prisma.ruta.create({
+      data: {
+        nombre: 'Ruta Centro - La Plata',
+        transportistaId: repartidor.id,
+      },
+    });
+  }
+
+  console.log(`✅ Ruta creada/encontrada: ${rutaSeed.nombre} (id: ${rutaSeed.id})`);
+
+  // 5 pedidos libres (REGISTRADO) + 1 pedido FALLIDO + 2 pedidos RETIRADOS/EN_CAMINO en la ruta del seed
   const pedidosIniciales = [
     {
       codigoSeguimiento: 'RY-LP01',
@@ -137,17 +172,34 @@ async function main() {
       destinatarioTelefono: '+5492214455667',
       descripcionProductos: 'Caja de repuestos electrónicos',
       notas: 'Timbre 2B',
+      motivoFallo: 'Domicilio cerrado al momento de la entrega',
       estado: 'FALLIDO',
     },
     {
-      codigoSeguimiento: 'RY-FA02',
+      codigoSeguimiento: 'RY-RT01',
       direccionOrigen: 'Av. 7 N° 850, La Plata',
-      direccionDestino: 'Diagonal 73 N° 1640, La Plata',
-      destinatarioNombre: 'Sofía Pereyra',
-      destinatarioTelefono: '+5492217788990',
-      descripcionProductos: 'Indumentaria deportiva',
-      notas: 'Dejar en recepción si no atiende',
-      estado: 'FALLIDO',
+      direccionDestino: 'Calle 8 N° 640, La Plata',
+      destinatarioNombre: 'Federico Álvarez',
+      destinatarioTelefono: '+5492219988776',
+      descripcionProductos: 'Auriculares inalámbricos',
+      notas: 'Piso 4 Depto B',
+      estado: 'EN_CAMINO',
+      repartidorId: repartidor.id,
+      rutaId: rutaSeed.id,
+      ordenEntrega: 1,
+    },
+    {
+      codigoSeguimiento: 'RY-RT02',
+      direccionOrigen: 'Av. 7 N° 850, La Plata',
+      direccionDestino: 'Calle 47 N° 510, La Plata',
+      destinatarioNombre: 'Valentina Ríos',
+      destinatarioTelefono: '+5492213322110',
+      descripcionProductos: 'Libros universitarios',
+      notas: 'Entregar en mesa de entradas',
+      estado: 'RETIRADO',
+      repartidorId: repartidor.id,
+      rutaId: rutaSeed.id,
+      ordenEntrega: 2,
     },
   ];
 
@@ -161,11 +213,15 @@ async function main() {
         destinatarioTelefono: pedido.destinatarioTelefono,
         descripcionProductos: pedido.descripcionProductos,
         notas: pedido.notas,
+        motivoFallo: pedido.motivoFallo ?? null,
         estado: pedido.estado,
+        repartidorId: pedido.repartidorId ?? null,
+        rutaId: pedido.rutaId ?? null,
+        ordenEntrega: pedido.ordenEntrega ?? null,
       },
       create: pedido,
     });
-    console.log(`📦 Pedido creado/actualizado: ${p.codigoSeguimiento} - ${p.destinatarioNombre} (id: ${p.id})`);
+    console.log(`📦 Pedido creado/actualizado: ${p.codigoSeguimiento} - ${p.destinatarioNombre} (${p.estado})`);
   }
 }
 
